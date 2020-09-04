@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="1"
+    android:layout_margin="@dimen/margin4"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/topic"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:text="@string/lblTopics"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:padding="@dimen/margin4"/>
+
+    <TextView
+        android:id="@+id/progressTopic"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/right_corner_radius"
+        android:layout_weight=".7"
+        android:textColor="@color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:padding="@dimen/margin4"/>
+</LinearLayout>

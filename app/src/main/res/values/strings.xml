@@ -1,0 +1,36 @@
+<resources>
+    <string name="facebook_app_id">1750199605287499</string>
+    <string name="fb_login_protocol_scheme">fb1750199605287499</string>
+
+    <string name="app_name">Gyan Se Pehchan</string>
+    <string name="lblGSP">Gyan Se Pehchan</string>
+    <string name="lblPresents">Presence</string>
+    <string name="lblPoweredBy">Powered by</string>
+    <string name="txtPoweredBy">www.klipinterest.com</string>
+    <string name="lblAllen">ALLEN</string>
+    <string name="txtFB">Login with Facebook</string>
+    <string name="txtGG">Sign in with Google</string>
+    <string name="txtPlay">Play Quiz</string>
+    <string name="lblProfile">Profile</string>
+    <string name="lblEarnCoins">Earn Coins</string>
+    <string name="lblNotification">Notification</string>
+    <string name="lblMoreContests">More Contests</string>
+    <string name="lblSetting">Setting</string>
+    <string name="lblLeaderboard">Leaderboard</string>
+    <string name="lblVideos">Videos</string>
+    <string name="lblBack">Back</string>
+    <string name="lblWonGames">Won Games</string>
+    <string name="lblTotalCoins">Total Coins</string>
+    <string name="lblAvatar">Avatar</string>
+    <string name="lblWin">Win</string>
+    <string name="lblLose">Lose</string>
+    <string name="lblStatistics">Statistics</string>
+    <string name="lblTopics">Topics</string>
+    <string name="lblEdit">Edit</string>
+    <string name="lblShare">Share</string>
+    <string name="lblUpdateMobile">Update mobile no.</string>
+    <string name="lblUpdateLocation">Where are you from</string>
+    <string name="lblUpdateQuote">Express Yourself</string>
+    <string name="lblCancel">Cancel</string>
+    <string name="lblSave">Save</string>
+</resources>
