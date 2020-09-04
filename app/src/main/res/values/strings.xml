@@ -3,7 +3,7 @@
     <string name="fb_login_protocol_scheme">fb1750199605287499</string>
 
     <string name="app_name">Gyan Se Pehchan</string>
-    <string name="lblGSP">Gyan Se Pehchan</string>
+    <string name="lblGSP">GSP</string>
     <string name="lblPresents">Presence</string>
     <string name="lblPoweredBy">Powered by</string>
     <string name="txtPoweredBy">www.klipinterest.com</string>
@@ -33,4 +33,20 @@
     <string name="lblUpdateQuote">Express Yourself</string>
     <string name="lblCancel">Cancel</string>
     <string name="lblSave">Save</string>
+    <string name="txt5">5</string>
+    <string name="lblRedeem">Redeem</string>
+    <string name="lblDay1">Day 1</string>
+    <string name="txt7">7</string>
+    <string name="lblDay2">Day 2</string>
+    <string name="txt10">10</string>
+    <string name="lblDay3">Day 3</string>
+    <string name="lblDay4">Day 4</string>
+    <string name="txt12">12</string>
+    <string name="lblDay5">Day 5</string>
+    <string name="txt15">15</string>
+    <string name="txt17">17</string>
+    <string name="lblDay6">Day 6</string>
+    <string name="lblDay7">Day 7</string>
+    <string name="txt20">20</string>
+    <string name="lblCheckin">Check In</string>
 </resources>

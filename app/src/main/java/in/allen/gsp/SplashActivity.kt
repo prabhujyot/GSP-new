@@ -49,7 +49,7 @@ class SplashActivity : AppCompatActivity() {
         )
     }
 
-    fun btnAction(view: View) {
+    fun btnActionSplash(view: View) {
         if(view.id == R.id.btnFB) {
 
         } else if(view.id == R.id.btnGG) {

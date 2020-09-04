@@ -61,7 +61,7 @@ class IntroActivity : AppCompatActivity() {
         }
     }
 
-    fun swipeNext(view: View) {
+    fun btnActionIntro(view: View) {
         if(view.id == R.id.btnNext && ::parallaxViewPager.isInitialized) {
             var position = parallaxViewPager.currentItem
             if(position < 2) {

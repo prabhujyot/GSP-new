@@ -88,12 +88,35 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    fun btnAction(view: View) {
-        val id = view.id
-        if(id == R.id.btnProfileTop) {
-            startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
-        } else if(id == R.id.btnProfile) {
-            startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+    fun btnActionHome(view: View) {
+        when (view.id) {
+            R.id.btnVideos -> {
+                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+            }
+            R.id.btnLeaderboard -> {
+                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+            }
+            R.id.btnProfileTop -> {
+                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+            }
+            R.id.btnPlay -> {
+                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+            }
+            R.id.btnProfile -> {
+                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+            }
+            R.id.btnCoins -> {
+                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+            }
+            R.id.btnNotification -> {
+                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+            }
+            R.id.btnContests -> {
+                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+            }
+            R.id.btnSetting -> {
+                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+            }
         }
     }
 }

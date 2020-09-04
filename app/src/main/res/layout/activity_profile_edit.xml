@@ -144,6 +144,7 @@
                             android:layout_marginBottom="@dimen/margin8"
                             android:weightSum="1">
                             <Button
+                                android:id="@+id/btnCancel"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight=".5"
@@ -152,9 +153,11 @@
                                 android:textAllCaps="false"
                                 android:textStyle="bold"
                                 android:background="@drawable/bg_btn_orange"
-                                android:layout_marginEnd="@dimen/margin4"/>
+                                android:layout_marginEnd="@dimen/margin4"
+                                android:onClick="btnActionProfileEdit"/>
 
                             <Button
+                                android:id="@+id/btnSave"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight=".5"
@@ -163,7 +166,8 @@
                                 android:textAllCaps="false"
                                 android:textStyle="bold"
                                 android:background="@drawable/bg_btn_blue"
-                                android:layout_marginLeft="@dimen/margin4"/>
+                                android:layout_marginLeft="@dimen/margin4"
+                                android:onClick="btnActionProfileEdit"/>
                         </LinearLayout>
 
                     </LinearLayout>

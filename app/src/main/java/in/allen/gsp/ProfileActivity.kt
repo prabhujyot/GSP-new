@@ -41,14 +41,13 @@ class ProfileActivity : AppCompatActivity() {
         toolbar.setContentInsetsAbsolute(0, 0)
         setSupportActionBar(toolbar)
 
-
         toolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 
         app = application as App
 
-        scrollView.setOnScrollChangeListener { v: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
+        scrollView.setOnScrollChangeListener { _: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
             Log.d(
                 tag,
                 "scrollx $scrollX, scrolly $scrollY, oldScrollX $oldScrollX, oldScrollY $oldScrollY"

@@ -42,7 +42,7 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:contentDescription="@string/lblVideos"
-            android:onClick="btnAction"
+            android:onClick="btnActionHome"
             android:scaleType="center"
             android:src="@drawable/ic_video"
             app:layout_constraintBottom_toBottomOf="@id/btnLeaderboard"
@@ -57,7 +57,7 @@
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:contentDescription="@string/lblLeaderboard"
-            android:onClick="btnAction"
+            android:onClick="btnActionHome"
             android:scaleType="center"
             android:src="@drawable/ic_leaderboard"
             app:layout_constraintBottom_toBottomOf="@id/btnProfileTop"
@@ -74,7 +74,7 @@
             android:scaleType="center"
             android:src="@drawable/ic_profile"
             android:tint="@color/yellow"
-            android:onClick="btnAction"
+            android:onClick="btnActionHome"
             app:layout_constraintTop_toTopOf="@id/allen"
             app:layout_constraintBottom_toBottomOf="@id/allen"
             app:layout_constraintEnd_toEndOf="parent"
@@ -120,7 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_btn_orange"
-            android:onClick="btnAction"
+            android:onClick="btnActionHome"
             android:paddingLeft="@dimen/margin56"
             android:paddingRight="@dimen/margin56"
             android:text="@string/txtPlay"
@@ -175,7 +175,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".2"
                 android:gravity="center_horizontal"
-                android:onClick="btnAction"
+                android:onClick="btnActionHome"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -204,7 +204,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".2"
                 android:gravity="center_horizontal"
-                android:onClick="btnAction"
+                android:onClick="btnActionHome"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -233,7 +233,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".2"
                 android:gravity="center_horizontal"
-                android:onClick="btnAction"
+                android:onClick="btnActionHome"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -262,7 +262,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".2"
                 android:gravity="center_horizontal"
-                android:onClick="btnAction"
+                android:onClick="btnActionHome"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -291,7 +291,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight=".2"
                 android:gravity="center_horizontal"
-                android:onClick="btnAction"
+                android:onClick="btnActionHome"
                 android:orientation="vertical">
 
                 <ImageButton
