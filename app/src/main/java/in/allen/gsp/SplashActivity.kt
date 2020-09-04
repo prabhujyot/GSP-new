@@ -11,7 +11,7 @@ import kotlinx.android.synthetic.main.activity_splash.*
 
 class SplashActivity : AppCompatActivity() {
 
-    private val tag = SplashActivity::class.java.name
+    private val TAG = SplashActivity::class.java.name
 
     private lateinit var app: App
     private lateinit var appPreferences: AppPreferences

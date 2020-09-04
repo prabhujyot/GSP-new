@@ -8,7 +8,7 @@
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -132,16 +132,10 @@
                 app:layout_constraintStart_toStartOf="@id/bgHeader"
                 app:layout_constraintTop_toBottomOf="@id/guidelineTop">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/margin8">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="@dimen/margin4">
+                        android:padding="@dimen/margin8">
                         <ImageView
                             android:id="@+id/imgDay1"
                             android:layout_width="0dp"
@@ -416,26 +410,7 @@
                             android:layout_marginTop="@dimen/margin16"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-                </LinearLayout>
-
-
             </androidx.cardview.widget.CardView>
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_scrollFlags="noScroll"
-                app:layout_constraintTop_toBottomOf="@id/layoutCheckin"
-                app:layout_constraintStart_toStartOf="parent"/>
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/viewPager2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/tabLayout"
-                app:layout_constraintStart_toStartOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

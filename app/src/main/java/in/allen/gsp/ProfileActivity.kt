@@ -27,7 +27,7 @@ import kotlin.random.Random
 
 class ProfileActivity : AppCompatActivity() {
 
-    private val tag = ProfileActivity::class.java.name
+    private val TAG = ProfileActivity::class.java.name
 
     private lateinit var app: App
     private lateinit var appPreferences: AppPreferences
@@ -48,10 +48,6 @@ class ProfileActivity : AppCompatActivity() {
         app = application as App
 
         scrollView.setOnScrollChangeListener { _: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
-            Log.d(
-                tag,
-                "scrollx $scrollX, scrolly $scrollY, oldScrollX $oldScrollX, oldScrollY $oldScrollY"
-            )
             if(scrollY > 40) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
                 toolbar.background.alpha = 240

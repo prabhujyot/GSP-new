@@ -2,7 +2,6 @@ package `in`.allen.gsp
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,14 +9,14 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.PagerAdapter
-import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.activity_home.*
 
 class HomeActivity : AppCompatActivity() {
 
-    private val tag = HomeActivity::class.java.name
-    private lateinit var viewpagerContest: ViewPager
+    private val TAG = HomeActivity::class.java.name
 
     private val contestList = ArrayList<HashMap<String,String>>()
 
@@ -25,7 +24,6 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        viewpagerContest = findViewById(R.id.viewpagerContest)
         viewpagerContest.pageMargin = 16
         viewpagerContest.adapter = ContestAdapter(this,layoutInflater,contestList)
 

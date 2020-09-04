@@ -13,7 +13,7 @@ import com.gohn.parallaxviewpager.ParallaxViewPager
 
 class IntroActivity : AppCompatActivity() {
 
-    private val tag = IntroActivity::class.java.name
+    private val TAG = IntroActivity::class.java.name
     private lateinit var parallaxViewPager: ParallaxViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {

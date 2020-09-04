@@ -2,20 +2,16 @@ package `in`.allen.gsp
 
 import `in`.allen.gsp.helpers.App
 import `in`.allen.gsp.helpers.AppPreferences
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.widget.NestedScrollView
-import kotlinx.android.synthetic.main.activity_reward.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 class RewardActivity : AppCompatActivity() {
 
-    private val tag = RewardActivity::class.java.name
+    private val TAG = RewardActivity::class.java.name
 
     private lateinit var app: App
     private lateinit var appPreferences: AppPreferences
@@ -35,23 +31,20 @@ class RewardActivity : AppCompatActivity() {
 
         app = application as App
 
-        scrollView.setOnScrollChangeListener { _: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
-            Log.d(
-                tag,
-                "scrollx $scrollX, scrolly $scrollY, oldScrollX $oldScrollX, oldScrollY $oldScrollY"
-            )
-            if(scrollY > 40) {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                toolbar.background.alpha = 240
-            } else {
-                window.setFlags(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                )
-                toolbar.background.alpha = 0
-            }
-        }
+//        scrollView.setOnScrollChangeListener { _: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
+//            if(scrollY > 40) {
+//                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+//                toolbar.background.alpha = 240
+//            } else {
+//                window.setFlags(
+//                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+//                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+//                )
+//                toolbar.background.alpha = 0
+//            }
+//        }
     }
 
     fun btnActionReward(view: View) {}
+
 }
