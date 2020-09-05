@@ -93,4 +93,9 @@
         \nHello blank fragment
         \nHello blank fragment
     </string>
+    <string name="lblTopPlayers">Top Players</string>
+    <string name="lblUsername">Username</string>
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
 </resources>

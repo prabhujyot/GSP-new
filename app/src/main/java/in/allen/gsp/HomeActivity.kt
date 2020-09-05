@@ -92,7 +92,7 @@ class HomeActivity : AppCompatActivity() {
                 startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
             }
             R.id.btnLeaderboard -> {
-                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+                startActivity(Intent(this@HomeActivity, LeaderboardActivity::class.java))
             }
             R.id.btnProfileTop -> {
                 startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
