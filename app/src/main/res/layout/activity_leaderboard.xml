@@ -13,7 +13,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:fitsSystemWindows="true"
             android:background="@drawable/gradiant_blue"
             app:contentScrim="@color/blue"
             app:titleEnabled="false">
@@ -189,40 +188,7 @@
                     android:gravity="center"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_marginTop="24dp"
-                app:layout_collapseMode="pin">
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageButton
-                        android:id="@+id/btnBack"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:adjustViewBounds="true"
-                        android:background="@android:color/transparent"
-                        android:padding="@dimen/margin16"
-                        android:src="@drawable/arrow_previous"
-                        app:layout_constraintStart_toStartOf="parent"
-                        android:tint="@color/white"
-                        android:contentDescription="@string/lblBack" />
-
-                    <TextView
-                        android:id="@+id/toolbarTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textColor="@color/white"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
-                        app:layout_constraintStart_toEndOf="@id/btnBack"
-                        app:layout_constraintTop_toTopOf="@id/btnBack"
-                        app:layout_constraintBottom_toBottomOf="@id/btnBack"
-                        android:layout_marginStart="@dimen/margin8"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </androidx.appcompat.widget.Toolbar>
+            <include layout="@layout/toolbar"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
