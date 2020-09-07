@@ -24,29 +24,13 @@ class ProfileEditActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_edit)
 
-        toolbar.background = ResourcesCompat.getDrawable(resources, R.drawable.gradiant_blue, null)
-        toolbar.background.alpha = 0
-        toolbar.setContentInsetsAbsolute(0, 0)
         setSupportActionBar(toolbar)
-
         toolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 
         app = application as App
 
-        scrollView.setOnScrollChangeListener { _: NestedScrollView?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int ->
-            if(scrollY > 40) {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
-                toolbar.background.alpha = 240
-            } else {
-                window.setFlags(
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                )
-                toolbar.background.alpha = 0
-            }
-        }
     }
 
     fun btnActionProfileEdit(view: View) {}
