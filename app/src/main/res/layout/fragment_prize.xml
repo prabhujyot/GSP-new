@@ -3,12 +3,279 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.Prize">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.PrizeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <HorizontalScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin24"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin8"
+                app:cardBackgroundColor="@color/yellow"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="@dimen/margin1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <TextView
+                        android:id="@+id/prize50"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin4"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin4"
+                        android:paddingRight="@dimen/margin8"
+                        android:text=" 50/-"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:drawableStartCompat="@drawable/ruppee" />
+
+                    <TextView
+                        android:id="@+id/coins50"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_btn_white"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin2"
+                        android:paddingRight="@dimen/margin8"
+                        android:paddingBottom="@dimen/margin2"
+                        android:text="25000"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/bag50"
+                        app:layout_constraintEnd_toStartOf="@+id/bag50"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/bag50" />
+
+                    <ImageView
+                        android:id="@+id/bag50"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginRight="@dimen/margin4"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/ruppee_bag_o"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/coins50" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/margin8"
+                app:cardBackgroundColor="@color/orange"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="@dimen/margin1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <TextView
+                        android:id="@+id/prize100"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin4"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin4"
+                        android:paddingRight="@dimen/margin8"
+                        android:text=" 100/-"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:drawableStartCompat="@drawable/ruppee"
+                        android:drawableTint="@color/white"/>
+
+                    <TextView
+                        android:id="@+id/coins100"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_btn_white"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin2"
+                        android:paddingRight="@dimen/margin8"
+                        android:paddingBottom="@dimen/margin2"
+                        android:text="50000"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/bag100"
+                        app:layout_constraintEnd_toStartOf="@+id/bag100"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/bag100" />
+
+                    <ImageView
+                        android:id="@+id/bag100"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginRight="@dimen/margin4"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/ruppee_bag_y"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/coins100" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin8"
+                app:cardBackgroundColor="@color/voilet"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="@dimen/margin1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <TextView
+                        android:id="@+id/prize150"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin4"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin4"
+                        android:paddingRight="@dimen/margin8"
+                        android:text=" 150/-"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:drawableStartCompat="@drawable/ruppee"
+                        android:drawableTint="@color/white"/>
+
+                    <TextView
+                        android:id="@+id/coins150"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_btn_white"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin2"
+                        android:paddingRight="@dimen/margin8"
+                        android:paddingBottom="@dimen/margin2"
+                        android:text="75000"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/bag150"
+                        app:layout_constraintEnd_toStartOf="@+id/bag150"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/bag150" />
+
+                    <ImageView
+                        android:id="@+id/bag150"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="@dimen/margin4"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/ruppee_bag_y"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/coins150" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/lightBlue"
+                app:cardCornerRadius="4dp"
+                app:cardElevation="@dimen/margin1">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="110dp"
+                    android:layout_height="95dp">
+
+                    <TextView
+                        android:id="@+id/prize200"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/margin4"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin4"
+                        android:paddingRight="@dimen/margin8"
+                        android:text=" 200/-"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:drawableStartCompat="@drawable/ruppee"
+                        android:drawableTint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/coins200"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_btn_white"
+                        android:paddingLeft="@dimen/margin8"
+                        android:paddingTop="@dimen/margin2"
+                        android:paddingRight="@dimen/margin8"
+                        android:paddingBottom="@dimen/margin2"
+                        android:text="100000"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/bag200"
+                        app:layout_constraintEnd_toStartOf="@+id/bag200"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/bag200" />
+
+                    <ImageView
+                        android:id="@+id/bag200"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="@dimen/margin4"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/ruppee_bag_o"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/coins200" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
 </FrameLayout>

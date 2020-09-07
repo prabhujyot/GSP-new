@@ -8,15 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-class Prize : Fragment() {
+class PrizeFragment : Fragment() {
 
-    private val TAG = Prize::class.java.name
+    private val TAG = PrizeFragment::class.java.name
 
     private lateinit var parentActivity: RewardActivity
     private lateinit var rootView: View
 
+    private var position = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.let {
+            position = it.getInt("position")
+        }
+
         parentActivity = activity as RewardActivity
     }
 
@@ -30,6 +36,10 @@ class Prize : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance() = Prize()
+        fun newInstance(position: Int) = PrizeFragment().apply {
+            arguments = Bundle().apply {
+                putInt("position", position)
+            }
+        }
     }
 }

@@ -31,4 +31,7 @@
     <color name="yellow">#ffee00</color>
     <color name="red">#db3100</color>
     <color name="blue">#f2141574</color>
+    <color name="orange">#f83329</color>
+    <color name="voilet">#a228d9</color>
+    <color name="lightBlue">#10828f</color>
 </resources>
