@@ -26,8 +26,8 @@ class RewardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reward)
 
-        setSupportActionBar(toolbar)
-        toolbar.btnBack.setOnClickListener {
+        setSupportActionBar(myToolbar)
+        myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 

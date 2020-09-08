@@ -26,8 +26,8 @@ class VideosActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_videos)
 
-        setSupportActionBar(toolbar)
-        toolbar.btnBack.setOnClickListener {
+        setSupportActionBar(myToolbar)
+        myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 

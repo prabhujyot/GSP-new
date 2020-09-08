@@ -18,21 +18,21 @@ class HomeActivity : AppCompatActivity() {
 
     private val TAG = HomeActivity::class.java.name
 
-    private val contestList = ArrayList<HashMap<String,String>>()
+    private val contestList = ArrayList<HashMap<String, String>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         viewpagerContest.pageMargin = 16
-        viewpagerContest.adapter = ContestAdapter(this,layoutInflater,contestList)
+        viewpagerContest.adapter = ContestAdapter(this, layoutInflater, contestList)
 
         getContestList()
     }
 
     private fun getContestList() {
         contestList.clear()
-        var hashMap = HashMap<String,String>()
+        var hashMap = HashMap<String, String>()
         hashMap["image"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTaqSCG-_PRudGH3PnjI5WD0NHRbqrioLFqJQ&usqp=CAU"
         hashMap["title"] = "Rakshabandhan contest"
         contestList.add(hashMap)
@@ -51,7 +51,7 @@ class HomeActivity : AppCompatActivity() {
     private class ContestAdapter(
         private val context: Context,
         private val inflater: LayoutInflater,
-        private val list: ArrayList<HashMap<String,String>>
+        private val list: ArrayList<HashMap<String, String>>
     ): PagerAdapter() {
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -87,34 +87,37 @@ class HomeActivity : AppCompatActivity() {
     }
 
     fun btnActionHome(view: View) {
+        val i = Intent()
         when (view.id) {
             R.id.btnVideos -> {
-                startActivity(Intent(this@HomeActivity, VideosActivity::class.java))
+                i.setClass(this@HomeActivity, VideosActivity::class.java)
             }
             R.id.btnLeaderboard -> {
-                startActivity(Intent(this@HomeActivity, LeaderboardActivity::class.java))
+                i.setClass(this@HomeActivity, LeaderboardActivity::class.java)
             }
             R.id.btnProfileTop -> {
-                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+                i.setClass(this@HomeActivity, ProfileActivity::class.java)
             }
             R.id.btnPlay -> {
-                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+                i.setClass(this@HomeActivity, ProfileActivity::class.java)
             }
             R.id.btnProfile -> {
-                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+                i.setClass(this@HomeActivity, ProfileActivity::class.java)
             }
             R.id.btnCoins -> {
-                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+                i.setClass(this@HomeActivity, RewardActivity::class.java)
             }
             R.id.btnNotification -> {
-                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+                i.setClass(this@HomeActivity, RewardActivity::class.java)
             }
             R.id.btnContests -> {
-                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+                i.setClass(this@HomeActivity, WebActivity::class.java)
+                i.putExtra("url", BuildConfig.BASE_URL + "category/quiz-time/")
             }
             R.id.btnSetting -> {
-                startActivity(Intent(this@HomeActivity, RewardActivity::class.java))
+                i.setClass(this@HomeActivity, RewardActivity::class.java)
             }
         }
+        startActivity(i)
     }
 }
