@@ -89,7 +89,7 @@ class HomeActivity : AppCompatActivity() {
     fun btnActionHome(view: View) {
         when (view.id) {
             R.id.btnVideos -> {
-                startActivity(Intent(this@HomeActivity, ProfileActivity::class.java))
+                startActivity(Intent(this@HomeActivity, VideosActivity::class.java))
             }
             R.id.btnLeaderboard -> {
                 startActivity(Intent(this@HomeActivity, LeaderboardActivity::class.java))

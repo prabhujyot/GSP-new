@@ -1,6 +1,7 @@
 <resources>
     <string name="facebook_app_id">1750199605287499</string>
     <string name="fb_login_protocol_scheme">fb1750199605287499</string>
+    <string name="yt_api_key">AIzaSyDbpMioiHvdMHmA41UETZy6sCO1txortVc</string>
 
     <string name="app_name">Gyan Se Pehchan</string>
     <string name="lblGSP">GSP</string>
@@ -115,4 +116,5 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="lblComment">Comment</string>
 </resources>
