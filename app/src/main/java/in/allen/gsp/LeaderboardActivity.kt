@@ -28,8 +28,8 @@ class LeaderboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_leaderboard)
 
-        setSupportActionBar(toolbar)
-        toolbar.btnBack.setOnClickListener {
+        setSupportActionBar(myToolbar)
+        myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 

@@ -62,7 +62,8 @@
             app:layout_constraintEnd_toStartOf="@id/guideline3"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@id/guideline2"
-            app:layout_constraintTop_toTopOf="@id/rank_avatar" />
+            app:layout_constraintTop_toTopOf="@id/rank_avatar"
+            android:layout_marginEnd="@dimen/margin8"/>
 
         <TextView
             android:id="@+id/rank_score"

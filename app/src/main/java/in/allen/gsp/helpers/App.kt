@@ -25,6 +25,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.text.SimpleDateFormat
+import java.util.*
 
 class App: Application() {
 
@@ -46,9 +48,15 @@ class App: Application() {
         MultiDex.install(this)
     }
 
+    fun milisToFormat(milliseconds: Long, format: String?): String? {
+        val sdf = SimpleDateFormat(format)
+        val resultdate = Date(milliseconds)
+        return sdf.format(resultdate)
+    }
+
     fun writeStringToFile(data: String, fileName: String){
         val file = File(getExternalFilesDir(null), fileName)
-        Log.d(tag,"Writing to : $file")
+        Log.d(tag, "Writing to : $file")
         file.writeText(data)
     }
 
@@ -57,13 +65,13 @@ class App: Application() {
         val file = File(getExternalFilesDir(null), fileName)
         if(file.exists()) {
             content = file.readText()
-            Log.d(tag,"Reading from : $file")
+            Log.d(tag, "Reading from : $file")
         }
         return content
     }
 
     fun drawaleGradiantColor(drawableId: Int, colorList: IntArray?): GradientDrawable {
-        val background = ResourcesCompat.getDrawable(resources, drawableId,null) as GradientDrawable
+        val background = ResourcesCompat.getDrawable(resources, drawableId, null) as GradientDrawable
         background.mutate()
         background.colors = colorList
         return background
@@ -88,7 +96,7 @@ class App: Application() {
         return file
     }
 
-    fun shareLink(context: Context, url: String, extra:String) {
+    fun shareLink(context: Context, url: String, extra: String) {
         val sendIntent = Intent()
         sendIntent.action = Intent.ACTION_SEND;
         sendIntent.putExtra(Intent.EXTRA_TEXT, "$extra $url")
@@ -105,7 +113,8 @@ class App: Application() {
         try {
             val info = packageManager.getPackageInfo(
                 BuildConfig.APPLICATION_ID,
-                PackageManager.GET_SIGNATURES)
+                PackageManager.GET_SIGNATURES
+            )
             for (signature in info.signatures) {
                 val md = MessageDigest.getInstance("SHA")
                 md.update(signature.toByteArray())
@@ -120,7 +129,9 @@ class App: Application() {
         val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
             .setLink(Uri.parse("https://gsp.allen.in?referral_id=" + "preferences.userID"))
             .setDomainUriPrefix("https://gsp.page.link") // Open links with this app on Android
-            .setAndroidParameters(DynamicLink.AndroidParameters.Builder(BuildConfig.APPLICATION_ID).build())
+            .setAndroidParameters(
+                DynamicLink.AndroidParameters.Builder(BuildConfig.APPLICATION_ID).build()
+            )
             .buildDynamicLink()
         FirebaseDynamicLinks.getInstance().createDynamicLink()
             .setLongLink(Uri.parse(dynamicLink.uri.toString()))

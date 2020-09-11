@@ -124,8 +124,8 @@
             android:id="@+id/layoutCheckin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin32"
-            android:layout_marginRight="@dimen/margin32"
+            android:layout_marginLeft="@dimen/margin24"
+            android:layout_marginRight="@dimen/margin24"
             android:background="@drawable/bg_btn_gray">
 
             <androidx.constraintlayout.widget.ConstraintLayout

@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:onClick="btnActionSplash"
-                android:layout_marginTop="@dimen/margin8">
+                android:layout_marginTop="@dimen/margin16">
                 <ImageView
                     android:id="@+id/imgGG"
                     android:layout_width="wrap_content"

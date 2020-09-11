@@ -4,20 +4,15 @@ import `in`.allen.gsp.helpers.App
 import `in`.allen.gsp.helpers.AppPreferences
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.widget.NestedScrollView
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.item_topic_progress.view.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -36,8 +31,8 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        setSupportActionBar(toolbar)
-        toolbar.btnBack.setOnClickListener {
+        setSupportActionBar(myToolbar)
+        myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 

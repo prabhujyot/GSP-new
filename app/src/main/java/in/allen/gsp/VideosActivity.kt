@@ -1,12 +1,11 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.fragments.PrizeFragment
-import `in`.allen.gsp.fragments.StatementFragment
+import `in`.allen.gsp.fragments.PlaylistFragment
 import `in`.allen.gsp.helpers.App
 import `in`.allen.gsp.helpers.AppPreferences
+import `in`.allen.gsp.helpers.services.WebServices
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -15,16 +14,17 @@ import kotlinx.android.synthetic.main.activity_reward.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
-class RewardActivity : AppCompatActivity() {
+class VideosActivity : AppCompatActivity() {
 
-    private val TAG = RewardActivity::class.java.name
+    private val TAG = VideosActivity::class.java.name
 
-    private lateinit var app: App
+    lateinit var app: App
+    lateinit var webServices: WebServices
     private lateinit var appPreferences: AppPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reward)
+        setContentView(R.layout.activity_videos)
 
         setSupportActionBar(myToolbar)
         myToolbar.btnBack.setOnClickListener {
@@ -32,22 +32,13 @@ class RewardActivity : AppCompatActivity() {
         }
 
         app = application as App
+        webServices = WebServices()
 
         viewPager2.isUserInputEnabled = false
         viewPager2.adapter = FragmentAdapter(this)
 
         TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
-            when (position) {
-                0 -> {
-                    tab.text = "Prizes"
-                }
-                1 -> {
-                    tab.text = "Earned"
-                }
-                2 -> {
-                    tab.text = "Redeemed"
-                }
-            }
+            tab.text = "Playlist ${(position + 1)}"
         }.attach()
     }
 
@@ -57,22 +48,22 @@ class RewardActivity : AppCompatActivity() {
         val fragmentList = ArrayList<Fragment>()
 
         override fun getItemCount(): Int {
-            return 3
+            return 2
         }
 
         override fun createFragment(position: Int): Fragment {
-            var frg:Fragment ?= null
-
-            if(position == 0) {
-                frg = PrizeFragment.newInstance(position)
-            } else if(position > 0) {
-                frg = StatementFragment.newInstance(position)
+            val playlistId: String = if(position == 0) {
+                "PLQ2YKhBryYBzh3NJW1uj1BWZhSODodI8r"
+            } else {
+                "PLQ2YKhBryYByhl0Zh-gluJ0uHpq3frZWy"
             }
+
+            val frg = PlaylistFragment.newInstance(playlistId)
 
             if(fragmentList.size < itemCount && !fragmentList.contains(frg)) {
-                fragmentList.add(frg!!)
+                fragmentList.add(frg)
             }
-            return frg!!
+            return frg
         }
 
         fun getFragment(position: Int): Fragment {
@@ -81,7 +72,4 @@ class RewardActivity : AppCompatActivity() {
         }
 
     }
-
-    fun btnActionReward(view: View) {}
-
 }
