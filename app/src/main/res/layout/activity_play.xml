@@ -8,6 +8,8 @@
     android:keepScreenOn="true"
     tools:context=".PlayActivity">
 
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -37,302 +39,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.slidingpanelayout.widget.SlidingPaneLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin80"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:id="@+id/layoutPoints"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/right_corner_radius"
-                    android:orientation="vertical"
-                    android:paddingLeft="@dimen/margin24"
-                    android:paddingTop="@dimen/margin16"
-                    android:paddingRight="@dimen/margin24"
-                    android:paddingBottom="@dimen/margin16">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblQuizPoints"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q15"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="1000000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q14"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="500000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q13"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="250000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q12"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="125000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q11"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="64000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/level3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:background="@drawable/bg_btn_black"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblLevel3"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q10"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="32000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q9"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="16000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q8"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="8000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q7"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="4000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q6"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="2000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/level2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:background="@drawable/bg_btn_black"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblLevel2"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q5"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="1000"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q4"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="500"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="300"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="200"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/q1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_btn_yellow"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="100"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/black"
-                        android:textStyle="bold" />
-
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/level1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:background="@drawable/bg_btn_black"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblLevel1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/btnPane"
-                    android:layout_width="24dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/right_corner_radius"
-                    android:src="@drawable/arrow_next" />
-            </LinearLayout>
-
-
-        </androidx.slidingpanelayout.widget.SlidingPaneLayout>
-
         <TextView
             android:id="@+id/qno"
             android:layout_width="wrap_content"
@@ -340,7 +46,7 @@
             android:layout_marginStart="@dimen/margin24"
             android:layout_marginTop="@dimen/margin80"
             android:text="Q.No.: 1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -458,6 +164,314 @@
             app:layout_constraintStart_toEndOf="@+id/btnFlip"
             app:layout_constraintTop_toTopOf="@id/progressTimer" />
 
+        <!-- Question -->
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/question"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin8"
+            android:text="The Jatropha curcas, source of inedible vegetable oil that is used to produce biofuel and which works as a carbon sink is native to which of the following regions of the world?"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
+            app:layout_constraintEnd_toEndOf="@id/textScore"
+            app:layout_constraintStart_toStartOf="@id/textMultiplier"
+            app:layout_constraintTop_toBottomOf="@id/progressTimer" />
+
+        <SlidingDrawer
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin80"
+            android:content="@id/layoutPoints"
+            android:handle="@id/btnPane"
+            android:orientation="horizontal"
+            android:rotation="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <LinearLayout
+                android:id="@+id/layoutPoints"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/left_corner_radius"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/margin24"
+                android:paddingTop="@dimen/margin16"
+                android:paddingRight="@dimen/margin24"
+                android:paddingBottom="@dimen/margin16">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin8"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="@string/lblQuizPoints"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q15"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="1000000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="500000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q13"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="250000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q12"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="125000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q11"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="64000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/level3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin4"
+                    android:layout_marginBottom="@dimen/margin8"
+                    android:background="@drawable/bg_btn_black"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="@string/lblLevel3"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q10"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="32000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q9"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="16000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="8000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="4000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="2000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/level2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin4"
+                    android:layout_marginBottom="@dimen/margin8"
+                    android:background="@drawable/bg_btn_black"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="@string/lblLevel2"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="1000"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="500"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="300"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="200"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/q1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_yellow"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="100"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/level1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/margin4"
+                    android:background="@drawable/bg_btn_black"
+                    android:paddingLeft="@dimen/margin16"
+                    android:paddingTop="@dimen/margin2"
+                    android:paddingRight="@dimen/margin16"
+                    android:paddingBottom="@dimen/margin2"
+                    android:text="@string/lblLevel1"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnPane"
+                android:layout_width="24dp"
+                android:layout_height="72dp"
+                android:background="@drawable/left_corner_radius"
+                android:src="@drawable/arrow_previous" />
+
+
+        </SlidingDrawer>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -472,7 +486,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65" />
+        app:layout_constraintGuide_percent="0.68" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
