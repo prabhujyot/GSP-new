@@ -14,4 +14,5 @@
     <dimen name="margin60">60dp</dimen>
     <dimen name="margin84">84dp</dimen>
     <dimen name="margin88">88dp</dimen>
+    <dimen name="margin80">80dp</dimen>
 </resources>

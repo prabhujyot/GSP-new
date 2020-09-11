@@ -99,7 +99,7 @@ class HomeActivity : AppCompatActivity() {
                 i.setClass(this@HomeActivity, ProfileActivity::class.java)
             }
             R.id.btnPlay -> {
-                i.setClass(this@HomeActivity, ProfileActivity::class.java)
+                i.setClass(this@HomeActivity, PlayActivity::class.java)
             }
             R.id.btnProfile -> {
                 i.setClass(this@HomeActivity, ProfileActivity::class.java)

@@ -117,4 +117,8 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="lblComment">Comment</string>
+    <string name="lblScore">Score</string>
+    <string name="lblLevel2">Level 2</string>
+    <string name="lblLevel1">Level 1</string>
+    <string name="lblLevel3">Level 3</string>
 </resources>
