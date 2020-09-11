@@ -8,8 +8,6 @@
     android:keepScreenOn="true"
     tools:context=".PlayActivity">
 
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -31,25 +29,37 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <include
-            layout="@layout/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin24"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <include-->
+<!--            layout="@layout/toolbar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="@dimen/margin24"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
         <TextView
             android:id="@+id/qno"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin24"
-            android:layout_marginTop="@dimen/margin80"
+            android:layout_marginTop="@dimen/margin24"
             android:text="Q.No.: 1"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin24"
+            android:layout_marginTop="@dimen/margin24"
+            android:src="@drawable/ic_close"
+            android:tint="@color/white"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
@@ -168,7 +178,7 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/question"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin8"
             android:text="The Jatropha curcas, source of inedible vegetable oil that is used to produce biofuel and which works as a carbon sink is native to which of the following regions of the world?"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -178,6 +188,22 @@
             app:layout_constraintEnd_toEndOf="@id/textScore"
             app:layout_constraintStart_toStartOf="@id/textMultiplier"
             app:layout_constraintTop_toBottomOf="@id/progressTimer" />
+
+
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineQuestion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.40" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guidelineAttachment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.68" />
 
         <SlidingDrawer
             android:layout_width="220dp"
@@ -468,25 +494,11 @@
                 android:layout_height="72dp"
                 android:background="@drawable/left_corner_radius"
                 android:src="@drawable/arrow_previous" />
-
-
         </SlidingDrawer>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineQuestion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.43" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guidelineAttachment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.68" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
