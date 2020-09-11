@@ -42,7 +42,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin24"
-            android:layout_marginTop="@dimen/margin24"
+            android:layout_marginTop="@dimen/margin48"
             android:text="Q.No.: 1"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
@@ -55,18 +55,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/margin24"
-            android:layout_marginTop="@dimen/margin24"
             android:src="@drawable/ic_close"
             android:tint="@color/white"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="@id/qno" />
 
         <ProgressBar
             android:id="@+id/progressMultiplier"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="match_parent"
-            android:layout_height="4dp"
+            android:layout_height="2dp"
             android:layout_marginTop="@dimen/margin8"
             android:progress="80"
             android:progressDrawable="@drawable/progressbar"
@@ -79,15 +78,15 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin24"
             android:layout_marginTop="@dimen/margin8"
-            android:drawableStart="@drawable/ic_action_clock"
-            android:drawableTint="@color/yellow"
+            app:drawableTint="@color/yellow"
             android:gravity="center_vertical"
             android:text=" 05"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progressMultiplier" />
+            app:layout_constraintTop_toBottomOf="@id/progressMultiplier"
+            app:drawableStartCompat="@drawable/ic_action_clock" />
 
         <TextView
             android:id="@+id/lblScore"
@@ -141,16 +140,33 @@
 
         <ProgressBar
             android:id="@+id/progressTimer"
-            style="@style/Widget.AppCompat.ProgressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:progress="80"
+            android:progress="60"
+            android:indeterminate="false"
+            android:max="100"
+            android:background="@drawable/bg_circle_black"
             android:progressDrawable="@drawable/circular_progressbar"
             app:layout_constraintEnd_toStartOf="@+id/btnFlip"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btnFiftyFifty"
             app:layout_constraintTop_toBottomOf="@id/textMultiplier" />
+
+        <TextView
+            android:id="@+id/textTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="90"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/progressTimer"
+            app:layout_constraintEnd_toEndOf="@id/progressTimer"
+            app:layout_constraintStart_toStartOf="@id/progressTimer"
+            app:layout_constraintTop_toTopOf="@id/progressTimer" />
 
         <ImageButton
             android:id="@+id/btnFlip"
@@ -178,32 +194,46 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/question"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="@dimen/margin8"
-            android:text="The Jatropha curcas, source of inedible vegetable oil that is used to produce biofuel and which works as a carbon sink is native to which of the following regions of the world?"
+            android:text="The Jatropha curcas."
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
             android:textStyle="bold"
+            app:autoSizeTextType="uniform"
             app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
             app:layout_constraintEnd_toEndOf="@id/textScore"
             app:layout_constraintStart_toStartOf="@id/textMultiplier"
             app:layout_constraintTop_toBottomOf="@id/progressTimer" />
 
+        <LinearLayout
+            android:id="@+id/attachmentLayout"
+            android:layout_width="0dp"
+            android:layout_height="170dp"
+            android:layout_marginTop="@dimen/margin8"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@id/textScore"
+            app:layout_constraintStart_toStartOf="@id/textMultiplier"
+            app:layout_constraintTop_toBottomOf="@id/guidelineQuestion"/>
 
+        <LinearLayout
+            android:id="@+id/layoutOption"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@id/textScore"
+            app:layout_constraintStart_toStartOf="@id/textMultiplier"
+            app:layout_constraintTop_toBottomOf="@id/attachmentLayout"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="@dimen/margin8"
+            android:layout_marginBottom="@dimen/margin8"/>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.40" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guidelineAttachment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.68" />
+            app:layout_constraintGuide_percent="0.405" />
 
         <SlidingDrawer
             android:layout_width="220dp"

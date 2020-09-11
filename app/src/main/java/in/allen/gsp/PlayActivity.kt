@@ -24,9 +24,9 @@ class PlayActivity : AppCompatActivity() {
             bg_layout.setImageDrawable(bg)
         }
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
-            onBackPressed()
-        }
+//        setSupportActionBar(myToolbar)
+//        myToolbar.btnBack.setOnClickListener {
+//            onBackPressed()
+//        }
     }
 }
