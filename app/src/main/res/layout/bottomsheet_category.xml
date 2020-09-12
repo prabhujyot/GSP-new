@@ -52,7 +52,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:padding="@dimen/margin16"
-            android:background="@drawable/bg_gray_pointer">
+            android:background="@drawable/bg_gray_corners">
             <Button
                 android:id="@+id/btnShuffle"
                 android:layout_width="0dp"

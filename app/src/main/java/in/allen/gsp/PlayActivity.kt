@@ -1,6 +1,7 @@
 package `in`.allen.gsp
 
 import `in`.allen.gsp.helpers.App
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,8 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.android.synthetic.main.activity_play.*
+import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.bottomsheet_attachment.*
 import kotlinx.android.synthetic.main.bottomsheet_category.*
+import kotlinx.android.synthetic.main.bottomsheet_finish.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
@@ -23,6 +26,7 @@ class PlayActivity : AppCompatActivity() {
 
     private lateinit var categorySheetBehavior: BottomSheetBehavior<FrameLayout>
     private lateinit var attachmentSheetBehavior: BottomSheetBehavior<FrameLayout>
+    private lateinit var finishSheetBehavior: BottomSheetBehavior<FrameLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,8 +45,10 @@ class PlayActivity : AppCompatActivity() {
 
         categorySheetBehavior = BottomSheetBehavior.from(bottomSheetCategory)
         attachmentSheetBehavior = BottomSheetBehavior.from(bottomSheetAttachment)
+        finishSheetBehavior = BottomSheetBehavior.from(bottomSheetFinish)
         categorySheetBehavior.isDraggable = false
         attachmentSheetBehavior.isDraggable = false
+        finishSheetBehavior.isDraggable = false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -57,6 +63,16 @@ class PlayActivity : AppCompatActivity() {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun initPointsTable() {
+        var colorList = IntArray(2)
+        colorList[0] = Color.rgb(112, 101, 193)
+        colorList[1] = Color.rgb(0, 147, 234)
+        progressLose.background = app.drawaleGradiantColor(
+            R.drawable.right_corner_radius,
+            colorList
+        )
     }
 
     fun btnActionPlay(view: View) {
@@ -76,7 +92,11 @@ class PlayActivity : AppCompatActivity() {
                 }
             }
             R.id.btnFlip -> {
-
+                if(finishSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    finishSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                } else {
+                    finishSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
             }
             R.id.btnQuit -> {
 

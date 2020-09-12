@@ -127,4 +127,5 @@
     <string name="lblTrue">True</string>
     <string name="lblFalse">False</string>
     <string name="lblExit">Exit</string>
+    <string name="lblRestart">Play Again</string>
 </resources>

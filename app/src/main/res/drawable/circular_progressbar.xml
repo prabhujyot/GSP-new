@@ -1,17 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rotate xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fromDegrees= "270"
-    android:toDegrees= "270" >
-    <shape
-        android:innerRadiusRatio= "2.2"
-        android:shape= "ring"
-        android:thickness= "2.2dp"
-        android:useLevel= "true" > <!-- this line fixes the issue for lollipop api 21 -->
-        <gradient
-            android:angle= "0"
-            android:endColor= "#f83329"
-            android:startColor= "#efa310"
-            android:type= "sweep"
-            android:useLevel= "false" />
-    </shape>
-</rotate>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@android:id/background">
+        <shape android:shape="oval">
+            <stroke android:width="4dp" android:color="#e8e8e8"/>
+            <solid android:color="@android:color/transparent"/>
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees= "270"
+            android:toDegrees= "270" >
+            <shape
+                android:shape="ring"
+                android:thickness="4dp"
+                android:innerRadiusRatio="2.14">
+                <gradient
+                    android:angle="0"
+                    android:endColor="#f83329"
+                    android:startColor="#efa310"
+                    android:type="sweep"
+                    android:useLevel="false" />
+            </shape>
+        </rotate>
+    </item>
+<!--    <item android:id="@android:id/progress">-->
+<!--        <rotate-->
+<!--            android:fromDegrees= "270"-->
+<!--            android:toDegrees= "270" >-->
+<!--            <shape-->
+<!--                android:innerRadiusRatio= "2.2"-->
+<!--                android:shape= "ring"-->
+<!--                android:thickness= "5dp"-->
+<!--                android:useLevel= "true" > &lt;!&ndash; this line fixes the issue for lollipop api 21 &ndash;&gt;-->
+<!--                <gradient-->
+<!--                    android:angle= "0"-->
+<!--                    android:endColor= "#f83329"-->
+<!--                    android:startColor= "#efa310"-->
+<!--                    android:type= "sweep"-->
+<!--                    android:useLevel= "false" />-->
+<!--            </shape>-->
+<!--        </rotate>-->
+<!--    </item>-->
+</layer-list>

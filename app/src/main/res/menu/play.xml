@@ -5,5 +5,6 @@
         android:id="@+id/menu_close"
         android:icon="@drawable/ic_close"
         android:title="@string/lblExit"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:iconTint="@color/white"/>
 </menu>
