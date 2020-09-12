@@ -122,4 +122,9 @@
     <string name="lblLevel1">Level 1</string>
     <string name="lblLevel3">Level 3</string>
     <string name="lblQuizPoints">Quiz Points</string>
+    <string name="lblShuffle">Shuffle</string>
+    <string name="lblQuit">Quit</string>
+    <string name="lblTrue">True</string>
+    <string name="lblFalse">False</string>
+    <string name="lblExit">Exit</string>
 </resources>

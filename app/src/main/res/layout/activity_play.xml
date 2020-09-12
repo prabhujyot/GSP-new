@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,13 +9,19 @@
     tools:context=".PlayActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="500dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+<!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintWidth_max="500dp">-->
 
         <ImageView
             android:id="@+id/bg_layout"
@@ -29,37 +35,26 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-<!--        <include-->
-<!--            layout="@layout/toolbar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="@dimen/margin24"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+        <include
+            layout="@layout/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/qno"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin24"
-            android:layout_marginTop="@dimen/margin48"
+            android:layout_marginTop="@dimen/margin88"
             android:text="Q.No.: 1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/btnClose"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin24"
-            android:src="@drawable/ic_close"
-            android:tint="@color/white"
-            android:background="@android:color/transparent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/qno" />
 
         <ProgressBar
             android:id="@+id/progressMultiplier"
@@ -78,15 +73,15 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin24"
             android:layout_marginTop="@dimen/margin8"
-            app:drawableTint="@color/yellow"
             android:gravity="center_vertical"
             android:text=" 05"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
             android:textStyle="bold"
+            app:drawableStartCompat="@drawable/ic_action_clock"
+            app:drawableTint="@color/yellow"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/progressMultiplier"
-            app:drawableStartCompat="@drawable/ic_action_clock" />
+            app:layout_constraintTop_toBottomOf="@id/progressMultiplier" />
 
         <TextView
             android:id="@+id/lblScore"
@@ -94,7 +89,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/margin8"
             android:text="@string/lblScore"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/textScore"
@@ -108,7 +103,7 @@
             android:layout_marginEnd="@dimen/margin24"
             android:gravity="center_vertical"
             android:text="00000000"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/yellow"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/textMultiplier"
@@ -121,15 +116,16 @@
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:background="@drawable/bg_circle_grey"
+            android:padding="@dimen/margin8"
             android:scaleType="centerInside"
             android:src="@drawable/double_dip"
-            android:padding="@dimen/margin8"
             app:layout_constraintBottom_toBottomOf="@id/progressTimer"
             app:layout_constraintEnd_toStartOf="@+id/btnFiftyFifty"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="@id/textMultiplier"
-            app:layout_constraintTop_toTopOf="@id/progressTimer" />
+            app:layout_constraintTop_toTopOf="@id/progressTimer"
+            android:onClick="btnActionPlay"/>
 
         <ImageButton
             android:id="@+id/btnFiftyFifty"
@@ -137,14 +133,15 @@
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:background="@drawable/bg_circle_grey"
+            android:padding="@dimen/margin8"
             android:scaleType="centerInside"
             android:src="@drawable/fifty"
-            android:padding="@dimen/margin8"
             app:layout_constraintBottom_toBottomOf="@id/progressTimer"
             app:layout_constraintEnd_toStartOf="@+id/progressTimer"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btnDoubleDip"
-            app:layout_constraintTop_toTopOf="@id/progressTimer" />
+            app:layout_constraintTop_toTopOf="@id/progressTimer"
+            android:onClick="btnActionPlay"/>
 
         <ProgressBar
             android:id="@+id/progressTimer"
@@ -152,10 +149,10 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
-            android:progress="60"
+            android:background="@drawable/bg_circle_black"
             android:indeterminate="false"
             android:max="100"
-            android:background="@drawable/bg_circle_black"
+            android:progress="60"
             android:progressDrawable="@drawable/circular_progressbar"
             app:layout_constraintEnd_toStartOf="@+id/btnFlip"
             app:layout_constraintHorizontal_bias="0.5"
@@ -182,14 +179,15 @@
             android:layout_height="40dp"
             android:adjustViewBounds="true"
             android:background="@drawable/bg_circle_grey"
+            android:padding="@dimen/margin8"
             android:scaleType="centerInside"
             android:src="@drawable/flip"
-            android:padding="@dimen/margin8"
             app:layout_constraintBottom_toBottomOf="@id/progressTimer"
             app:layout_constraintEnd_toStartOf="@+id/btnQuit"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/progressTimer"
-            app:layout_constraintTop_toTopOf="@id/progressTimer" />
+            app:layout_constraintTop_toTopOf="@id/progressTimer"
+            android:onClick="btnActionPlay"/>
 
         <ImageButton
             android:id="@+id/btnQuit"
@@ -204,7 +202,8 @@
             app:layout_constraintEnd_toEndOf="@id/textScore"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/btnFlip"
-            app:layout_constraintTop_toTopOf="@id/progressTimer" />
+            app:layout_constraintTop_toTopOf="@id/progressTimer"
+            android:onClick="btnActionPlay"/>
 
         <!-- Question -->
         <androidx.appcompat.widget.AppCompatTextView
@@ -212,10 +211,14 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/margin8"
+            android:gravity="center"
             android:text="The Jatropha curcas."
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/white"
             android:textStyle="bold"
+            app:autoSizeMaxTextSize="28sp"
+            app:autoSizeMinTextSize="10sp"
+            app:autoSizeStepGranularity="1sp"
             app:autoSizeTextType="uniform"
             app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
             app:layout_constraintEnd_toEndOf="@id/textScore"
@@ -223,27 +226,18 @@
             app:layout_constraintTop_toBottomOf="@id/progressTimer" />
 
         <LinearLayout
-            android:id="@+id/attachmentLayout"
-            android:layout_width="0dp"
-            android:layout_height="170dp"
-            android:layout_marginTop="@dimen/margin8"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="@id/textScore"
-            app:layout_constraintStart_toStartOf="@id/textMultiplier"
-            app:layout_constraintTop_toBottomOf="@id/guidelineQuestion"/>
-
-        <LinearLayout
             android:id="@+id/layoutOption"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="@dimen/margin8"
+            android:layout_marginBottom="@dimen/margin8"
             android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/textScore"
             app:layout_constraintStart_toStartOf="@id/textMultiplier"
-            app:layout_constraintTop_toBottomOf="@id/attachmentLayout"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="@dimen/margin8"
-            android:layout_marginBottom="@dimen/margin8">
-            <include layout="@layout/option_grid"/>
+            app:layout_constraintTop_toBottomOf="@id/guidelineQuestion">
+
+            <include layout="@layout/option_true_false" />
         </LinearLayout>
 
         <androidx.constraintlayout.widget.Guideline
@@ -251,7 +245,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.405" />
+            app:layout_constraintGuide_percent="0.48" />
 
         <SlidingDrawer
             android:layout_width="220dp"
@@ -264,7 +258,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
 
             <LinearLayout
                 android:id="@+id/layoutPoints"
@@ -538,7 +531,7 @@
 
             <ImageButton
                 android:id="@+id/btnPane"
-                android:layout_width="24dp"
+                android:layout_width="18dp"
                 android:layout_height="72dp"
                 android:background="@drawable/left_corner_radius"
                 android:src="@drawable/arrow_previous" />
@@ -547,6 +540,10 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+    <!-- Category bottom sheet -->
+    <include layout="@layout/bottomsheet_category" />
 
+    <!-- Attachment bottom sheet -->
+    <include layout="@layout/bottomsheet_attachment" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
