@@ -38,7 +38,11 @@ class VideosActivity : AppCompatActivity() {
         viewPager2.adapter = FragmentAdapter(this)
 
         TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
-            tab.text = "Playlist ${(position + 1)}"
+            if(position == 0) {
+                tab.text = "Power of Knowledge"
+            } else if(position == 1) {
+                tab.text = "Incredible India"
+            }
         }.attach()
     }
 
