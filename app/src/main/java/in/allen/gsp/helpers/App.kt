@@ -11,6 +11,7 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
+import android.text.format.DateUtils
 import android.util.Base64
 import android.util.Log
 import android.view.View
@@ -48,10 +49,21 @@ class App: Application() {
         MultiDex.install(this)
     }
 
-    fun milisToFormat(milliseconds: Long, format: String?): String? {
+    fun milisToFormat(milliseconds: Long, format: String): String {
         val sdf = SimpleDateFormat(format)
         val resultdate = Date(milliseconds)
         return sdf.format(resultdate)
+    }
+
+    fun timeInAgo(dateTime: String?, format: String): String {
+        var ago = ""
+        val sdf = SimpleDateFormat(format)
+        //sdf.timeZone = TimeZone.getTimeZone("GMT")
+
+        val time = sdf.parse(dateTime).time
+        val now = System.currentTimeMillis()
+        ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.MINUTE_IN_MILLIS) as String
+        return ago
     }
 
     fun writeStringToFile(data: String, fileName: String){

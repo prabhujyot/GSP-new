@@ -108,7 +108,7 @@ class HomeActivity : AppCompatActivity() {
                 i.setClass(this@HomeActivity, RewardActivity::class.java)
             }
             R.id.btnNotification -> {
-                i.setClass(this@HomeActivity, RewardActivity::class.java)
+                i.setClass(this@HomeActivity, NotificationActivity::class.java)
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
