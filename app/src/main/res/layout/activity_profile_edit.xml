@@ -1,193 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:keepScreenOn="true"
-    tools:context=".ProfileEditActivity">
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewModel"
+            type="in.allen.gsp.ui.profile.ProfileViewModel" />
+    </data>
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="300dp">
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:background="@drawable/gradiant_blue"
-            app:contentScrim="@color/blue"
-            app:titleEnabled="false">
-
-            <include layout="@layout/toolbar"/>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollView"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_overlapTop="@dimen/margin88"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:padding="@dimen/margin8">
+        android:keepScreenOn="true"
+        tools:context=".ui.profile.ProfileEditActivity">
 
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="300dp">
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:background="@drawable/gradiant_blue"
+                app:contentScrim="@color/blue"
+                app:titleEnabled="false">
+
+                <include layout="@layout/toolbar"/>
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_overlapTop="@dimen/margin88"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
             android:padding="@dimen/margin8">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginLeft="@dimen/margin16"
-                android:layout_marginBottom="@dimen/margin16"
-                android:gravity="center_vertical">
-                <ImageView
-                    android:id="@+id/avatar"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:background="@drawable/bg_circle_orange"
-                    android:contentDescription="@string/lblAvatar" />
-                <TextView
-                    android:id="@+id/username"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/margin16"
-                    android:text="Prabhujyot Singh Bamrah"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="@dimen/margin16"/>
-            </LinearLayout>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin4"
-                android:background="@drawable/bg_btn_gray"
-                app:cardCornerRadius="@dimen/margin8">
+                android:orientation="vertical"
+                android:padding="@dimen/margin8">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/margin8">
-
-                    <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_marginStart="@dimen/margin16"
+                    android:layout_marginBottom="@dimen/margin16"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:background="@drawable/bg_circle_orange"
+                        android:contentDescription="@string/lblAvatar" />
+                    <TextView
+                        android:id="@+id/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/margin8"
-                        android:layout_marginBottom="@dimen/margin8">
-
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:adjustViewBounds="true"
-                            android:contentDescription="@string/lblUpdateMobile"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_phone_android" />
-
-                        <androidx.appcompat.widget.AppCompatEditText
-                            android:id="@+id/mobile"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin16"
-                            android:hint="@string/lblUpdateMobile"
-                            android:inputType="numberSigned"
-                            android:maxLength="10"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/margin8"
-                        android:layout_marginBottom="@dimen/margin8">
-
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:adjustViewBounds="true"
-                            android:contentDescription="@string/lblUpdateMobile"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_action_location" />
-
-                        <androidx.appcompat.widget.AppCompatEditText
-                            android:id="@+id/location"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/margin16"
-                            android:hint="@string/lblUpdateLocation"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/margin8"
-                        android:layout_marginBottom="@dimen/margin8">
-
-                        <ImageView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:adjustViewBounds="true"
-                            android:contentDescription="@string/lblUpdateMobile"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_action_document" />
-
-                        <androidx.appcompat.widget.AppCompatEditText
-                            android:id="@+id/quote"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="@dimen/margin16"
-                            android:hint="@string/lblUpdateQuote"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginTop="@dimen/margin8"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:weightSum="1">
-                        <Button
-                            android:id="@+id/btnCancel"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight=".5"
-                            android:text="@string/lblCancel"
-                            android:textColor="@color/white"
-                            android:textAllCaps="false"
-                            android:textStyle="bold"
-                            android:background="@drawable/bg_btn_orange"
-                            android:layout_marginEnd="@dimen/margin4"
-                            android:onClick="btnActionProfileEdit"/>
-
-                        <Button
-                            android:id="@+id/btnSave"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight=".5"
-                            android:text="@string/lblSave"
-                            android:textColor="@color/white"
-                            android:textAllCaps="false"
-                            android:textStyle="bold"
-                            android:background="@drawable/bg_btn_blue"
-                            android:layout_marginLeft="@dimen/margin4"
-                            android:onClick="btnActionProfileEdit"/>
-                    </LinearLayout>
-
+                        android:layout_marginLeft="@dimen/margin16"
+                        android:text="@={viewModel.username}"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="@dimen/margin16"/>
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/margin4"
+                    android:background="@drawable/bg_btn_gray"
+                    app:cardCornerRadius="@dimen/margin8">
 
-    </androidx.core.widget.NestedScrollView>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin8">
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="@dimen/margin8"
+                            android:layout_marginBottom="@dimen/margin8">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/lblUpdateMobile"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_phone_android" />
+
+                            <androidx.appcompat.widget.AppCompatEditText
+                                android:id="@+id/mobile"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin16"
+                                android:hint="@string/lblUpdateMobile"
+                                android:inputType="numberSigned"
+                                android:maxLength="10"
+                                android:textColor="@color/black"
+                                android:text="@={viewModel.mobile}"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="@dimen/margin8"
+                            android:layout_marginBottom="@dimen/margin8">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/lblUpdateMobile"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_action_location" />
+
+                            <androidx.appcompat.widget.AppCompatEditText
+                                android:id="@+id/location"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin16"
+                                android:hint="@string/lblUpdateLocation"
+                                android:textColor="@color/black"
+                                android:text="@={viewModel.location}"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="@dimen/margin8"
+                            android:layout_marginBottom="@dimen/margin8">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/lblUpdateMobile"
+                                android:scaleType="center"
+                                android:src="@drawable/ic_action_document" />
+
+                            <androidx.appcompat.widget.AppCompatEditText
+                                android:id="@+id/quote"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin16"
+                                android:hint="@string/lblUpdateQuote"
+                                android:textColor="@color/black"
+                                android:text="@={viewModel.quote}"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="@dimen/margin8"
+                            android:layout_marginBottom="@dimen/margin8"
+                            android:weightSum="1">
+                            <Button
+                                android:id="@+id/btnCancel"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight=".5"
+                                android:text="@string/lblCancel"
+                                android:textColor="@color/white"
+                                android:textAllCaps="false"
+                                android:textStyle="bold"
+                                android:background="@drawable/bg_btn_orange"
+                                android:layout_marginEnd="@dimen/margin4"
+                                android:onClick="@{viewModel::btnActionProfileEdit}"/>
+
+                            <Button
+                                android:id="@+id/btnSave"
+                                android:layout_width="0dp"
+                                android:layout_height="36dp"
+                                android:layout_weight=".5"
+                                android:text="@string/lblSave"
+                                android:textColor="@color/white"
+                                android:textAllCaps="false"
+                                android:textStyle="bold"
+                                android:background="@drawable/bg_btn_blue"
+                                android:layout_marginStart="@dimen/margin4"
+                                android:onClick="@{viewModel::btnActionProfileEdit}"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

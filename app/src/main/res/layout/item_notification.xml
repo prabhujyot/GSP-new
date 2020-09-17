@@ -10,7 +10,7 @@
         android:layout_height="1dp"
         android:layout_marginTop="@dimen/margin8"
         android:layout_marginBottom="@dimen/margin8"
-        android:background="@drawable/gradiant_blue"
+        android:background="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
