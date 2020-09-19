@@ -1,4 +1,4 @@
-package `in`.allen.gsp.helpers.services
+package `in`.allen.gsp.utils.services
 
 import android.util.Log
 import com.androidnetworking.AndroidNetworking

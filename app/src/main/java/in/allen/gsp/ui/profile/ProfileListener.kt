@@ -1,9 +1,9 @@
 package `in`.allen.gsp.ui.profile
 
-import androidx.lifecycle.LiveData
+import `in`.allen.gsp.data.db.entities.User
 
 interface ProfileListener {
     fun onStarted()
-    fun onSuccess(response: LiveData<String>)
+    fun onSuccess(user: User)
     fun onFailed(message: String)
 }

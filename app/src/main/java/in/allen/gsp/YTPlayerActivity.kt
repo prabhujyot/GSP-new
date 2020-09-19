@@ -1,7 +1,7 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.helpers.App
-import `in`.allen.gsp.helpers.services.WebServices
+import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.services.WebServices
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -18,8 +18,6 @@ import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import com.google.android.youtube.player.YouTubePlayerView
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONObject
 import java.text.ParseException
 import java.text.SimpleDateFormat

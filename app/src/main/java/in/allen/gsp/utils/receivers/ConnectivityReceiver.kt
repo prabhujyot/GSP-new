@@ -1,4 +1,4 @@
-package `in`.allen.gsp.helpers.receivers
+package `in`.allen.gsp.utils.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

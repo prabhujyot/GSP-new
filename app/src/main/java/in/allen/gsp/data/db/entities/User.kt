@@ -1,0 +1,22 @@
+package `in`.allen.gsp.data.db.entities
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "user")
+data class User (
+    @PrimaryKey(autoGenerate = false) val id: Int,
+    val user_id: Int,
+    val name: String,
+    val avatar: String,
+    val email: String,
+    val mobile: String,
+    val referral_id: String,
+    val firebase_token: String,
+    val firebase_uid: String,
+    val played_qid: String,
+    val create_date: String,
+    val session_token: String,
+    val coins: Int,
+    val is_admin: Boolean
+)

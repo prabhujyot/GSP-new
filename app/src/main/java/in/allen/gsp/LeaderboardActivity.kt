@@ -1,7 +1,7 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.helpers.App
-import `in`.allen.gsp.helpers.AppPreferences
+import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.AppPreferences
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

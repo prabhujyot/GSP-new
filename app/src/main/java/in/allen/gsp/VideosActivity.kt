@@ -1,9 +1,9 @@
 package `in`.allen.gsp
 
 import `in`.allen.gsp.fragments.PlaylistFragment
-import `in`.allen.gsp.helpers.App
-import `in`.allen.gsp.helpers.AppPreferences
-import `in`.allen.gsp.helpers.services.WebServices
+import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.AppPreferences
+import `in`.allen.gsp.utils.services.WebServices
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity

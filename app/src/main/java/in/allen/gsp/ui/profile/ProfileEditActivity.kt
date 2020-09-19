@@ -1,15 +1,14 @@
 package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.R
+import `in`.allen.gsp.data.db.entities.User
 import `in`.allen.gsp.databinding.ActivityProfileEditBinding
-import `in`.allen.gsp.helpers.App
-import `in`.allen.gsp.helpers.tag
-import `in`.allen.gsp.helpers.toast
+import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.toast
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
@@ -36,19 +35,16 @@ class ProfileEditActivity : AppCompatActivity(), ProfileListener {
 
     override fun onStarted() {
         toast("onStarted")
-        tag(TAG,"onStarted")
+        tag("onStarted")
     }
 
-    override fun onSuccess(response: LiveData<String>) {
-        response.observe(this, Observer {
-            tag(TAG,"onSuccess $it")
-        })
-        toast("onSuccess")
+    override fun onSuccess(user: User) {
+        toast("onSuccess ${user.name}")
     }
 
     override fun onFailed(message: String) {
         toast(message)
-        tag(TAG,message)
+        tag(message)
     }
 
 }

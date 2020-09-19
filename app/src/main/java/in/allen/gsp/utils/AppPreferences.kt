@@ -1,6 +1,5 @@
-package `in`.allen.gsp.helpers
+package `in`.allen.gsp.utils
 
-import `in`.allen.gsp.HomeActivity
 import android.content.Context
 import android.content.SharedPreferences
 

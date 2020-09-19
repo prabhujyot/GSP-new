@@ -2,8 +2,8 @@ package `in`.allen.gsp
 
 import `in`.allen.gsp.fragments.PrizeFragment
 import `in`.allen.gsp.fragments.StatementFragment
-import `in`.allen.gsp.helpers.App
-import `in`.allen.gsp.helpers.AppPreferences
+import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.AppPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View

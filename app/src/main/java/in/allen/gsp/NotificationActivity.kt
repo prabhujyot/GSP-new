@@ -1,6 +1,6 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.helpers.App
+import `in`.allen.gsp.utils.App
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater

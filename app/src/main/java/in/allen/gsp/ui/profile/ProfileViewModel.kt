@@ -1,7 +1,6 @@
 package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.repositories.ProfileRepository
 import android.view.View
 import androidx.lifecycle.ViewModel
 
@@ -22,8 +21,7 @@ class ProfileViewModel: ViewModel() {
                 profileListener?.onFailed("cancel")
             }
             R.id.btnSave -> {
-                val response = ProfileRepository().updateProfile(null)
-                profileListener?.onSuccess(response)
+
             }
         }
     }

@@ -3,7 +3,7 @@ package `in`.allen.gsp.fragments
 import `in`.allen.gsp.R
 import `in`.allen.gsp.VideosActivity
 import `in`.allen.gsp.YTPlayerActivity
-import `in`.allen.gsp.helpers.services.WebServices
+import `in`.allen.gsp.utils.services.WebServices
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater

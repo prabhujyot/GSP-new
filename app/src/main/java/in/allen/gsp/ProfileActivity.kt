@@ -1,7 +1,7 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.helpers.App
-import `in`.allen.gsp.helpers.AppPreferences
+import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.ui.profile.ProfileEditActivity
 import android.content.Intent
 import android.graphics.Color
