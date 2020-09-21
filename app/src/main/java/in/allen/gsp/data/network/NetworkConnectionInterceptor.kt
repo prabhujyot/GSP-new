@@ -1,5 +1,6 @@
 package `in`.allen.gsp.data.network
 
+import `in`.allen.gsp.utils.NoInternetExeption
 import android.content.Context
 import android.net.ConnectivityManager
 import okhttp3.Interceptor
@@ -13,7 +14,7 @@ class NetworkConnectionInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         if(!isInternetAvailable())
-            throw Exception("Hmm... Looks like you lost your connection.")
+            throw NoInternetExeption("Hmm... Looks like you lost your connection.")
         return chain.proceed(chain.request())
     }
 

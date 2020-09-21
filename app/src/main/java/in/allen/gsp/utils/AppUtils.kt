@@ -13,7 +13,7 @@ fun Context.toast(message: String) {
 }
 
 fun View.snackbar(message: String) {
-    Snackbar.make(this,message,Snackbar.LENGTH_LONG).also { snackbar ->
+    Snackbar.make(this,message,Snackbar.LENGTH_INDEFINITE).also { snackbar ->
         snackbar.setAction("Ok") {
             snackbar.dismiss()
         }

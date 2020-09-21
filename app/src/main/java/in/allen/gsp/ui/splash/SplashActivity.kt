@@ -2,7 +2,6 @@ package `in`.allen.gsp.ui.splash
 
 import `in`.allen.gsp.HomeActivity
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.db.entities.User
 import `in`.allen.gsp.databinding.ActivitySplashBinding
 import `in`.allen.gsp.utils.*
 import android.content.Intent
@@ -14,7 +13,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.facebook.CallbackManager
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_splash.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -73,10 +71,27 @@ class SplashActivity : AppCompatActivity(), SplashListener, KodeinAware {
             colorList
         )
 
-        askToLogin(false)
         // check firebase uid
-        val currentUser = viewModel.getFirebaseUID()
-        updateUI(currentUser)
+        viewModel.updateUI().observe(this, Observer { response ->
+            tag(response)
+            if(response["status"].equals("progress",true)) {
+                root_layout.showProgress()
+            } else if(response["status"].equals("fail",true)) {
+                askToLogin(true)
+                root_layout.hideProgress()
+                response["message"]?.let { it1 ->
+                    if(it1.isNotEmpty())
+                        root_layout.snackbar(it1)
+                }
+            } else if(response["status"].equals("success",true)) {
+                root_layout.hideProgress()
+                Intent(this, HomeActivity::class.java)
+                    .also {
+                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(it)
+                    }
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -109,34 +124,7 @@ class SplashActivity : AppCompatActivity(), SplashListener, KodeinAware {
 //        }
 //    }
 
-    private fun updateUI(user: FirebaseUser?) {
-        val isSignedIn = user != null
-        // Status text
-        if (isSignedIn) {
-            val displayName = user?.displayName
-            val email = user?.email;
-            val emailVerified = user?.isEmailVerified;
-            val photoURL = user?.photoUrl;
-            val isAnonymous = user?.isAnonymous;
-            val uid = user?.uid;
-            val providerData = user?.providerId;
 
-            tag("user: $displayName : $email : $emailVerified : $photoURL : $isAnonymous : $uid : $providerData"
-            )
-
-            viewModel.getLoggedInUser().observe(this, Observer {user ->
-                if(user != null) {
-                    tag(user)
-//                    Intent(this, HomeActivity::class.java).also {
-//                        it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                        startActivity(it)
-//                    }
-                }
-            })
-        } else {
-            askToLogin(true)
-        }
-    }
 
     private fun askToLogin(visible: Boolean) {
         if(visible) {
@@ -147,23 +135,5 @@ class SplashActivity : AppCompatActivity(), SplashListener, KodeinAware {
             layoutAction.visibility = View.GONE
         }
     }
-
-    override fun onStarted() {}
-
-    override fun onProgress() {
-        root_layout.showProgress()
-    }
-
-    override fun onSuccess(user: User) {
-        root_layout.hideProgress()
-        startActivity(Intent(this, HomeActivity::class.java))
-    }
-
-    override fun onFailure(message: String) {
-        root_layout.hideProgress()
-        tag("onFailed $message")
-        root_layout.snackbar(message)
-    }
-
 
 }

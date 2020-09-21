@@ -98,7 +98,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/guidelineMiddle"
                     android:orientation="vertical"
-                    android:layout_marginTop="@dimen/margin24">
+                    android:layout_marginTop="@dimen/margin24"
+                    android:visibility="gone">
                     <LinearLayout
                         android:id="@+id/btnFB"
                         android:layout_width="match_parent"
