@@ -1,6 +1,8 @@
 package `in`.allen.gsp
 
+import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
 import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.drawaleGradiantColor
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -69,7 +71,7 @@ class PlayActivity : AppCompatActivity() {
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(112, 101, 193)
         colorList[1] = Color.rgb(0, 147, 234)
-        progressLose.background = app.drawaleGradiantColor(
+        progressLose.background = drawaleGradiantColor(
             R.drawable.right_corner_radius,
             colorList
         )

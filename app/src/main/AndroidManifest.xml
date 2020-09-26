@@ -17,8 +17,8 @@
         <activity android:name=".PlayActivity" />
         <activity android:name=".WebActivity" />
         <activity android:name=".YTPlayerActivity" />
-        <activity android:name=".VideosActivity" />
-        <activity android:name=".LeaderboardActivity" />
+        <activity android:name=".ui.videos.VideosActivity" />
+        <activity android:name=".ui.leaderboard.LeaderboardActivity" />
         <activity android:name=".RewardActivity" />
         <activity android:name=".ui.profile.ProfileEditActivity" />
         <activity android:name=".ProfileActivity" />

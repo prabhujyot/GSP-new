@@ -5,8 +5,6 @@ import android.content.SharedPreferences
 
 class AppPreferences(context: Context) {
 
-    private val tag = AppPreferences::class.java.name
-
     private val sharedpreferences: SharedPreferences = context.getSharedPreferences("App_" + context.packageName, Context.MODE_PRIVATE)
     private val editor: SharedPreferences.Editor = sharedpreferences.edit()
 

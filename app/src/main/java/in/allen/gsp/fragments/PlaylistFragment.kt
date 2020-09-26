@@ -1,8 +1,9 @@
 package `in`.allen.gsp.fragments
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.VideosActivity
+import `in`.allen.gsp.ui.videos.VideosActivity
 import `in`.allen.gsp.YTPlayerActivity
+import `in`.allen.gsp.utils.milisToFormat
 import `in`.allen.gsp.utils.services.WebServices
 import android.content.Intent
 import android.os.Bundle
@@ -109,6 +110,7 @@ class PlaylistFragment : Fragment() {
                             hashMap["publishedAt"] = item.getJSONObject("snippet").getString("publishedAt")
                             hashMap["description"] = item.getJSONObject("snippet").getString("description")
                             hashMap["channelTitle"] = item.getJSONObject("snippet").getString("channelTitle")
+                            hashMap["playlistId"] = item.getJSONObject("snippet").getString("playlistId")
                             hashMap["videoId"] = item.getJSONObject("snippet").getJSONObject("resourceId").getString("videoId")
 
                             var thumbnails = ""
@@ -168,7 +170,7 @@ class PlaylistFragment : Fragment() {
             try {
                 date = sdf.parse(list[i]["publishedAt"])
                 cal.time = date
-                val dat = parentActivity.app.milisToFormat(cal.timeInMillis, "dd MMM yyyy")
+                val dat = milisToFormat(cal.timeInMillis, "dd MMM yyyy")
                 recyclerViewHolder.date.text = dat
             } catch (e: ParseException) {
                 e.printStackTrace()

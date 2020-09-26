@@ -9,6 +9,9 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:fontFamily">@font/quicksand_regular</item>
+        <!-- THIS is where you can color the arrow and the overflow button! -->
+        <item name="colorControlNormal">@color/white</item> <!-- sets the color for the back arrow -->
+        <item name="actionOverflowButtonStyle">@color/white</item> <!-- sets the style for the overflow button -->
     </style>
 
 </resources>

@@ -1,6 +1,7 @@
 package `in`.allen.gsp
 
 import `in`.allen.gsp.utils.App
+import `in`.allen.gsp.utils.timeInAgo
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -105,7 +106,7 @@ class NotificationActivity : AppCompatActivity() {
 
             itemViewHolder.title.text = "${item["title"]}"
             itemViewHolder.msg.text = "${item["msg"]}"
-            itemViewHolder.time.text = app.timeInAgo(item["time"],"yyyy-MM-dd hh:mm:ss")
+            itemViewHolder.time.text = timeInAgo(item["time"],"yyyy-MM-dd hh:mm:ss")
         }
 
         override fun getItemCount(): Int {

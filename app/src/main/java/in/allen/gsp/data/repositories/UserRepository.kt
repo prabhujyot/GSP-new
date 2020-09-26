@@ -11,16 +11,15 @@ class UserRepository(
     private val db: AppDatabase
 ): SafeApiRequest() {
 
-    suspend fun login(name: String, email: String, avatar: String, firebaseUid: String): String? {
+    suspend fun login(params: HashMap<String,String>): String? {
         return apiRequest {
-            api.authentication(name, email, avatar, firebaseUid)
+            api.authentication(params)
         }
     }
 
+    suspend fun setDBUser(user: User) = db.getUserDao().upsert(user)
 
-    suspend fun saveUser(user: User) = db.getUserDao().upsert(user)
-
-    suspend fun getUser() = db.getUserDao().getUser()
+    suspend fun getDBUser() = db.getUserDao().getUser()
 
 
 //    fun login(name: String, email: String, avatar: String, firebaseUid: String): LiveData<String> {

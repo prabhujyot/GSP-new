@@ -3,6 +3,8 @@ package `in`.allen.gsp
 import `in`.allen.gsp.utils.App
 import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.ui.profile.ProfileEditActivity
+import `in`.allen.gsp.utils.drawaleGradiantColor
+import `in`.allen.gsp.utils.screenShot
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -56,7 +58,7 @@ class ProfileActivity : AppCompatActivity() {
             val share = Intent(Intent.ACTION_SEND)
             share.type = "image/jpeg"
             share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            val file = app.screenShot(statistics,"screenshot.jpg")
+            val file = screenShot(statistics,"screenshot.jpg")
             share.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this,applicationContext.packageName+".provider",file))
             startActivity(Intent.createChooser(share, "Share Image"))
         }
@@ -67,7 +69,7 @@ class ProfileActivity : AppCompatActivity() {
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(112, 101, 193)
         colorList[1] = Color.rgb(0, 147, 234)
-        progressLose.background = app.drawaleGradiantColor(
+        progressLose.background = drawaleGradiantColor(
             R.drawable.right_corner_radius,
             colorList
         )
@@ -112,7 +114,7 @@ class ProfileActivity : AppCompatActivity() {
             colorList = IntArray(2)
             colorList[0] = Color.rgb(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
             colorList[1] = Color.rgb(Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))
-            topicView.progressTopic.background = app.drawaleGradiantColor(
+            topicView.progressTopic.background = drawaleGradiantColor(
                 R.drawable.right_corner_radius,
                 colorList
             )

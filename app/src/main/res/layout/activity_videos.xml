@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".VideosActivity"
+    tools:context=".ui.videos.VideosActivity"
     android:keepScreenOn="true">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -28,7 +28,8 @@
                 app:tabSelectedTextColor="@color/white"
                 app:tabIndicatorColor="@color/white"
                 app:tabPaddingStart="0dp"
-                android:layout_gravity="bottom"/>
+                android:layout_gravity="bottom"
+                android:layout_marginTop="?attr/actionBarSize"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>

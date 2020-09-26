@@ -1,5 +1,7 @@
 package `in`.allen.gsp
 
+import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
+import `in`.allen.gsp.ui.videos.VideosActivity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -112,7 +114,7 @@ class HomeActivity : AppCompatActivity() {
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
-                i.putExtra("url", BuildConfig.BASE_URL + "category/quiz-time/")
+                i.putExtra("url","https://www.klipinterest.com/category/quiz-time/")
             }
             R.id.btnSetting -> {
                 i.setClass(this@HomeActivity, RewardActivity::class.java)

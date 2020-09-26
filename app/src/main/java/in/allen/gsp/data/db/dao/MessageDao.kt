@@ -11,7 +11,7 @@ import androidx.room.Query
 interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(messages: Message): Long
+    suspend fun insert(messages: Message): Long
 
     @Query("update message set status = :status where id = :id")
     fun update(id:Int,status: Int)
@@ -20,7 +20,10 @@ interface MessageDao {
     fun delete(id:Int)
 
     @Query("select * from message order by create_date desc")
-    fun getList(): List<Message>
+    fun getList(): LiveData<List<Message>>
+
+//    @Insert
+//    suspend fun setList(messages: List<Message>)
 
     @Query("select * from message  where id = :id")
     fun getItem(id:Int): LiveData<Message>

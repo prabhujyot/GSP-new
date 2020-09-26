@@ -1,89 +1,55 @@
 package `in`.allen.gsp.ui.splash
 
-import `in`.allen.gsp.R
 import `in`.allen.gsp.data.db.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.Encryption
-import `in`.allen.gsp.utils.NoInternetExeption
+import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
-import android.content.Intent
-import android.view.View
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-const val GOOGLE_SIGN_IN : Int = 9001
 
 class SplashViewModel(
-    private val repository: UserRepository,
-    private val googleSignInClient: GoogleSignInClient
+    private val repository: UserRepository
 ): ViewModel() {
 
-    // interface to activity
-    var splashListener: SplashListener ?= null
-    val startActivityForResultEvent = LiveMessageEvent<SplashListener>()
+//    suspend fun getDBUser(): User? {
+//        return repository.getDBUser()
+//    }
+//
+//    suspend fun setDBUser(user: User): Long {
+//        return repository.setDBUser(user)
+//    }
+//
+//    suspend fun loginUser( params: HashMap<String,String>): String? {
+//        return withContext(Dispatchers.IO) { repository.login(params) }
+//    }
+
+
+
+    // interaction with activity
+    val _loading = MutableLiveData<Resource.Loading<String>>()
+    val _success = MutableLiveData<Resource.Success<User>>()
+    val _error = MutableLiveData<Resource.Error<String>>()
 
     // check firebase uid
     private val auth = FirebaseAuth.getInstance()
 
-    fun btnActionSplash(view: View) {
-        when (view.id) {
-            R.id.btnFB -> {
-            }
-            R.id.btnGG -> {
-                val signInIntent = googleSignInClient.signInIntent
-                startActivityForResultEvent.sendEvent {
-                    startActivityForResult(
-                        signInIntent,
-                        GOOGLE_SIGN_IN
-                    )
-                }
-            }
-        }
+    init {
+        val currentUser = auth.currentUser
+        tag("init currentUser $currentUser")
+        authUser(currentUser)
     }
 
-    //Called from Activity receving result
-    fun onResultFromActivity(requestCode: Int, resultCode: Int, data: Intent?) {
-        when(requestCode) {
-            GOOGLE_SIGN_IN -> {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-                googleSignInComplete(task)
-            }
-        }
-    }
-
-    private fun googleSignInComplete(completedTask: Task<GoogleSignInAccount>) {
-        try {
-            val account = completedTask.getResult(ApiException::class.java)
-            account?.apply {
-                tag("firebaseAuthWithGoogle:" + account.id)
-                firebaseAuthWithGoogle(account.idToken!!)
-            }
-        } catch (e: ApiException) {
-            tag("Google sign in failed $e")
-            hashMap["status"] = "fail"
-            hashMap["message"] = "Google sign in failed $e"
-            viewModelResponse.value = hashMap
-        }
-    }
-
-    private fun firebaseAuthWithGoogle(idToken: String) {
-        hashMap["status"] = "progress"
-        hashMap["message"] = ""
-        viewModelResponse.value = hashMap
-
+    fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
@@ -95,14 +61,12 @@ class SplashViewModel(
                 } else {
                     // If sign in fails, display a message to the user.
                     tag("signInWithCredential:failure ${task.exception}")
-                    hashMap["status"] = "fail"
-                    hashMap["message"] = "${task.exception}"
-                    viewModelResponse.value = hashMap
+                    _error.value = Resource.Error("${task.exception}")
                 }
             }
     }
 
-    private fun firebaseAuthWithFB(token: AccessToken) {
+    fun firebaseAuthWithFB(token: AccessToken) {
         tag("handleFacebookAccessToken:$token")
         val credential = FacebookAuthProvider.getCredential(token.token)
         auth.signInWithCredential(credential)
@@ -110,21 +74,19 @@ class SplashViewModel(
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     tag("signInWithCredential:success")
-                    val user = auth.currentUser
-                    authToServer(user)
+                    val firebaseUser = auth.currentUser
+                    authToServer(firebaseUser)
                 } else {
                     // If sign in fails, display a message to the user.
                     tag("signInWithCredential:failure ${task.exception}")
-                    hashMap["status"] = "fail"
-                    hashMap["message"] = "${task.exception}"
-                    viewModelResponse.value = hashMap
+                    _error.value = Resource.Error("${task.exception}")
                 }
             }
     }
 
     private fun authToServer(firebaseUser: FirebaseUser?) {
         val isSignedIn = firebaseUser != null
-        // Status text
+        tag("authToServer $isSignedIn")
         if (isSignedIn) {
             val displayName = firebaseUser?.displayName
             val email = firebaseUser?.email
@@ -136,14 +98,15 @@ class SplashViewModel(
 
             tag("user: $displayName : $email : $emailVerified : $photoURL : $isAnonymous : $uid : $providerData")
 
-            Coroutines.main {
+            viewModelScope.launch {
+                _loading.value = Resource.Loading()
                 try {
-                    val response = repository.login(
-                        displayName!!,
-                        email!!,
-                        photoURL.toString(),
-                        uid!!
-                    )
+                    val params = HashMap<String,String>()
+                    params["name"] = firebaseUser?.displayName!!
+                    params["email"] = firebaseUser.email!!
+                    params["avatar"] = firebaseUser.photoUrl.toString()
+                    params["firebase_uid"] = firebaseUser.uid
+                    val response = repository.login(params)
                     tag("response: $response")
                     if (response != null) {
                         val responseObj = JSONObject(response)
@@ -166,49 +129,34 @@ class SplashViewModel(
                                 data.getInt("coins"),
                                 data.getBoolean("is_admin")
                             )
-                            repository.saveUser(user)
-
-                            hashMap["status"] = "success"
-                            hashMap["message"] = ""
-                            viewModelResponse.value = hashMap
+                            repository.setDBUser(user)
+                            _success.value = Resource.Success(user)
                         } else {
-                            hashMap["status"] = "fail"
-                            hashMap["message"] = responseObj.getString("message")
-                            viewModelResponse.value = hashMap
+                            _error.value = Resource.Error(responseObj.getString("message"))
                         }
                     }
-                } catch (e: ApiException) {
-                    hashMap["status"] = "fail"
-                    hashMap["message"] = "${e.message}"
-                    viewModelResponse.value = hashMap
-                } catch (e: NoInternetExeption) {
-                    hashMap["status"] = "fail"
-                    hashMap["message"] = "${e.message}"
-                    viewModelResponse.value = hashMap
+                } catch (e: Exception) {
+                    _error.value = e.message?.let { Resource.Error(it) }
                 }
             }
         }
     }
 
-    fun logout() {
+    private fun logout() {
         auth.signOut()
     }
 
-
-    private val viewModelResponse = MutableLiveData<HashMap<String,String>>()
-    private val hashMap = HashMap<String,String>()
-
-    fun updateUI(): LiveData<HashMap<String, String>> {
-        // check if user is firebase user
-        val firebaseUser = auth.currentUser
+    private fun authUser(firebaseUser: FirebaseUser?) {
         val isSignedIn = firebaseUser != null
+        tag("authUser $isSignedIn")
         // Status text
         if (isSignedIn) {
             // check if firebase uid match with db user
-            Coroutines.main {
-                val dbUser = repository.getUser()
-                tag("dbUser: $dbUser")
+            viewModelScope.launch {
+                val dbUser = repository.getDBUser()
+                tag("authUser: dbUser $isSignedIn")
                 if (dbUser != null) {
+                    tag("authUser: dbUser uid ${dbUser.firebase_uid.equals(firebaseUser?.uid,true)}")
                     if(dbUser.firebase_uid.equals(firebaseUser?.uid,true)) {
                         val encryption = Encryption()
                         try {
@@ -220,34 +168,24 @@ class SplashViewModel(
                             if (sysTime > expireTime) {
                                 authToServer(firebaseUser)
                             } else {
-                                hashMap["status"] = "success"
-                                hashMap["message"] = ""
-                                viewModelResponse.value = hashMap
+                                _success.value = Resource.Success(dbUser)
                             }
                         } catch (e: Exception) {
-                            hashMap["status"] = "fail"
-                            hashMap["message"] = "${e.message}"
-                            viewModelResponse.value = hashMap
+                            tag("authUser: ${e.message}")
+                            _error.value = Resource.Error("${e.message}")
                         }
                     } else {
                         // logout old user and ask login
                         logout()
-
-                        hashMap["status"] = "fail"
-                        hashMap["message"] = ""
-                        viewModelResponse.value = hashMap
+                        _error.value = Resource.Error("")
                     }
                 } else {
                     authToServer(firebaseUser)
                 }
             }
         } else {
-            hashMap["status"] = "fail"
-            hashMap["message"] = ""
-            viewModelResponse.value = hashMap
+            _error.value = Resource.Error("")
         }
-
-        return viewModelResponse
     }
 
 }

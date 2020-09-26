@@ -1,6 +1,6 @@
-package `in`.allen.gsp
+package `in`.allen.gsp.ui.videos
 
-import `in`.allen.gsp.fragments.PlaylistFragment
+import `in`.allen.gsp.R
 import `in`.allen.gsp.utils.App
 import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.utils.services.WebServices

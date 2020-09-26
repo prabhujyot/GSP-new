@@ -2,6 +2,7 @@ package `in`.allen.gsp
 
 import `in`.allen.gsp.utils.App
 import `in`.allen.gsp.utils.services.WebServices
+import `in`.allen.gsp.utils.toast
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -113,7 +114,7 @@ class YTPlayerActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListe
             p1.getErrorDialog(this, RECOVERY_REQUEST).show()
         } else {
             val error = String.format("Error initializing YouTube player: %s", p1.toString())
-            app.toast(error)
+            toast(error)
         }
     }
 
@@ -142,7 +143,7 @@ class YTPlayerActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListe
                     }
                     getComments()
                 } else {
-                    app.toast(response.getJSONObject("error").getString("message"))
+                    toast(response.getJSONObject("error").getString("message"))
                 }
             }
 
@@ -172,7 +173,7 @@ class YTPlayerActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListe
                         pageToken = ""
                     }
                 } else {
-                    app.toast(response.getJSONObject("error").getString("message"))
+                    toast(response.getJSONObject("error").getString("message"))
                 }
             }
 

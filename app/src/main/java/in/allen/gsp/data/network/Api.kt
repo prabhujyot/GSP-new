@@ -1,29 +1,31 @@
 package `in`.allen.gsp.data.network
 
-import `in`.allen.gsp.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface Api {
 
     companion object {
         operator fun invoke(networkConnectionInterceptor: NetworkConnectionInterceptor): Api {
+            val logging = HttpLoggingInterceptor()
+            logging.level = HttpLoggingInterceptor.Level.BODY
+
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(networkConnectionInterceptor)
+                .addInterceptor(logging)
                 .build()
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl(BuildConfig.BASE_URL + "gsp-admin/index.php/android_v2/")
+                .baseUrl("https://www.klipinterest.com/gsp-admin/index.php/android_v2/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -35,14 +37,11 @@ interface Api {
     @FormUrlEncoded
     @POST("authentication")
     suspend fun authentication(
-        @Field("name") name: String,
-        @Field("email") email: String,
-        @Field("avatar") avatar: String,
-        @Field("firebase_uid") firebaseUid: String
+        @FieldMap params: Map<String, String>
     ): Response<String>
 
     // leaderboard
     @GET("leaderboard")
-    fun leaderboard(): Call<ResponseBody>
+    suspend fun leaderboard(): Response<String>
 
 }
