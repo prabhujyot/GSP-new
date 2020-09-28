@@ -1,6 +1,7 @@
 package `in`.allen.gsp
 
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
+import `in`.allen.gsp.ui.profile.ProfileActivity
 import `in`.allen.gsp.ui.videos.VideosActivity
 import android.content.Context
 import android.content.Intent

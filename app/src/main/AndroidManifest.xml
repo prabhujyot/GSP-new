@@ -21,7 +21,7 @@
         <activity android:name=".ui.leaderboard.LeaderboardActivity" />
         <activity android:name=".RewardActivity" />
         <activity android:name=".ui.profile.ProfileEditActivity" />
-        <activity android:name=".ProfileActivity" />
+        <activity android:name=".ui.profile.ProfileActivity" />
         <activity android:name=".HomeActivity" />
         <activity android:name=".IntroActivity" />
         <activity android:name=".ui.splash.SplashActivity">

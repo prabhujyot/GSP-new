@@ -11,7 +11,7 @@ class UserRepository(
     private val db: AppDatabase
 ): SafeApiRequest() {
 
-    suspend fun login(params: HashMap<String,String>): String? {
+    suspend fun login(params: Map<String, String>): String? {
         return apiRequest {
             api.authentication(params)
         }
@@ -20,6 +20,12 @@ class UserRepository(
     suspend fun setDBUser(user: User) = db.getUserDao().upsert(user)
 
     suspend fun getDBUser() = db.getUserDao().getUser()
+
+    suspend fun profile(user_id: Int): String? {
+        return apiRequest {
+            api.profile(user_id)
+        }
+    }
 
 
 //    fun login(name: String, email: String, avatar: String, firebaseUid: String): LiveData<String> {

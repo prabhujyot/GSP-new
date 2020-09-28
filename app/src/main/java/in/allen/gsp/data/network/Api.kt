@@ -1,10 +1,7 @@
 package `in`.allen.gsp.data.network
 
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
-import org.json.JSONObject
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -38,6 +35,13 @@ interface Api {
     @POST("authentication")
     suspend fun authentication(
         @FieldMap params: Map<String, String>
+    ): Response<String>
+
+    // user stats
+    @FormUrlEncoded
+    @POST("profile")
+    suspend fun profile(
+        @Field("user_id") user_id: Int
     ): Response<String>
 
     // leaderboard

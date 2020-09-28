@@ -86,4 +86,5 @@
     <string name="lblExit">Exit</string>
     <string name="lblRestart">Play Again</string>
     <string name="lblLogout">Logout</string>
+    <string name="lblTotalGames">Total Games</string>
 </resources>

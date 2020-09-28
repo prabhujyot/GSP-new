@@ -1,50 +1,40 @@
 package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityProfileEditBinding
-import `in`.allen.gsp.utils.App
-import `in`.allen.gsp.utils.tag
-import `in`.allen.gsp.utils.toast
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
-class ProfileEditActivity : AppCompatActivity(), ProfileListener {
+class ProfileEditActivity : AppCompatActivity(), KodeinAware {
 
     private val TAG = ProfileEditActivity::class.java.name
+    private lateinit var binding: ActivityProfileEditBinding
+    private lateinit var viewModel: ProfileViewModel
 
-    private lateinit var app: App
+    override val kodein by kodein()
+    private val instance: UserRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = DataBindingUtil.setContentView<ActivityProfileEditBinding>(this, R.layout.activity_profile_edit)
-        val viewModel = ProfileViewModel()
-        binding.viewModel = viewModel
-        viewModel.profileListener = this
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_profile_edit)
+        viewModel = ProfileViewModel(instance)
 
         setSupportActionBar(myToolbar)
         myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 
-        app = application as App
     }
 
-    override fun onStarted() {
-        toast("onStarted")
-        tag("onStarted")
-    }
-
-    override fun onSuccess(user: User) {
-        toast("onSuccess ${user.name}")
-    }
-
-    override fun onFailed(message: String) {
-        toast(message)
-        tag(message)
-    }
+    fun btnActionProfileEdit(view: View) {}
 
 }

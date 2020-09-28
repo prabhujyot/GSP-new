@@ -62,7 +62,7 @@
                         android:id="@+id/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/margin16"
+                        android:layout_marginStart="@dimen/margin16"
                         android:text="@={viewModel.username}"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/white"
@@ -178,7 +178,7 @@
                                 android:textStyle="bold"
                                 android:background="@drawable/bg_btn_orange"
                                 android:layout_marginEnd="@dimen/margin4"
-                                android:onClick="@{viewModel::btnActionProfileEdit}"/>
+                                android:onClick="btnActionProfileEdit"/>
 
                             <Button
                                 android:id="@+id/btnSave"
@@ -191,7 +191,7 @@
                                 android:textStyle="bold"
                                 android:background="@drawable/bg_btn_blue"
                                 android:layout_marginStart="@dimen/margin4"
-                                android:onClick="@{viewModel::btnActionProfileEdit}"/>
+                                android:onClick="btnActionProfileEdit"/>
                         </LinearLayout>
 
                     </LinearLayout>

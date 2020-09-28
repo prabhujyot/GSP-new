@@ -48,7 +48,7 @@ class VideosRepository(
     }
 
     private fun isFetchNeeded(): Boolean {
-        return true
+        return false
     }
 
     private fun saveVideos(video: List<Video>) {

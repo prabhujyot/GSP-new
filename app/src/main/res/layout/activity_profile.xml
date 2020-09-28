@@ -1,314 +1,353 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ProfileActivity"
-    android:keepScreenOn="true">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="300dp">
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:background="@drawable/gradiant_blue"
-            app:contentScrim="@color/blue"
-            app:titleEnabled="false">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/bgHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/summary"
-                    android:layout_marginBottom="@dimen/margin16">
-
-                    <ImageView
-                        android:id="@+id/avatar"
-                        android:layout_width="90dp"
-                        android:layout_height="0dp"
-                        android:layout_margin="@dimen/margin16"
-                        android:background="@drawable/bg_circle_orange"
-                        android:contentDescription="@string/lblAvatar"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="h,1:1"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                    <TextView
-                        android:id="@+id/username"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/margin16"
-                        android:text="Prabhujyot Singh Bamrah"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toTopOf="@+id/email"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@id/avatar"
-                        app:layout_constraintTop_toTopOf="@id/avatar"
-                        app:layout_constraintVertical_chainStyle="packed" />
-
-                    <TextView
-                        android:id="@+id/email"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:text="prabhujyotsingh.allen@gmail.com"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toTopOf="@+id/mobile"
-                        app:layout_constraintEnd_toEndOf="@id/username"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="@id/username"
-                        app:layout_constraintTop_toBottomOf="@+id/username" />
-
-                    <TextView
-                        android:id="@+id/mobile"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:text="7737418984"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/avatar"
-                        app:layout_constraintEnd_toEndOf="@id/email"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="@id/email"
-                        app:layout_constraintTop_toBottomOf="@+id/email" />
-
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-                <LinearLayout
-                    android:id="@+id/summary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight=".5"
-                        android:background="@drawable/gradiant_blue"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="@dimen/margin8">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lblWonGames"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                            android:textColor="@color/white"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/wonGames"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="70"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            android:textColor="@color/white"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight=".5"
-                        android:background="@drawable/gradiant_orange"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="@dimen/margin8">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/lblTotalCoins"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                            android:textColor="@color/white"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/totalCoins"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="2500"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                            android:textColor="@color/white"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <include layout="@layout/toolbar"/>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollView"
+    <data>
+        <variable
+            name="user"
+            type="in.allen.gsp.data.db.entities.User" />
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/rootLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_overlapTop="0dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:padding="@dimen/margin8">
+        tools:context=".ui.profile.ProfileActivity"
+        android:keepScreenOn="true">
 
-        <LinearLayout
-            android:id="@+id/statistics"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/summary"
-            android:padding="@dimen/margin8"
-            android:orientation="vertical">
-            <androidx.cardview.widget.CardView
+            android:layout_height="300dp">
+            <com.google.android.material.appbar.CollapsingToolbarLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="@dimen/margin8"
-                android:layout_margin="@dimen/margin4"
-                android:background="@drawable/bg_btn_gray">
+                android:layout_height="match_parent"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                android:background="@drawable/gradiant_blue"
+                app:contentScrim="@color/blue"
+                app:titleEnabled="false">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/margin8">
-                    <TextView
+                    android:layout_height="match_parent">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/bgHeader"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/lblStatistics"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_marginBottom="@dimen/margin8"/>
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/summary"
+                        android:layout_marginBottom="@dimen/margin16">
 
+                        <ImageView
+                            android:id="@+id/avatar"
+                            android:layout_width="90dp"
+                            android:layout_height="0dp"
+                            android:layout_margin="@dimen/margin16"
+                            android:background="@drawable/bg_circle_orange"
+                            android:contentDescription="@string/lblAvatar"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintDimensionRatio="h,1:1"
+                            app:layout_constraintStart_toStartOf="parent" />
+
+                        <TextView
+                            android:id="@+id/username"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/margin16"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toTopOf="@+id/email"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@id/avatar"
+                            app:layout_constraintTop_toTopOf="@id/avatar"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/email"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin4"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toTopOf="@+id/mobile"
+                            app:layout_constraintEnd_toEndOf="@id/username"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toStartOf="@id/username"
+                            app:layout_constraintTop_toBottomOf="@+id/username" />
+
+                        <TextView
+                            android:id="@+id/mobile"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin4"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="@id/avatar"
+                            app:layout_constraintEnd_toEndOf="@id/email"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toStartOf="@id/email"
+                            app:layout_constraintTop_toBottomOf="@+id/email" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                     <LinearLayout
+                        android:id="@+id/summary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:weightSum="1">
+                        android:weightSum="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
                         <LinearLayout
-                            android:id="@+id/layoutWin"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight=".5"
+                            android:background="@drawable/gradiant_blue"
+                            android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="@dimen/margin4"
-                            android:gravity="center_horizontal">
+                            android:padding="@dimen/margin8">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:maxLines="1"
-                                android:text="@string/lblWin"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                                android:textColor="@color/black"
+                                android:text="@string/lblTotalGames"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textColor="@color/white"
                                 android:textStyle="bold" />
 
-                            <View
-                                android:id="@+id/progressWin"
-                                android:layout_width="match_parent"
-                                android:layout_height="16dp"
-                                android:background="@drawable/left_corner_radius"
-                                android:layout_marginTop="@dimen/margin4"
-                                android:layout_marginBottom="@dimen/margin4"/>
-
                             <TextView
-                                android:id="@+id/percentWin"
+                                android:id="@+id/totalGames"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:maxLines="1"
-                                android:text="50%"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                                android:textColor="@color/black"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textColor="@color/white"
                                 android:textStyle="bold" />
                         </LinearLayout>
+
                         <LinearLayout
-                            android:id="@+id/layoutLose"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight=".5"
+                            android:background="@drawable/gradiant_orange"
+                            android:gravity="center"
                             android:orientation="vertical"
-                            android:padding="@dimen/margin4"
-                            android:gravity="center_horizontal">
+                            android:padding="@dimen/margin8">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:maxLines="1"
-                                android:text="@string/lblLose"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                                android:textColor="@color/black"
+                                android:text="@string/lblTotalCoins"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                                android:textColor="@color/white"
                                 android:textStyle="bold" />
 
-                            <View
-                                android:id="@+id/progressLose"
-                                android:layout_width="match_parent"
-                                android:layout_height="16dp"
-                                android:background="@drawable/right_corner_radius"
-                                android:layout_marginTop="@dimen/margin4"
-                                android:layout_marginBottom="@dimen/margin4"/>
-
                             <TextView
-                                android:id="@+id/percentLose"
+                                android:id="@+id/totalCoins"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:maxLines="1"
-                                android:text="50%"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                                android:textColor="@color/black"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                                android:textColor="@color/white"
                                 android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <include layout="@layout/toolbar"/>
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+        </com.google.android.material.appbar.AppBarLayout>
 
-            <androidx.cardview.widget.CardView
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_overlapTop="0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:padding="@dimen/margin8">
+
+            <LinearLayout
+                android:id="@+id/statistics"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="@dimen/margin8"
-                android:layout_margin="@dimen/margin4"
-                android:background="@drawable/bg_btn_gray">
-
-                <LinearLayout
+                app:layout_constraintTop_toBottomOf="@id/summary"
+                android:padding="@dimen/margin8"
+                android:orientation="vertical">
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/margin8">
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/lblTopics"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:layout_marginBottom="@dimen/margin8"/>
+                    app:cardCornerRadius="@dimen/margin8"
+                    android:layout_margin="@dimen/margin4"
+                    android:background="@drawable/bg_btn_gray">
 
                     <LinearLayout
-                        android:id="@+id/layoutTopics"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-        </LinearLayout>
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin8">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lblStatistics"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:layout_marginBottom="@dimen/margin8"/>
 
-    </androidx.core.widget.NestedScrollView>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="1">
+                            <LinearLayout
+                                android:id="@+id/layoutWin"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight=".33"
+                                android:orientation="vertical"
+                                android:padding="@dimen/margin4"
+                                android:gravity="center_horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:text="@string/lblWin"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+
+                                <View
+                                    android:id="@+id/progressWin"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/left_corner_radius"
+                                    android:layout_marginTop="@dimen/margin4"
+                                    android:layout_marginBottom="@dimen/margin4"/>
+
+                                <TextView
+                                    android:id="@+id/percentWin"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:text="33%"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                            <LinearLayout
+                                android:id="@+id/layoutPlayed"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight=".33"
+                                android:orientation="vertical"
+                                android:padding="@dimen/margin4"
+                                android:gravity="center_horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+
+                                <View
+                                    android:id="@+id/progressPlayed"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/gradiant_blue"
+                                    android:layout_marginTop="@dimen/margin4"
+                                    android:layout_marginBottom="@dimen/margin4"/>
+
+                                <TextView
+                                    android:id="@+id/percentPlayed"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:text="33%"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                            <LinearLayout
+                                android:id="@+id/layoutLose"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight=".33"
+                                android:orientation="vertical"
+                                android:padding="@dimen/margin4"
+                                android:gravity="center_horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:text="@string/lblLose"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+
+                                <View
+                                    android:id="@+id/progressLose"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="16dp"
+                                    android:background="@drawable/right_corner_radius"
+                                    android:layout_marginTop="@dimen/margin4"
+                                    android:layout_marginBottom="@dimen/margin4"/>
+
+                                <TextView
+                                    android:id="@+id/percentLose"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:text="33%"
+                                    android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                    android:textColor="@color/black"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
 
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="@dimen/margin8"
+                    android:layout_margin="@dimen/margin4"
+                    android:background="@drawable/bg_btn_gray">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/margin8">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lblTopics"
+                            android:textColor="@color/black"
+                            android:textStyle="bold"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                            android:layout_marginBottom="@dimen/margin8"/>
+
+                        <LinearLayout
+                            android:id="@+id/layoutTopics"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"/>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <include layout="@layout/progress" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
