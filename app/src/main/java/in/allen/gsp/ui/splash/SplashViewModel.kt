@@ -5,6 +5,7 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Encryption
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,39 +14,44 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.logging.Handler
 
 
 class SplashViewModel(
     private val repository: UserRepository
 ): ViewModel() {
 
-//    suspend fun getDBUser(): User? {
-//        return repository.getDBUser()
-//    }
-//
-//    suspend fun setDBUser(user: User): Long {
-//        return repository.setDBUser(user)
-//    }
-//
-//    suspend fun loginUser( params: HashMap<String,String>): String? {
-//        return withContext(Dispatchers.IO) { repository.login(params) }
-//    }
-
-
+    private val TAG = SplashViewModel::class.java.name
 
     // interaction with activity
-    val _loading = MutableLiveData<Resource.Loading<String>>()
-    val _success = MutableLiveData<Resource.Success<User>>()
-    val _error = MutableLiveData<Resource.Error<String>>()
+    private val _loading = MutableLiveData<Resource.Loading<String>>()
+    private val _success = MutableLiveData<Resource.Success<User>>()
+    private val _error = MutableLiveData<Resource.Error<String>>()
+
+    fun stateLoading(): LiveData<Resource.Loading<String>> {
+        return _loading
+    }
+
+    fun stateError(): LiveData<Resource.Error<String>> {
+        return _error
+    }
+
+    fun stateSuccess(): LiveData<Resource.Success<User>> {
+        return _success
+    }
+
+    fun setError(error: String) {
+        _error.value = Resource.Error(error)
+    }
 
     // check firebase uid
     private val auth = FirebaseAuth.getInstance()
 
     init {
         val currentUser = auth.currentUser
-        tag("init currentUser $currentUser")
         authUser(currentUser)
     }
 
@@ -120,6 +126,8 @@ class SplashViewModel(
                                 data.getString("avatar"),
                                 data.getString("email"),
                                 data.getString("mobile"),
+                                data.getString("about"),
+                                data.getString("location"),
                                 data.getString("referral_id"),
                                 data.getString("firebase_token"),
                                 data.getString("firebase_uid"),
@@ -127,6 +135,7 @@ class SplashViewModel(
                                 data.getString("create_date"),
                                 data.getString("session_token"),
                                 data.getInt("coins"),
+                                data.getInt("redeemed_otp_status"),
                                 data.getBoolean("is_admin")
                             )
                             repository.setDBUser(user)
@@ -168,7 +177,10 @@ class SplashViewModel(
                             if (sysTime > expireTime) {
                                 authToServer(firebaseUser)
                             } else {
-                                _success.value = Resource.Success(dbUser)
+                                viewModelScope.launch {
+                                    delay(2*1000)
+                                    _success.value = Resource.Success(dbUser)
+                                }
                             }
                         } catch (e: Exception) {
                             tag("authUser: ${e.message}")

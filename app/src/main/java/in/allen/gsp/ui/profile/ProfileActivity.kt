@@ -1,6 +1,7 @@
 package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.R
+import `in`.allen.gsp.data.db.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityProfileBinding
 import `in`.allen.gsp.utils.*
@@ -15,6 +16,7 @@ import android.view.animation.ScaleAnimation
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.item_topic_progress.view.*
@@ -34,57 +36,22 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
     private lateinit var viewModel: ProfileViewModel
 
     override val kodein by kodein()
-    private val instance: UserRepository by instance()
+    private val repository: UserRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
-        binding.lifecycleOwner = this
-        viewModel = ProfileViewModel(instance)
+        viewModel = ProfileViewModel(repository)
 
         setSupportActionBar(myToolbar)
         myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 
-
-        viewModel._user.observe(this, {
-            tag("viewModel._user: ${it.data}")
-            if (it.data != null) {
-                if (it.data.avatar.isNotBlank())
-                    binding.avatar.loadImage(it.data.avatar, true)
-                binding.username.text = it.data.name
-                binding.email.text = it.data.email
-                if (it.data.mobile.length > 9)
-                    binding.mobile.text = it.data.mobile
-                binding.totalCoins.text = "${it.data.coins}"
-            }
-        })
-
-        viewModel._stats.observe(this, {
-            binding.rootLayout.hideProgress()
-            tag("viewModel._stats: ${it.data}")
-            if (it.data != null) {
-                binding.totalGames.text = it.data.getString("total")
-                setStatistics(it.data)
-            }
-        })
-
-        viewModel._loading.observe(this, {
-            tag("viewModel._loading: ${it.message}")
-            binding.rootLayout.showProgress()
-        })
-
-        viewModel._error.observe(this, {
-            tag("viewModel._error: ${it.message}")
-            binding.rootLayout.hideProgress()
-            it.message?.let { it1 ->
-                if (it1.isNotBlank())
-                    binding.rootLayout.snackbar(it1.trim())
-            }
-        })
-
-        viewModel.statsData()
+        observeLoading()
+        observeError()
+        observeSuccess()
+        viewModel.userData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -112,6 +79,62 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
             startActivity(Intent.createChooser(share, "Share Image"))
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun observeLoading() {
+        viewModel.stateLoading().observe(this, {
+            tag("viewModel._loading: ${it.message}")
+            binding.rootLayout.showProgress()
+        })
+    }
+
+    private fun observeError() {
+        viewModel.stateError().observe(this, {
+            tag("viewModel._error: ${it.message}")
+            binding.rootLayout.hideProgress()
+            it.message?.let { it1 ->
+                if (it1.isNotBlank()) {
+                    binding.rootLayout.snackbar(it1.trim())
+                }
+            }
+        })
+    }
+
+    private fun observeSuccess() {
+        viewModel.stateSuccess().observe(this, {
+            if(it != null) {
+                binding.rootLayout.hideProgress()
+                when (it.message) {
+                    "user" -> {
+                        val user = it.data as User
+                        if (user.avatar.isNotBlank())
+                            binding.avatar.loadImage(user.avatar, true)
+                        binding.username.text = user.name
+                        binding.email.text = user.email
+                        if (user.mobile.length > 9) {
+                            binding.mobile.text = "Mob. ${user.mobile} "
+                            if(user.is_verified == 1) {
+                                binding.mobile.setCompoundDrawablesWithIntrinsicBounds(
+                                    null,
+                                    null,
+                                    ResourcesCompat.getDrawable(resources,R.drawable.ic_check,null),
+                                    null
+                                )
+                            }
+                        }
+                        binding.referralId.text = "Referral Code: ${user.referral_id}"
+                        binding.totalCoins.text = "${user.coins}"
+
+                        viewModel.statsData(user.user_id)
+                    }
+                    "stats" -> {
+                        val obj = it.data as JSONObject
+                        binding.totalGames.text = obj.getString("total")
+                        setStatistics(obj)
+                    }
+                }
+            }
+        })
     }
 
     private fun setStatistics(data: JSONObject) {
@@ -184,18 +207,12 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                     R.drawable.right_corner_radius,
                     colorList
                 )
-                topicView.progressTopic.text = "${el["percent"]}%"
-                topicView.topic.text = el["topic"]
-
-                val percent = (0.7).times(el["percent"]?.toFloat()!!)
-
+                topicView.topic.text = "${el["topic"]} (${el["percent"]}%)"
                 val param = topicView.progressTopic.layoutParams
-                (param as LinearLayout.LayoutParams).weight = (percent.toFloat()/100)
+                (param as LinearLayout.LayoutParams).weight = (el["percent"]?.toFloat()!!/100)
                 topicView.progressTopic.layoutParams = param
-
-                scaleView(topicView.progressTopic, 0f, 1f)
-
                 layoutTopics.addView(topicView)
+                scaleView(topicView.progressTopic, 0f, 1f)
             }
         }
     }

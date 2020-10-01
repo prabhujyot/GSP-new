@@ -3,11 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="user"
-            type="in.allen.gsp.data.db.entities.User" />
-    </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/rootLayout"
         android:layout_width="match_parent"
@@ -53,7 +48,7 @@
                             android:id="@+id/username"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="@dimen/margin16"
+                            android:layout_marginStart="@dimen/margin16"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                             android:textColor="@color/white"
                             android:textStyle="bold"
@@ -66,31 +61,41 @@
 
                         <TextView
                             android:id="@+id/email"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin4"
                             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                             android:textColor="@color/white"
                             android:textStyle="bold"
-                            app:layout_constraintBottom_toTopOf="@+id/mobile"
-                            app:layout_constraintEnd_toEndOf="@id/username"
+                            app:layout_constraintBottom_toTopOf="@id/referralId"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintStart_toStartOf="@id/username"
                             app:layout_constraintTop_toBottomOf="@+id/username" />
 
                         <TextView
-                            android:id="@+id/mobile"
-                            android:layout_width="0dp"
+                            android:id="@+id/referralId"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/margin4"
                             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                             android:textColor="@color/white"
                             android:textStyle="bold"
-                            app:layout_constraintBottom_toBottomOf="@id/avatar"
-                            app:layout_constraintEnd_toEndOf="@id/email"
+                            app:layout_constraintBottom_toTopOf="@id/mobile"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintStart_toStartOf="@id/email"
                             app:layout_constraintTop_toBottomOf="@+id/email" />
+
+                        <TextView
+                            android:id="@+id/mobile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/margin4"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toStartOf="@id/referralId"
+                            app:layout_constraintTop_toBottomOf="@+id/referralId" />
 
 
                     </androidx.constraintlayout.widget.ConstraintLayout>

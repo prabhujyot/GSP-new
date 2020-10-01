@@ -1,9 +1,9 @@
 package `in`.allen.gsp.ui.splash
 
-import `in`.allen.gsp.HomeActivity
+import `in`.allen.gsp.ui.home.HomeActivity
 import `in`.allen.gsp.R
+import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivitySplashBinding
-import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
 import `in`.allen.gsp.utils.*
 import android.content.Intent
 import android.graphics.Color
@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -34,14 +33,13 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
     private lateinit var viewModel: SplashViewModel
 
     override val kodein by kodein()
-    private val factory: SplashViewModelFactory by instance()
-
+    private val repository: UserRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
-        viewModel = ViewModelProvider(this, factory).get(SplashViewModel::class.java)
+        viewModel = SplashViewModel(repository)
 
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(5, 137, 229)
@@ -69,34 +67,9 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             colorList
         )
 
-        viewModel._success.observe(this, {
-            tag("viewModel._success: ${it.data}")
-            binding.rootLayout.hideProgress()
-            if(it.data != null) {
-                Intent(this, HomeActivity::class.java)
-                    .also { it1 ->
-                        it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(it1)
-                    }
-            }
-        })
-
-        viewModel._loading.observe(this, {
-            tag("viewModel._loading: ${it.message}")
-            binding.rootLayout.showProgress()
-        })
-
-        viewModel._error.observe(this, {
-            tag("viewModel._error: ${it.message}")
-            binding.rootLayout.hideProgress()
-            askToLogin()
-
-            it.message?.let { it1 ->
-                if(it1.isNotBlank())
-                    binding.rootLayout.snackbar(it1.trim())
-            }
-        })
-
+        observeSuccess()
+        observeLoading()
+        observeError()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -107,12 +80,12 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 try {
                     val account = task.getResult(ApiException::class.java)
                     account?.apply {
-                        tag("firebaseAuthWithGoogle:" + account.id)
+                        tag("$TAG firebaseAuthWithGoogle:" + account.id)
                         viewModel.firebaseAuthWithGoogle(account.idToken!!)
                     }
                 } catch (e: ApiException) {
-                    tag("Google sign in failed $e")
-                    viewModel._error.value = Resource.Error("Google sign in failed $e")
+                    tag("$TAG Google sign in failed $e")
+                    viewModel.setError("Google sign in failed $e")
                 }
             }
         }
@@ -134,20 +107,55 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         LoginManager.getInstance().registerCallback(callbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
-                    tag("FB Login Success")
+                    tag("$TAG FB Login Success")
                     viewModel.firebaseAuthWithFB(loginResult.accessToken)
                 }
 
                 override fun onCancel() {
-                    viewModel._error.value = Resource.Error("FB Login cancel")
+                    viewModel.setError("FB Login cancel")
                 }
 
                 override fun onError(exception: FacebookException) {
-                    tag("FB Error ${exception.message}")
-                    viewModel._error.value = Resource.Error("FB Error ${exception.message}")
+                    tag("$TAG FB Error ${exception.message}")
+                    viewModel.setError("FB Error ${exception.message}")
                 }
             })
         LoginManager.getInstance().logInWithReadPermissions(this, listOf("email", "public_profile"))
+    }
+
+
+    private fun observeLoading() {
+        viewModel.stateLoading().observe(this, {
+            tag("$TAG viewModel._loading: ${it.message}")
+            binding.rootLayout.showProgress()
+        })
+    }
+
+    private fun observeError() {
+        viewModel.stateError().observe(this, {
+            tag("$TAG viewModel._error: ${it.message}")
+            binding.rootLayout.hideProgress()
+            askToLogin()
+
+            it.message?.let { it1 ->
+                if(it1.isNotBlank())
+                    binding.rootLayout.snackbar(it1.trim())
+            }
+        })
+    }
+
+    private fun observeSuccess() {
+        viewModel.stateSuccess().observe(this, {
+            tag("$TAG viewModel._success: ${it.data}")
+            binding.rootLayout.hideProgress()
+            if(it.data != null) {
+                Intent(this, HomeActivity::class.java)
+                    .also { it1 ->
+                        it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(it1)
+                    }
+            }
+        })
     }
 
     private fun askToLogin() {

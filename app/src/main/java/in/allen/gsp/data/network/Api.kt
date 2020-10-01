@@ -44,6 +44,31 @@ interface Api {
         @Field("user_id") user_id: Int
     ): Response<String>
 
+    // update user
+    @FormUrlEncoded
+    @POST("update_user")
+    suspend fun updateProfile(
+        @FieldMap params: Map<String, String>
+    ): Response<String>
+
+    // otp
+    @FormUrlEncoded
+    @POST("otp")
+    suspend fun otp(
+        @Field("user_id") user_id: Int,
+        @Field("mobile") mobile: String
+    ): Response<String>
+
+    // mobile verification
+    @FormUrlEncoded
+    @POST("mobile_verification")
+    suspend fun verifyMobile(
+        @Field("user_id") user_id: Int,
+        @Field("mobile") mobile: String,
+        @Field("otp") otp: String
+    ): Response<String>
+
+
     // leaderboard
     @GET("leaderboard")
     suspend fun leaderboard(): Response<String>

@@ -27,6 +27,24 @@ class UserRepository(
         }
     }
 
+    suspend fun updateProfile(params: HashMap<String, String>): String? {
+        return apiRequest {
+            api.updateProfile(params)
+        }
+    }
+
+    suspend fun otp(user_id: Int, mobile: String): String? {
+        return apiRequest {
+            api.otp(user_id,mobile)
+        }
+    }
+
+    suspend fun verifyMobile(user_id: Int, mobile: String, otp: String): String? {
+        return apiRequest {
+            api.verifyMobile(user_id,mobile,otp)
+        }
+    }
+
 
 //    fun login(name: String, email: String, avatar: String, firebaseUid: String): LiveData<String> {
 //        val loginResponse = MutableLiveData<String>()

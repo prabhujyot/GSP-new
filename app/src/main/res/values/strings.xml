@@ -25,7 +25,7 @@
     <string name="lblAvatar">Avatar</string>
     <string name="lblWin">Win</string>
     <string name="lblLose">Lose</string>
-    <string name="lblStatistics">Statistics</string>
+    <string name="lblStatistics">Statistics (Last 30 days)</string>
     <string name="lblTopics">Topics</string>
     <string name="lblEdit">Edit</string>
     <string name="lblShare">Share</string>
@@ -87,4 +87,7 @@
     <string name="lblRestart">Play Again</string>
     <string name="lblLogout">Logout</string>
     <string name="lblTotalGames">Total Games</string>
+    <string name="lblVerify">Verify</string>
+    <string name="submit">Submit</string>
+    <string name="prompt_code">Enter OTP</string>
 </resources>

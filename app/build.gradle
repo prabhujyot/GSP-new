@@ -69,6 +69,8 @@ dependencies {
     // ted permission dispatcher
     implementation 'gun0912.ted:tedpermission:2.2.2'
 
+    implementation 'com.chaos.view:pinview:1.4.4'
+
     // networking
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
 
@@ -82,10 +84,6 @@ dependencies {
     // glide
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     kapt 'com.github.bumptech.glide:compiler:4.11.0'
-
-    // databinding
-//    kapt 'com.android.databinding:compiler:3.1.4'
-
 
     // Room components
     implementation "androidx.room:room-runtime:2.2.5"

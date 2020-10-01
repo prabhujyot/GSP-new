@@ -10,7 +10,9 @@ data class User (
     val name: String,
     val avatar: String,
     val email: String,
-    val mobile: String,
+    var mobile: String,
+    var about: String,
+    var location: String,
     val referral_id: String,
     val firebase_token: String,
     val firebase_uid: String,
@@ -18,5 +20,6 @@ data class User (
     val create_date: String,
     val session_token: String,
     val coins: Int,
+    var is_verified: Int,
     val is_admin: Boolean
 )
