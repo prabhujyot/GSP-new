@@ -1,25 +1,28 @@
 package `in`.allen.gsp.ui.home
 
 import `in`.allen.gsp.*
+import `in`.allen.gsp.data.db.entities.Contest
+import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.repositories.ContestRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityHomeBinding
+import `in`.allen.gsp.databinding.ItemContestBinding
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
 import `in`.allen.gsp.ui.profile.ProfileActivity
 import `in`.allen.gsp.ui.videos.VideosActivity
-import android.content.Context
+import `in`.allen.gsp.utils.*
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
-import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -31,43 +34,76 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     private lateinit var viewModel: HomeViewModel
 
     override val kodein by kodein()
-    private val repository: UserRepository by instance()
-
-    private val contestList = ArrayList<HashMap<String, String>>()
+    private val userRepository: UserRepository by instance()
+    private val contestRepository: ContestRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = HomeViewModel(repository)
+        viewModel = HomeViewModel(userRepository,contestRepository)
 
-        viewpagerContest.pageMargin = 16
-        viewpagerContest.adapter = ContestAdapter(this, layoutInflater, contestList)
+        binding.viewpagerContest.pageMargin = 16
 
-        getContestList()
+        observeLoading()
+        observeError()
+        observeSuccess()
+        viewModel.userData()
     }
 
-    private fun getContestList() {
-        contestList.clear()
-        var hashMap = HashMap<String, String>()
-        hashMap["image"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTaqSCG-_PRudGH3PnjI5WD0NHRbqrioLFqJQ&usqp=CAU"
-        hashMap["title"] = "Rakshabandhan contest"
-        contestList.add(hashMap)
-        hashMap = HashMap()
-        hashMap["image"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTaqSCG-_PRudGH3PnjI5WD0NHRbqrioLFqJQ&usqp=CAU"
-        hashMap["title"] = "Diwali contest"
-        contestList.add(hashMap)
-        hashMap = HashMap()
-        hashMap["image"] = "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTaqSCG-_PRudGH3PnjI5WD0NHRbqrioLFqJQ&usqp=CAU"
-        hashMap["title"] = "Christmas contest"
-        contestList.add(hashMap)
 
-        viewpagerContest.adapter?.notifyDataSetChanged()
+    private fun observeLoading() {
+        viewModel.stateLoading().observe(this, {
+            tag("$TAG viewModel._loading: ${it.message}")
+            binding.rootLayout.showProgress()
+        })
+    }
+
+    private fun observeError() {
+        viewModel.stateError().observe(this, {
+            tag("$TAG viewModel._error: ${it.message}")
+            binding.rootLayout.hideProgress()
+
+            it.message?.let { it1 ->
+                if(it1.isNotBlank())
+                    binding.rootLayout.snackbar(it1.trim())
+            }
+        })
+    }
+
+    private fun observeSuccess() {
+        viewModel.stateSuccess().observe(this, {
+            tag("$TAG viewModel._success: ${it.data}")
+            if(it != null) {
+                binding.rootLayout.hideProgress()
+                when (it.message) {
+                    "user" -> {
+                        val user = it.data as User
+                        if (user.avatar.isNotBlank())
+                            binding.btnProfileTop.loadImage(user.avatar, true)
+
+                        viewModel.contestData(user.user_id)
+                    }
+
+                    "contest" -> {
+                        if(it.data is Deferred<*>) {
+                            val deferredList = it.data as Deferred<LiveData<List<Contest>>>
+                            lifecycleScope.launch {
+                                deferredList.await().observe(this@HomeActivity, { list->
+                                    binding.viewpagerContest.adapter = ContestAdapter(layoutInflater,
+                                        list
+                                    )
+                                })
+                            }
+                        }
+                    }
+                }
+            }
+        })
     }
 
     private class ContestAdapter(
-        private val context: Context,
         private val inflater: LayoutInflater,
-        private val list: ArrayList<HashMap<String, String>>
+        private val list: List<Contest>
     ): PagerAdapter() {
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -79,22 +115,20 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val v: View = inflater.inflate(R.layout.item_contest, null)
+            val binding: ItemContestBinding = DataBindingUtil.inflate(inflater,R.layout.item_contest,container,false)
+//            val v: View = inflater.inflate(R.layout.item_contest, null)
 
-            val image = v.findViewById<ImageView>(R.id.image)
-            val title = v.findViewById<TextView>(R.id.title)
-            val btnGo = v.findViewById<ImageButton>(R.id.btnGo)
+//            val image = v.findViewById<ImageView>(R.id.image)
+//            val title = v.findViewById<TextView>(R.id.title)
+//            val btnGo = v.findViewById<ImageButton>(R.id.btnGo)
 
             val item = list[position]
-            Glide.with(context)
-                .load(item["image"])
-                .centerCrop()
-                .into(image)
-            title.text = item["title"]
-//            btnGo.setOnClickListener {  }
+            binding.image.loadImage("https://www.klipinterest.com/gsp-admin/uploads/contest/${item.logo}")
+            binding.title.text = item.name
+            binding.btnGo.setOnClickListener {  }
 
-            container.addView(v)
-            return v
+            container.addView(binding.root)
+            return binding.root
         }
 
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {

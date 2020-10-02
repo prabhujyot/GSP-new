@@ -68,6 +68,13 @@ interface Api {
         @Field("otp") otp: String
     ): Response<String>
 
+    // user stats
+    @FormUrlEncoded
+    @POST("contest")
+    suspend fun contest(
+        @Field("user_id") user_id: Int
+    ): Response<String>
+
 
     // leaderboard
     @GET("leaderboard")

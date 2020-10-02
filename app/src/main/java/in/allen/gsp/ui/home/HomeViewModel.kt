@@ -1,14 +1,19 @@
 package `in`.allen.gsp.ui.home
 
+import `in`.allen.gsp.data.repositories.ContestRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
+import `in`.allen.gsp.utils.lazyDeferred
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 
 class HomeViewModel(
-    private val repository: UserRepository
+    private val userRepository: UserRepository,
+    private val contestRepository: ContestRepository
 ): ViewModel() {
 
     private val TAG = HomeViewModel::class.java.name
@@ -30,8 +35,22 @@ class HomeViewModel(
         return _success
     }
 
-    fun setError(error: String) {
-        _error.value = Resource.Error(error)
+    fun userData() {
+        viewModelScope.launch {
+            val dbUser = userRepository.getDBUser()
+            if (dbUser != null) {
+                _success.value = Resource.Success(dbUser,"user")
+            } else {
+                _error.value = Resource.Error("Not found")
+            }
+        }
+    }
+
+    fun contestData(user_id: Int) {
+        val response by lazyDeferred {
+            contestRepository.getList(user_id)
+        }
+        _success.value = Resource.Success(response,"contest")
     }
 
 }

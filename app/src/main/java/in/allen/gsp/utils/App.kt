@@ -4,6 +4,7 @@ import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.NetworkConnectionInterceptor
 import `in`.allen.gsp.data.network.YTApi
+import `in`.allen.gsp.data.repositories.ContestRepository
 import `in`.allen.gsp.data.repositories.LeaderboardRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.repositories.VideosRepository
@@ -30,6 +31,7 @@ class App: Application(), KodeinAware {
         bind() from singleton { Api(instance()) }
         bind() from singleton { AppDatabase(instance()) }
         bind() from singleton { UserRepository(instance(),instance()) }
+        bind() from singleton { ContestRepository(instance(),instance()) }
         bind() from singleton { LeaderboardRepository(instance(),instance()) }
 
         bind() from singleton { YTApi(instance()) }

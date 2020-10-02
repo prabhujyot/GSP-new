@@ -76,21 +76,21 @@
                     app:layout_constraintEnd_toStartOf="@id/btnProfileTop"
                     app:layout_constraintTop_toTopOf="@id/btnProfileTop" />
 
-                <ImageButton
+                <ImageView
                     android:id="@+id/btnProfileTop"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:layout_marginEnd="@dimen/margin16"
                     android:adjustViewBounds="true"
                     android:background="@drawable/bg_circle_orange"
                     android:contentDescription="@string/lblProfile"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_profile"
-                    android:tint="@color/yellow"
                     android:onClick="btnActionHome"
-                    app:layout_constraintTop_toTopOf="@id/allen"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_profile"
                     app:layout_constraintBottom_toBottomOf="@id/allen"
+                    app:layout_constraintDimensionRatio="h,1:1"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginEnd="@dimen/margin16"/>
+                    app:layout_constraintTop_toTopOf="@id/allen" />
 
                 <ImageView
                     android:id="@+id/allen"

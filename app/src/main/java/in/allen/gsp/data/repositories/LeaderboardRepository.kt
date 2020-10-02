@@ -46,7 +46,7 @@ class LeaderboardRepository(
     }
 
     private fun isFetchNeeded(): Boolean {
-        return false
+        return true
     }
 
     private fun setDBList(list: List<Leaderboard>) {

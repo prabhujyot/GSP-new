@@ -1,9 +1,10 @@
 package `in`.allen.gsp.ui.splash
 
-import `in`.allen.gsp.ui.home.HomeActivity
+import `in`.allen.gsp.NotificationActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivitySplashBinding
+import `in`.allen.gsp.ui.home.HomeActivity
 import `in`.allen.gsp.utils.*
 import android.content.Intent
 import android.graphics.Color
@@ -23,6 +24,7 @@ import com.google.android.gms.common.api.ApiException
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+
 
 private const val GOOGLE_SIGN_IN : Int = 9001
 
@@ -70,6 +72,8 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         observeSuccess()
         observeLoading()
         observeError()
+
+        catchNotification()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -138,7 +142,7 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             askToLogin()
 
             it.message?.let { it1 ->
-                if(it1.isNotBlank())
+                if (it1.isNotBlank())
                     binding.rootLayout.snackbar(it1.trim())
             }
         })
@@ -148,7 +152,7 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         viewModel.stateSuccess().observe(this, {
             tag("$TAG viewModel._success: ${it.data}")
             binding.rootLayout.hideProgress()
-            if(it.data != null) {
+            if (it.data != null) {
                 Intent(this, HomeActivity::class.java)
                     .also { it1 ->
                         it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -174,6 +178,19 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                     googleSignInClient.signInIntent,
                     GOOGLE_SIGN_IN
                 )
+            }
+        }
+    }
+
+    private fun catchNotification() {
+        if (intent.hasExtra("click_action")
+            && (intent.getStringExtra("click_action")
+                    == "ACTION_NOTIFICATION")) {
+            Intent(this, NotificationActivity::class.java).also {
+                it.putExtra("title", intent.getStringExtra("title"))
+                it.putExtra("body", intent.getStringExtra("body"))
+                it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(it)
             }
         }
     }
