@@ -1,6 +1,7 @@
 package `in`.allen.gsp.data.network
 
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -14,8 +15,12 @@ interface YTApi {
 
     companion object {
         operator fun invoke(networkConnectionInterceptor: NetworkConnectionInterceptor): YTApi {
+            val logging = HttpLoggingInterceptor()
+            logging.level = HttpLoggingInterceptor.Level.BODY
+
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(networkConnectionInterceptor)
+                .addInterceptor(logging)
                 .build()
 
             return Retrofit.Builder()
@@ -31,6 +36,18 @@ interface YTApi {
     // playlist
     @GET("playlistItems")
     suspend fun playlist(
+        @QueryMap params:Map<String, String>
+    ): Response<String>
+
+    // video data
+    @GET("videos")
+    suspend fun video(
+        @QueryMap params:Map<String, String>
+    ): Response<String>
+
+    // video comments
+    @GET("commentThreads")
+    suspend fun comments(
         @QueryMap params:Map<String, String>
     ): Response<String>
 

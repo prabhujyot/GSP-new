@@ -4,7 +4,7 @@
     <data>
         <variable
             name="leaderboard"
-            type="in.allen.gsp.data.db.entities.Leaderboard" />
+            type="in.allen.gsp.data.entities.Leaderboard" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

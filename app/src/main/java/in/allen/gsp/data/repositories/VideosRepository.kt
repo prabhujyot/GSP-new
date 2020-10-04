@@ -1,14 +1,13 @@
 package `in`.allen.gsp.data.repositories
 
 import `in`.allen.gsp.data.db.AppDatabase
-import `in`.allen.gsp.data.db.entities.Video
+import `in`.allen.gsp.data.entities.Video
 import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagingSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
@@ -23,7 +22,7 @@ class VideosRepository(
 
     init {
         videos.observeForever {
-            saveVideos(it)
+            saveDBVideos(it)
         }
     }
 
@@ -51,7 +50,7 @@ class VideosRepository(
         return true
     }
 
-    private fun saveVideos(video: List<Video>) {
+    private fun saveDBVideos(video: List<Video>) {
         Coroutines.io {
             db.getVideoDao().setList(video)
         }
@@ -88,35 +87,15 @@ class VideosRepository(
     }
 
 
+    suspend fun getVideoDetails(params: Map<String, String>): String? {
+        return apiRequest {
+            api.video(params)
+        }
+    }
 
-
-
-
-
-
-    suspend fun getLiveVideos(
-        params:Map<String, String>
-    ): PagingSource.LoadResult<String, Video> {
-        return try {
-            val response = apiRequest {
-                api.playlist(params)
-            }
-
-            val obj = JSONObject(response.toString())
-            val prevKey = if (obj.has("prevPageToken")) obj.getString("prevPageToken") else null
-            val nextKey = if (obj.has("nextPageToken")) obj.getString("nextPageToken") else null
-            PagingSource.LoadResult.Page(
-                createData(response!!),
-                prevKey,
-                nextKey)
-
-//            LoadResult.Page(
-//                data = response.data,
-//                prevKey = if (nextPageNumber > 0) nextPageNumber - 1 else null,
-//                nextKey = if (nextPageNumber < response.totalPages) nextPageNumber + 1 else null
-//            )
-        } catch (e: Exception) {
-            PagingSource.LoadResult.Error(e)
+    suspend fun getComments(params: Map<String, String>): String? {
+        return apiRequest {
+            api.comments(params)
         }
     }
 

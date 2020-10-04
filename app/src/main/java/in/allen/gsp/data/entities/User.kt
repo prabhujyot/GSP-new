@@ -1,4 +1,4 @@
-package `in`.allen.gsp.data.db.entities
+package `in`.allen.gsp.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -19,7 +19,8 @@ data class User (
     val played_qid: String,
     val create_date: String,
     val session_token: String,
-    val coins: Int,
+    var coins: Int,
     var is_verified: Int,
-    val is_admin: Boolean
+    val is_admin: Boolean,
+    val config: String
 )

@@ -4,7 +4,7 @@
     <data>
         <variable
             name="video"
-            type="in.allen.gsp.data.db.entities.Video" />
+            type="in.allen.gsp.data.entities.Video" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,7 +1,7 @@
 package `in`.allen.gsp.data.repositories
 
 import `in`.allen.gsp.data.db.AppDatabase
-import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
 

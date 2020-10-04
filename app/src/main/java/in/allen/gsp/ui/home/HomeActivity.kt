@@ -1,14 +1,15 @@
 package `in`.allen.gsp.ui.home
 
 import `in`.allen.gsp.*
-import `in`.allen.gsp.data.db.entities.Contest
-import `in`.allen.gsp.data.db.entities.User
-import `in`.allen.gsp.data.repositories.ContestRepository
+import `in`.allen.gsp.data.entities.Banner
+import `in`.allen.gsp.data.entities.User
+import `in`.allen.gsp.data.repositories.BannerRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityHomeBinding
-import `in`.allen.gsp.databinding.ItemContestBinding
+import `in`.allen.gsp.databinding.ItemBannerBinding
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
 import `in`.allen.gsp.ui.profile.ProfileActivity
+import `in`.allen.gsp.ui.reward.RewardActivity
 import `in`.allen.gsp.ui.videos.VideosActivity
 import `in`.allen.gsp.utils.*
 import android.content.Intent
@@ -35,14 +36,14 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
     private val userRepository: UserRepository by instance()
-    private val contestRepository: ContestRepository by instance()
+    private val bannerRepository: BannerRepository by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = HomeViewModel(userRepository,contestRepository)
+        viewModel = HomeViewModel(userRepository,bannerRepository)
 
-        binding.viewpagerContest.pageMargin = 16
+        binding.viewpagerBanner.pageMargin = 16
 
         observeLoading()
         observeError()
@@ -81,15 +82,15 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                         if (user.avatar.isNotBlank())
                             binding.btnProfileTop.loadImage(user.avatar, true)
 
-                        viewModel.contestData(user.user_id)
+                        viewModel.bannerData(user.user_id)
                     }
 
-                    "contest" -> {
+                    "banner" -> {
                         if(it.data is Deferred<*>) {
-                            val deferredList = it.data as Deferred<LiveData<List<Contest>>>
+                            val deferredList = it.data as Deferred<LiveData<List<Banner>>>
                             lifecycleScope.launch {
                                 deferredList.await().observe(this@HomeActivity, { list->
-                                    binding.viewpagerContest.adapter = ContestAdapter(layoutInflater,
+                                    binding.viewpagerBanner.adapter = BannerAdapter(layoutInflater,
                                         list
                                     )
                                 })
@@ -101,9 +102,9 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         })
     }
 
-    private class ContestAdapter(
+    private class BannerAdapter(
         private val inflater: LayoutInflater,
-        private val list: List<Contest>
+        private val list: List<Banner>
     ): PagerAdapter() {
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -115,16 +116,11 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val binding: ItemContestBinding = DataBindingUtil.inflate(inflater,R.layout.item_contest,container,false)
-//            val v: View = inflater.inflate(R.layout.item_contest, null)
-
-//            val image = v.findViewById<ImageView>(R.id.image)
-//            val title = v.findViewById<TextView>(R.id.title)
-//            val btnGo = v.findViewById<ImageButton>(R.id.btnGo)
+            val binding: ItemBannerBinding = DataBindingUtil.inflate(inflater,R.layout.item_banner,container,false)
 
             val item = list[position]
-            binding.image.loadImage("https://www.klipinterest.com/gsp-admin/uploads/contest/${item.logo}")
-            binding.title.text = item.name
+            binding.image.loadImage("https://www.klipinterest.com/gsp-admin/uploads/banners/${item.image}")
+            binding.title.text = item.title
             binding.btnGo.setOnClickListener {  }
 
             container.addView(binding.root)
@@ -162,7 +158,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
-                i.putExtra("url","https://www.klipinterest.com/category/quiz-time/")
+                i.putExtra("url",BuildConfig.BASE_URL + "category/quiz-time/")
             }
             R.id.btnSetting -> {
                 i.setClass(this@HomeActivity, RewardActivity::class.java)

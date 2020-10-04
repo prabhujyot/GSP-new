@@ -1,4 +1,4 @@
-package `in`.allen.gsp.data.db.entities
+package `in`.allen.gsp.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

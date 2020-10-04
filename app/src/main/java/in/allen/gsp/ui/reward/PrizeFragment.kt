@@ -1,7 +1,6 @@
-package `in`.allen.gsp.fragments
+package `in`.allen.gsp.ui.reward
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.RewardActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater

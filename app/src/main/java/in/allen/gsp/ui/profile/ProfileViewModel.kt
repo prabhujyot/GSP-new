@@ -1,6 +1,6 @@
 package `in`.allen.gsp.ui.profile
 
-import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
@@ -20,7 +20,7 @@ class ProfileViewModel(
 
     private val TAG = ProfileViewModel::class.java.name
 
-    private var user: User ?= null
+    private var user: User?= null
 
     // interaction with activity
     private val _loading = MutableLiveData<Resource.Loading<String>>()

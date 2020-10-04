@@ -32,12 +32,6 @@ class WebActivity : AppCompatActivity() {
         }
 
         webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(
-                view: WebView,
-                request: WebResourceRequest
-            ): Boolean {
-                return super.shouldOverrideUrlLoading(view, request)
-            }
         }
 
         webView.settings.javaScriptEnabled = true

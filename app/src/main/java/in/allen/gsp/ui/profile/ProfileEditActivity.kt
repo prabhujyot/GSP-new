@@ -1,7 +1,7 @@
 package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityProfileEditBinding
 import `in`.allen.gsp.utils.*

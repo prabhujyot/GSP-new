@@ -1,6 +1,6 @@
 package `in`.allen.gsp.data.db.dao
 
-import `in`.allen.gsp.data.db.entities.Video
+import `in`.allen.gsp.data.entities.Video
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert

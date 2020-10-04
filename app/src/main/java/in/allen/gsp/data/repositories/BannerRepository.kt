@@ -1,7 +1,7 @@
 package `in`.allen.gsp.data.repositories
 
 import `in`.allen.gsp.data.db.AppDatabase
-import `in`.allen.gsp.data.db.entities.Contest
+import `in`.allen.gsp.data.entities.Banner
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.utils.Coroutines
@@ -12,12 +12,12 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 
-class ContestRepository(
+class BannerRepository(
     private val api: Api,
     private val db: AppDatabase
 ): SafeApiRequest() {
 
-    private val contest = MutableLiveData<List<Contest>>()
+    private val contest = MutableLiveData<List<Banner>>()
 
     init {
         contest.observeForever {
@@ -25,17 +25,17 @@ class ContestRepository(
         }
     }
 
-    suspend fun getList(user_id: Int): LiveData<List<Contest>> {
+    suspend fun getList(user_id: Int): LiveData<List<Banner>> {
         return withContext(Dispatchers.IO) {
             fetchList(user_id)
-            db.getContestDao().getList()
+            db.getBannerDao().getList()
         }
     }
 
     private suspend fun fetchList(user_id: Int) {
         if(isFetchNeeded()) {
             val response = apiRequest {
-                api.contest(user_id)
+                api.banners(user_id)
             }
             contest.postValue(response?.let { createData(it) })
         }
@@ -45,14 +45,15 @@ class ContestRepository(
         return true
     }
 
-    private fun setDBList(list: List<Contest>) {
+    private fun setDBList(list: List<Banner>) {
         Coroutines.io {
-            db.getContestDao().setList(list)
+            db.getBannerDao().clearList()
+            db.getBannerDao().setList(list)
         }
     }
 
-    private fun createData(data: String): List<Contest> {
-        val list = mutableListOf<Contest>()
+    private fun createData(data: String): List<Banner> {
+        val list = mutableListOf<Banner>()
         val response = JSONObject(data)
 
         if(response.getInt("status") == 1) {
@@ -60,22 +61,18 @@ class ContestRepository(
             if(arr.length() > 0) {
                 for(i in 0 until arr.length()) {
                     val item = arr.get(i) as JSONObject
-                    val contest = Contest(
+                    val banner = Banner(
                         item.getInt("id"),
-                        item.getString("name"),
-                        item.getString("desc"),
-                        item.getString("start_date"),
-                        item.getString("end_date"),
-                        item.getString("logo"),
-                        item.getInt("enrollment_requirement"),
-                        item.getString("enrollment_start_time"),
-                        item.getString("enrollment_end_time"),
-                        item.getInt("enrollment_max_user"),
-                        item.getString("attempt_type"),
-                        item.getString("contest_msg"),
+                        item.getString("title"),
+                        item.getString("image"),
+                        item.getString("banner_type"),
+                        item.getString("banner_action"),
+                        item.getString("start_time"),
+                        item.getString("end_time"),
+                        item.getString("meta"),
                         item.getInt("status")
                     )
-                    list.add(contest)
+                    list.add(banner)
                 }
             }
         }

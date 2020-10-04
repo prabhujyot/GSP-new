@@ -1,5 +1,6 @@
 package `in`.allen.gsp.data.network
 
+import `in`.allen.gsp.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -22,7 +23,7 @@ interface Api {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl("https://www.klipinterest.com/gsp-admin/index.php/android_v2/")
+                .baseUrl(BuildConfig.BASE_URL + "gsp-admin/index.php/android_v2/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -38,15 +39,14 @@ interface Api {
     ): Response<String>
 
     // user stats
-    @FormUrlEncoded
-    @POST("profile")
+    @GET("profile")
     suspend fun profile(
-        @Field("user_id") user_id: Int
+        @Query("user_id") user_id: Int
     ): Response<String>
 
     // update user
     @FormUrlEncoded
-    @POST("update_user")
+    @POST("profile")
     suspend fun updateProfile(
         @FieldMap params: Map<String, String>
     ): Response<String>
@@ -68,16 +68,46 @@ interface Api {
         @Field("otp") otp: String
     ): Response<String>
 
-    // user stats
-    @FormUrlEncoded
-    @POST("contest")
-    suspend fun contest(
-        @Field("user_id") user_id: Int
+    // banners
+    @GET("banners")
+    suspend fun banners(
+        @Query("user_id") user_id: Int
     ): Response<String>
-
 
     // leaderboard
     @GET("leaderboard")
     suspend fun leaderboard(): Response<String>
+
+    // statements
+    @GET("transactions")
+    suspend fun getTransactions(
+        @Query("user_id") user_id: Int,
+        @Query("type") type: String,
+        @Query("page") page: Int,
+    ): Response<String>
+    
+    // daily reward get status
+    @GET("dailyreward")
+    suspend fun getDailyReward(
+        @Query("user_id") user_id: Int,
+        @Query("type") type: String
+    ): Response<String>
+
+    // post daily reward value
+    @FormUrlEncoded
+    @POST("dailyreward")
+    suspend fun setDailyReward(
+        @Field("user_id") user_id: Int,
+        @Field("type") type: String,
+        @Field("value") value: Int
+    ): Response<String>
+
+    // redeem coins
+    @FormUrlEncoded
+    @POST("dailyreward")
+    suspend fun redeem(
+        @Field("user_id") user_id: Int,
+        @Field("value") value: Int
+    ): Response<String>
 
 }

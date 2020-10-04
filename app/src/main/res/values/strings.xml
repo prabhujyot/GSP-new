@@ -90,4 +90,12 @@
     <string name="lblVerify">Verify</string>
     <string name="submit">Submit</string>
     <string name="prompt_code">Enter OTP</string>
+    <string name="lblInvite">Invite</string>
+    <string name="lblInstructions">Instructions</string>
+    <string name="dialogTitle">Dialog Title</string>
+    <string name="lblNo">No</string>
+    <string name="lblYes">Yes</string>
+    <string name="dialogMessage">Dialog Message</string>
+    <string name="lblClose">Close</string>
+    <string name="lblOk">Ok</string>
 </resources>

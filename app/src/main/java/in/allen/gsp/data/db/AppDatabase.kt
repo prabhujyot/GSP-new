@@ -1,7 +1,7 @@
 package `in`.allen.gsp.data.db
 
 import `in`.allen.gsp.data.db.dao.*
-import `in`.allen.gsp.data.db.entities.*
+import `in`.allen.gsp.data.entities.*
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -13,6 +13,7 @@ import androidx.room.RoomDatabase
         Leaderboard::class,
         Message::class,
         Video::class,
+        Banner::class,
         Contest::class
     ],
     version = 1,
@@ -24,6 +25,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun getLeaderboardDao(): LeaderboardDao
     abstract fun getMessageDao(): MessageDao
     abstract fun getVideoDao(): VideoDao
+    abstract fun getBannerDao(): BannerDao
     abstract fun getContestDao(): ContestDao
 
     companion object {

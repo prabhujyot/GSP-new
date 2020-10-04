@@ -222,7 +222,7 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <!-- Game finish bottom sheet -->
+        <!-- OTP bottom sheet -->
         <include layout="@layout/bottomsheet_verification" />
 
         <include layout="@layout/progress" />

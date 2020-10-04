@@ -1,7 +1,7 @@
 package `in`.allen.gsp.ui.leaderboard
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.db.entities.Leaderboard
+import `in`.allen.gsp.data.entities.Leaderboard
 import `in`.allen.gsp.data.repositories.LeaderboardRepository
 import `in`.allen.gsp.databinding.ActivityLeaderboardBinding
 import `in`.allen.gsp.databinding.ItemLeaderboardBinding
@@ -92,7 +92,11 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
         val context: Context
     ) : RecyclerView.Adapter<RecyclerViewAdapter.ItemViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-            val binding: ItemLeaderboardBinding = DataBindingUtil.inflate(LayoutInflater.from(context),R.layout.item_leaderboard,parent,false)
+            val binding: ItemLeaderboardBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context)
+                ,R.layout.item_leaderboard,
+                parent,
+                false)
             return ItemViewHolder(binding)
         }
 
@@ -108,10 +112,10 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
             RecyclerView.ViewHolder(binding.root) {
             fun bind(data: Leaderboard) {
                 binding.leaderboard = data
-                binding.executePendingBindings()
-
                 binding.rankAvatar.loadImage(data.avatar,true)
                 binding.rankScore.text = "Score\n${data.score}"
+
+                binding.executePendingBindings()
             }
         }
     }

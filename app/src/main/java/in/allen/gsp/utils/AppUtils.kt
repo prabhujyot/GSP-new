@@ -2,26 +2,26 @@ package `in`.allen.gsp.utils
 
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
-import android.text.Layout
 import android.text.format.DateUtils
 import android.util.Base64
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -45,6 +45,59 @@ fun View.snackbar(message: String) {
             snackbar.dismiss()
         }
     }.show()
+}
+
+fun Activity.confirmDialog(title: String, message: String, confirmAction: () -> Unit) {
+    val dialogBuilder = AlertDialog.Builder(this)
+    val inflater = this.layoutInflater
+    val dialogView = inflater.inflate(R.layout.dialog_confirm, null)
+    dialogBuilder.setView(dialogView)
+
+    val btnYes: Button = dialogView.findViewById(R.id.btnYes)
+    val btnNo: Button = dialogView.findViewById(R.id.btnNo)
+    val ttle: TextView = dialogView.findViewById(R.id.title)
+    val msg: TextView = dialogView.findViewById(R.id.msg)
+    val alertDialog = dialogBuilder.create()
+
+    ttle.text = title
+    msg.text = message
+
+    //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
+    alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    alertDialog.setCanceledOnTouchOutside(false)
+    alertDialog.show()
+    btnYes.setOnClickListener {
+        alertDialog.dismiss()
+        confirmAction()
+    }
+
+    btnNo.setOnClickListener {
+        alertDialog.dismiss()
+    }
+}
+
+fun Activity.alertDialog(title: String, message: String, alertAction: () -> Unit) {
+    val dialogBuilder = AlertDialog.Builder(this)
+    val inflater = this.layoutInflater
+    val dialogView = inflater.inflate(R.layout.dialog_alert, null)
+    dialogBuilder.setView(dialogView)
+
+    val btnOk: Button = dialogView.findViewById(R.id.btnOk)
+    val ttle: TextView = dialogView.findViewById(R.id.title)
+    val msg: TextView = dialogView.findViewById(R.id.msg)
+    val alertDialog = dialogBuilder.create()
+
+    ttle.text = title
+    msg.text = message
+
+    //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
+    alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    alertDialog.setCanceledOnTouchOutside(false)
+    alertDialog.show()
+    btnOk.setOnClickListener {
+        alertDialog.dismiss()
+        alertAction()
+    }
 }
 
 fun tag(data: Any) {

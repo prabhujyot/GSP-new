@@ -1,6 +1,6 @@
 package `in`.allen.gsp.ui.home
 
-import `in`.allen.gsp.data.repositories.ContestRepository
+import `in`.allen.gsp.data.repositories.BannerRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.lazyDeferred
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val userRepository: UserRepository,
-    private val contestRepository: ContestRepository
+    private val bannerRepository: BannerRepository
 ): ViewModel() {
 
     private val TAG = HomeViewModel::class.java.name
@@ -46,11 +46,10 @@ class HomeViewModel(
         }
     }
 
-    fun contestData(user_id: Int) {
+    fun bannerData(user_id: Int) {
         val response by lazyDeferred {
-            contestRepository.getList(user_id)
+            bannerRepository.getList(user_id)
         }
-        _success.value = Resource.Success(response,"contest")
+        _success.value = Resource.Success(response,"banner")
     }
-
 }

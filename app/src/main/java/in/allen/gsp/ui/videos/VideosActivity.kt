@@ -1,43 +1,34 @@
 package `in`.allen.gsp.ui.videos
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.utils.App
-import `in`.allen.gsp.utils.AppPreferences
-import `in`.allen.gsp.utils.services.WebServices
+import `in`.allen.gsp.databinding.ActivityVideosBinding
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.activity_reward.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 class VideosActivity : AppCompatActivity() {
 
     private val TAG = VideosActivity::class.java.name
-
-    lateinit var app: App
-    lateinit var webServices: WebServices
-    private lateinit var appPreferences: AppPreferences
+    private lateinit var binding: ActivityVideosBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_videos)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_videos)
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        setSupportActionBar(binding.rootLayout.myToolbar)
+        binding.rootLayout.myToolbar.btnBack.setOnClickListener {
             onBackPressed()
         }
 
-        app = application as App
-        webServices = WebServices()
+        binding.viewPager2.isUserInputEnabled = false
+        binding.viewPager2.adapter = FragmentAdapter(this)
 
-        viewPager2.isUserInputEnabled = false
-        viewPager2.adapter = FragmentAdapter(this)
-
-        TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
+        TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
             if(position == 0) {
                 tab.text = "Power of Knowledge"
             } else if(position == 1) {
@@ -74,6 +65,5 @@ class VideosActivity : AppCompatActivity() {
             Log.d("fragmentList", "" + fragmentList.size)
             return fragmentList[position]
         }
-
     }
 }

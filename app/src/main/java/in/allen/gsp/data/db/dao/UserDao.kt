@@ -1,6 +1,6 @@
 package `in`.allen.gsp.data.db.dao
 
-import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.entities.User
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy

@@ -19,7 +19,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "BASE_URL", "\"https://www.klipinterest.com/\";"
+        }
         release {
+            buildConfigField "String", "BASE_URL", "\"https://www.klipinterest.com/\";"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -71,8 +75,8 @@ dependencies {
 
     implementation 'com.chaos.view:pinview:1.4.4'
 
-    // networking
-    implementation 'com.amitshekhar.android:android-networking:1.0.2'
+    // blur
+    implementation 'jp.wasabeef:blurry:4.0.0'
 
     // retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
@@ -93,7 +97,7 @@ dependencies {
 
     // Lifecycle components
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
-    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
+//    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
 
     // Kotlin components
@@ -104,13 +108,8 @@ dependencies {
     implementation 'org.kodein.di:kodein-di-generic-jvm:6.2.1'
     implementation 'org.kodein.di:kodein-di-framework-android-x:6.2.1'
 
-    // groupie for recyclerview
-    implementation "com.xwray:groupie:2.8.1"
-    implementation "com.xwray:groupie-kotlin-android-extensions:2.8.1"
-    implementation "com.xwray:groupie-databinding:2.8.1"
-
     // pagination
-    implementation "androidx.paging:paging-runtime:3.0.0-alpha06"
+//    implementation "androidx.paging:paging-runtime:3.0.0-alpha06"
 
     // Navigation component
     implementation "androidx.navigation:navigation-fragment-ktx:2.3.0"

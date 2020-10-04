@@ -1,29 +1,39 @@
 package `in`.allen.gsp.ui.videos
 
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.db.entities.Video
-import `in`.allen.gsp.utils.Coroutines
+import `in`.allen.gsp.data.entities.Video
+import `in`.allen.gsp.data.repositories.VideosRepository
+import `in`.allen.gsp.databinding.FragmentPlaylistBinding
+import `in`.allen.gsp.databinding.ItemPlaylistBinding
+import `in`.allen.gsp.utils.loadImage
+import `in`.allen.gsp.utils.show
+import `in`.allen.gsp.utils.tag
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.GroupieViewHolder
-import kotlinx.android.synthetic.main.playlist_fragment.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.kodein
 import org.kodein.di.generic.instance
 
 class PlaylistFragment : Fragment(), KodeinAware {
 
+    private val TAG = PlaylistFragment::class.java.name
+    private lateinit var binding: FragmentPlaylistBinding
+    private lateinit var viewModel: VideosViewModel
+
     override val kodein by kodein()
-    private lateinit var viewModel: PlaylistViewModel
-    private val factory:VideosViewModelFactory by instance()
+    private val videosRepository: VideosRepository by instance()
 
     private lateinit var playlistId: String
 
@@ -38,68 +48,50 @@ class PlaylistFragment : Fragment(), KodeinAware {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.playlist_fragment, container, false)
+        binding = DataBindingUtil.inflate(inflater,R.layout.fragment_playlist,container,false)
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this, factory).get(PlaylistViewModel::class.java)
-        bindUI()
+        viewModel = VideosViewModel(videosRepository)
+
+        observeSuccess()
+
+        val hashMap = HashMap<String,String>()
+        hashMap["part"] = "snippet"
+        hashMap["maxResults"] = "50"
+        hashMap["playlistId"] = playlistId
+        hashMap["key"] = "AIzaSyDbpMioiHvdMHmA41UETZy6sCO1txortVc"
+        viewModel.videoList(hashMap)
     }
 
-    private fun bindUI() = Coroutines.main {
-        viewModel.hashMap["part"] = "snippet"
-        viewModel.hashMap["maxResults"] = "50"
-        viewModel.hashMap["playlistId"] = playlistId
-        viewModel.hashMap["key"] = "AIzaSyDbpMioiHvdMHmA41UETZy6sCO1txortVc"
-        viewModel.videos.await().observe(viewLifecycleOwner, Observer {
-            tinyProgressBar.visibility = View.GONE
-            initRecyclerView(it.toPlaylisItem())
+    private fun observeSuccess() {
+        viewModel.stateSuccess().observe(viewLifecycleOwner, {
+            tag("$TAG viewModel._success: ${it.data}")
+            if(it != null) {
+                binding.tinyProgressBar.show(false)
+                when (it.message) {
+                    "videoList" -> {
+                        if(it.data is Deferred<*>) {
+                            val deferredList = it.data as Deferred<LiveData<List<Video>>>
+                            lifecycleScope.launch {
+                                deferredList.await().observe(viewLifecycleOwner, { list->
+                                    val recyclerAdapter = context?.let { it1 -> RecyclerViewAdapter(list, it1) }
+                                    binding.recyclerView.apply {
+                                        layoutManager =  LinearLayoutManager(context)
+                                        setHasFixedSize(true)
+                                        adapter = recyclerAdapter
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            }
         })
     }
 
-    private fun initRecyclerView(playlistItem: List<PlaylistItem>) {
-        var pageToken = ""
-        var nomore = false
-        var loading = true
-        var pastVisiblesItems = 0
-        var visibleItemCount = 0
-        var totalItemCount = 0
-
-        val groupAdapter = GroupAdapter<GroupieViewHolder>().apply {
-            addAll(playlistItem)
-        }
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
-            setHasFixedSize(true)
-            adapter = groupAdapter
-
-//            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-//                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                    if (dy > 0) {
-//                        val linearLayoutManager = layoutManager as LinearLayoutManager
-//                        visibleItemCount = linearLayoutManager.childCount
-//                        totalItemCount = linearLayoutManager.itemCount
-//                        pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition()
-//                        if (loading) {
-//                            if (visibleItemCount + pastVisiblesItems >= totalItemCount - 2) {
-//                                loading = false
-//                                if (!nomore) {
-//                                    getPlaylist(playlistId)
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            })
-        }
-    }
-
-    private fun List<Video>.toPlaylisItem(): List<PlaylistItem> {
-        return map {
-            PlaylistItem(it)
-        }
-    }
 
     companion object {
         @JvmStatic
@@ -109,6 +101,47 @@ class PlaylistFragment : Fragment(), KodeinAware {
                     putString("playlistId", playlistId)
                 }
             }
+    }
+
+
+    private class RecyclerViewAdapter(
+        val list: List<Video>,
+        val context: Context
+    ) : RecyclerView.Adapter<RecyclerViewAdapter.ItemViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+            val binding: ItemPlaylistBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_playlist,
+                parent,
+                false)
+            return ItemViewHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+            holder.bind(list[position])
+        }
+
+        override fun getItemCount(): Int {
+            return list.size
+        }
+
+        class ItemViewHolder(val binding: ItemPlaylistBinding):
+            RecyclerView.ViewHolder(binding.root) {
+            fun bind(data: Video) {
+                binding.video = data
+
+                if (data.thumb.isNotBlank())
+                    binding.thumb.loadImage(data.thumb)
+
+                binding.ytItem.setOnClickListener {
+                    val act = Intent(binding.root.context, YTPlayerActivity::class.java)
+                    act.putExtra("videoId", data.videoId)
+                    binding.root.context.startActivity(act)
+                }
+
+                binding.executePendingBindings()
+            }
+        }
     }
 
 }

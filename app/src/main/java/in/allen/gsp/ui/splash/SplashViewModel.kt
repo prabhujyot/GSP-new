@@ -1,6 +1,6 @@
 package `in`.allen.gsp.ui.splash
 
-import `in`.allen.gsp.data.db.entities.User
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Encryption
 import `in`.allen.gsp.utils.Resource
@@ -136,7 +136,8 @@ class SplashViewModel(
                                 data.getString("session_token"),
                                 data.getInt("coins"),
                                 data.getInt("redeemed_otp_status"),
-                                data.getBoolean("is_admin")
+                                data.getBoolean("is_admin"),
+                                data.getString("config_data")
                             )
                             repository.setDBUser(user)
                             _success.value = Resource.Success(user)

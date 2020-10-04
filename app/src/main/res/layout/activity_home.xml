@@ -145,7 +145,7 @@
                     app:layout_constraintWidth_min="100dp" />
 
                 <androidx.viewpager.widget.ViewPager
-                    android:id="@+id/viewpagerContest"
+                    android:id="@+id/viewpager_banner"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginTop="@dimen/margin32"

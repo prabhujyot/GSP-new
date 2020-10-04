@@ -4,11 +4,8 @@ import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.NetworkConnectionInterceptor
 import `in`.allen.gsp.data.network.YTApi
-import `in`.allen.gsp.data.repositories.ContestRepository
-import `in`.allen.gsp.data.repositories.LeaderboardRepository
-import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.data.repositories.VideosRepository
-import `in`.allen.gsp.ui.videos.VideosViewModelFactory
+import `in`.allen.gsp.data.repositories.*
+import `in`.allen.gsp.ui.reward.RewardViewModelFactory
 import android.app.Application
 import android.content.Context
 import android.os.Build
@@ -29,14 +26,14 @@ class App: Application(), KodeinAware {
 
         bind() from singleton { NetworkConnectionInterceptor(instance()) }
         bind() from singleton { Api(instance()) }
+        bind() from singleton { YTApi(instance()) }
         bind() from singleton { AppDatabase(instance()) }
         bind() from singleton { UserRepository(instance(),instance()) }
-        bind() from singleton { ContestRepository(instance(),instance()) }
+        bind() from singleton { BannerRepository(instance(),instance()) }
         bind() from singleton { LeaderboardRepository(instance(),instance()) }
-
-        bind() from singleton { YTApi(instance()) }
         bind() from singleton { VideosRepository(instance(),instance()) }
-        bind() from provider { VideosViewModelFactory(instance()) }
+        bind() from singleton { RewardRepository(instance()) }
+        bind() from provider { RewardViewModelFactory(instance(),instance()) }
     }
 
     override fun onCreate() {

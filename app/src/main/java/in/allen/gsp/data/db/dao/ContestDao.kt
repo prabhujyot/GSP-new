@@ -1,6 +1,6 @@
 package `in`.allen.gsp.data.db.dao
 
-import `in`.allen.gsp.data.db.entities.Contest
+import `in`.allen.gsp.data.entities.Contest
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
