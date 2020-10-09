@@ -7,6 +7,7 @@ import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.databinding.ActivityRewardBinding
 import `in`.allen.gsp.utils.*
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -15,9 +16,12 @@ import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -27,9 +31,11 @@ import com.google.android.material.tabs.TabLayoutMediator
 import jp.wasabeef.blurry.Blurry
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.bottomsheet_redemption.view.*
+import kotlinx.android.synthetic.main.checkin.view.*
 import kotlinx.android.synthetic.main.fragment_prize.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -88,7 +94,10 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         if(id == R.id.menu_instructions) {
             Intent(this, WebActivity::class.java)
                 .also { it1 ->
-                    it1.putExtra("url",BuildConfig.BASE_URL + "gsp-admin/index.php/site/page/coins-instructions")
+                    it1.putExtra(
+                        "url",
+                        BuildConfig.BASE_URL + "gsp-admin/index.php/site/page/coins-instructions"
+                    )
                     startActivity(it1)
                 }
         }
@@ -111,24 +120,32 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun observeLoading() {
-        viewModel.stateLoading().observe(this, {
+        viewModel.getLoading().observe(this, {
             tag("$TAG _loading: ${it.message}")
-            binding.rootLayout.showProgress()
+            binding.rootLayout.hideProgress()
+            if (it.data is Boolean && it.data) {
+                binding.rootLayout.showProgress()
+            }
         })
     }
 
     private fun observeError() {
-        viewModel.stateError().observe(this, {
+        viewModel.getError().observe(this, {
             tag("$TAG _error: ${it.message}")
-            if(it != null) {
+            if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
-                    "message" -> {
-                        it.data?.let { it1 -> binding.rootLayout.snackbar(it1) }
-                    }
-
-                    "exception" -> {
+                    "alert" -> {
                         it.data?.let { it1 -> alertDialog("Error", it1) {} }
+                    }
+                    "tag" -> {
+                        it.data?.let { it1 -> tag("$TAG $it1") }
+                    }
+                    "toast" -> {
+                        it.data?.let { it1 -> toast(it1) }
+                    }
+                    "snackbar" -> {
+                        it.data?.let { it1 -> binding.rootLayout.snackbar(it1) }
                     }
                 }
             }
@@ -136,9 +153,9 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeSuccess() {
-        viewModel.stateSuccess().observe(this, {
+        viewModel.getSuccess().observe(this, {
             tag("$TAG _success: ${it.data}")
-            if(it != null) {
+            if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
                     "user" -> {
@@ -147,6 +164,22 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                             binding.totalCoins.text = "${user.coins}"
 
                         initBottomSheet()
+
+                        viewModel.getDailyReward()
+                    }
+
+                    "getDailyReward" -> {
+                        if (it.data is JSONObject) {
+                            val obj = it.data
+                            setDailyCheckinViews(obj.getInt("diff"),obj.getInt("today_value"))
+                        }
+                    }
+
+                    "setDailyReward" -> {
+                        if (it.data is JSONObject) {
+                            val obj = it.data
+                            setDailyCheckinViews(obj.getInt("diff"),obj.getInt("today_value"))
+                        }
                     }
                 }
             }
@@ -181,7 +214,6 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             Log.d("fragmentList", "" + fragmentList.size)
             return fragmentList[position]
         }
-
     }
 
     private fun initBottomSheet() {
@@ -269,7 +301,71 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
 
             R.id.btnCheckin -> {
-                toast("checkin")
+                binding.rootLayout.btnCheckin.show(false)
+                viewModel.setDailyReward(view.tag as Int)
+            }
+
+            R.id.card50 -> {
+                if (redeemSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    redeemSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+
+            R.id.card100 -> {
+                if (redeemSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    redeemSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+
+            R.id.card150 -> {
+                if (redeemSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    redeemSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+
+            R.id.card200 -> {
+                if (redeemSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                    redeemSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+        }
+    }
+
+
+    private fun setDailyCheckinViews(diff: Int, todayValue: Int) {
+        binding.rootLayout.btnCheckin.show(false)
+        if (diff > 0) {
+            binding.rootLayout.btnCheckin.tag = todayValue
+            binding.rootLayout.btnCheckin.show()
+        }
+
+        // Setting drawables
+        for(i in 0 until 7) {
+            val imgId = "imgDay" + (i+1)
+            val textId = "textDay" + (i+1)
+            val lblId = "lblDay" + (i+1)
+
+            val imgView: ImageView = binding.rootLayout.findViewById(resources.getIdentifier(imgId,"id",packageName))
+            val textView: TextView = binding.rootLayout.findViewById(resources.getIdentifier(textId,"id",packageName))
+            val lblView: TextView = binding.rootLayout.findViewById(resources.getIdentifier(lblId,"id",packageName))
+
+            if (textView.text.toString().toInt() < todayValue) {
+                imgView.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_black,null))
+                lblView.background = ResourcesCompat.getDrawable(resources,R.drawable.ic_check,null)
+                ViewCompat.setBackgroundTintList(
+                    lblView,
+                    ColorStateList.valueOf(ResourcesCompat.getColor(resources,R.color.black,null)))
+                lblView.text = null
+            }
+            if (textView.text.toString().toInt() == todayValue) {
+                if (diff == 0) {
+                    imgView.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_black,null))
+                    lblView.background = ResourcesCompat.getDrawable(resources,R.drawable.ic_check,null)
+                    ViewCompat.setBackgroundTintList(
+                        lblView,
+                        ColorStateList.valueOf(ResourcesCompat.getColor(resources,R.color.black,null)))
+                    lblView.text = null
+                }
             }
         }
     }

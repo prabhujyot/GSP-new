@@ -1,18 +1,27 @@
 package `in`.allen.gsp.ui.reward
 
 import `in`.allen.gsp.R
+import `in`.allen.gsp.databinding.FragmentPrizeBinding
+import `in`.allen.gsp.databinding.FragmentStatementBinding
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.x.kodein
+import org.kodein.di.generic.instance
 
-class PrizeFragment : Fragment() {
+class PrizeFragment : Fragment(), KodeinAware {
 
     private val TAG = PrizeFragment::class.java.name
+    private lateinit var binding: FragmentPrizeBinding
+    private lateinit var viewModel: RewardViewModel
 
-    private lateinit var parentActivity: RewardActivity
-    private lateinit var rootView: View
+    override val kodein by kodein()
+    private val factory:RewardViewModelFactory by instance()
 
     private var position = 0
 
@@ -21,16 +30,21 @@ class PrizeFragment : Fragment() {
         arguments?.let {
             position = it.getInt("position")
         }
-
-        parentActivity = activity as RewardActivity
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        rootView = inflater.inflate(R.layout.fragment_prize, container, false)
-        return rootView
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_prize, container, false)
+        return binding.root
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        activity?.let {
+            viewModel = ViewModelProvider(it, factory).get(RewardViewModel::class.java)
+        }
     }
 
     companion object {

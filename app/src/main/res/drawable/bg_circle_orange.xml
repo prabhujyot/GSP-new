@@ -1,11 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-    <!-- view background color -->
-    <gradient
-        android:startColor="#efa310"
-        android:endColor="#f83329"
-        android:angle="270"/>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- disabled -->
+    <item android:state_enabled="false" android:drawable="@drawable/bg_btn_disabled" />
 
-    <stroke android:color="#efa310"
-        android:width="3dp"/>
-</shape>
+    <!-- pressed -->
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <!-- view background color -->
+            <gradient
+                android:startColor="#efa310"
+                android:endColor="#f83329"
+                android:angle="270"/>
+
+            <stroke android:color="#efa310"
+                android:width="3dp"/>
+        </shape>
+    </item>
+
+    <!-- default -->
+    <item>
+        <shape android:shape="oval">
+            <!-- view background color -->
+            <gradient
+                android:startColor="#efa310"
+                android:endColor="#f83329"
+                android:angle="270"/>
+
+            <stroke android:color="#efa310"
+                android:width="3dp"/>
+        </shape>
+    </item>
+</selector>
+
+
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">-->
+<!--    &lt;!&ndash; view background color &ndash;&gt;-->
+<!--    <gradient-->
+<!--        android:startColor="#efa310"-->
+<!--        android:endColor="#f83329"-->
+<!--        android:angle="270"/>-->
+
+<!--    <stroke android:color="#efa310"-->
+<!--        android:width="3dp"/>-->
+<!--</shape>-->

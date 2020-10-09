@@ -19,24 +19,48 @@ class RewardViewModel(
     private val rewardRepository: RewardRepository
 ): ViewModel() {
 
-    private val TAG = RewardViewModel::class.java.name
-    private var user: User?= null
+    private val ALERT = "alert"
+    private val SNACKBAR = "snackbar"
+    private val TAG = "tag"
+    private val TOAST = "toast"
+
+    private var userData: User?= null
 
     // interaction with activity
-    private val _loading = MutableLiveData<Resource.Loading<String>>()
+    private val _loading = MutableLiveData<Resource.Loading<Any>>()
     private val _success = MutableLiveData<Resource.Success<Any>>()
     private val _error = MutableLiveData<Resource.Error<String>>()
 
-    fun stateLoading(): LiveData<Resource.Loading<String>> {
+    fun getLoading(): LiveData<Resource.Loading<Any>> {
         return _loading
     }
 
-    fun stateError(): LiveData<Resource.Error<String>> {
+    fun getError(): LiveData<Resource.Error<String>> {
         return _error
     }
 
-    fun stateSuccess(): LiveData<Resource.Success<Any>> {
+    fun getSuccess(): LiveData<Resource.Success<Any>> {
         return _success
+    }
+
+    fun setLoading(loading: Boolean) {
+        _loading.value = Resource.Loading(loading)
+    }
+
+    fun setError(data: String, filter: String) {
+        _error.value = Resource.Error(filter, data)
+    }
+
+    fun setSuccess(data: Any, filter: String) {
+        _success.value = Resource.Success(data,filter)
+    }
+
+    fun setUserData(user: User) {
+        userData = user
+    }
+
+    fun getUserData(): User? {
+        return userData
     }
 
 
@@ -44,75 +68,82 @@ class RewardViewModel(
         viewModelScope.launch {
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
-                user = dbUser
-                _success.value = Resource.Success(dbUser, "user")
+                setUserData(dbUser)
+                setSuccess(dbUser,"user")
             } else {
-                _error.value = Resource.Error("message","Not found")
+                setError("Not Found",TAG)
             }
         }
     }
 
     fun getStatement(type: String, page: Int) {
-        if(user != null && user?.user_id!! > 0) {
+        val user = getUserData()
+        if(user != null && user.user_id > 0) {
             viewModelScope.launch {
                 try {
-                    val response = rewardRepository.getStatement(user?.user_id!!, type, page)
+                    val response = rewardRepository.getStatement(user.user_id, type, page)
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if (responseObj.getInt("status") == 1) {
                             val data = responseObj.getJSONObject("data")
-                            _success.value = Resource.Success(data, "statement")
+                            setSuccess(data,"statement")
                         } else {
-                            _error.value = Resource.Error("message", responseObj.getString("message"))
+                            setError(responseObj.getString("message"),SNACKBAR)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = Resource.Error("exception","$TAG ${e.message}")
+                    setError("${e.message}", ALERT)
                 }
             }
         }
     }
 
-    private fun getDailyReward() {
-        if(user != null && user?.user_id!! > 0) {
+    fun getDailyReward() {
+        val user = getUserData()
+        if(user != null && user.user_id > 0) {
             viewModelScope.launch {
                 try {
-                    val response = rewardRepository.getDailyReward(user?.user_id!!,"earn")
+                    val response = rewardRepository.getDailyReward(user.user_id,"earn")
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if (responseObj.getInt("status") == 1) {
                             val data = responseObj.getJSONObject("data")
-                            _success.value = Resource.Success(data, "getDailyReward")
+                            user.coins = data.getInt("total_coins")
+                            userRepository.setDBUser(user)
+                            setSuccess(user,"user")
+                            setSuccess(data,"getDailyReward")
                         } else {
-                            _error.value = Resource.Error("message", responseObj.getString("message"))
+                            setError(responseObj.getString("message"), SNACKBAR)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = Resource.Error("exception","$TAG ${e.message}")
+                    setError("${e.message}", ALERT)
                 }
             }
         }
     }
 
-    private fun setDailyReward(value: Int) {
-        if(user != null && user?.user_id!! > 0) {
+    fun setDailyReward(value: Int) {
+        val user = getUserData()
+        if(user != null && user.user_id > 0) {
             viewModelScope.launch {
+                setLoading(true)
                 try {
-                    val response = rewardRepository.setDailyReward(user?.user_id!!, "earn", value)
+                    val response = rewardRepository.setDailyReward(user.user_id, "earn", value)
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if (responseObj.getInt("status") == 1) {
                             val data = responseObj.getJSONObject("data")
-                            _success.value = Resource.Success(data, "setDailyReward")
+                            user.coins = data.getInt("total_coins")
+                            userRepository.setDBUser(user)
+                            setSuccess(user,"user")
+                            setSuccess(data, "setDailyReward")
                         } else {
-                            _error.value = Resource.Error("message",responseObj.getString("message"))
+                            setError(responseObj.getString("message"), SNACKBAR)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = Resource.Error("exception","$TAG ${e.message}")
+                    setError("${e.message}", ALERT)
                 }
             }
         }
@@ -120,28 +151,30 @@ class RewardViewModel(
 
 
     fun redeem(coins: Int) {
-        if(user != null && user?.user_id!! > 0) {
-            if(coins <= user?.coins!!) {
+        val user = getUserData()
+        if(user != null && user.user_id > 0) {
+            if(coins <= user.coins) {
                 viewModelScope.launch {
-                    _loading.value = Resource.Loading("")
+                    setLoading(true)
                     try {
-                        val response = rewardRepository.redeem(user?.user_id!!, coins)
+                        val response = rewardRepository.redeem(user.user_id, coins)
                         if (response != null) {
                             val responseObj = JSONObject(response)
                             if (responseObj.getInt("status") == 1) {
-                                user?.coins = responseObj.getInt("data")
-                                userRepository.setDBUser(user!!)
-                                _success.value = Resource.Success(responseObj.getString("message"),"redeem")
+                                user.coins = responseObj.getInt("data")
+                                userRepository.setDBUser(user)
+                                setSuccess(user,"user")
+                                setSuccess(responseObj.getString("message"),"redeem")
                             } else {
-                                _error.value = Resource.Error("message",responseObj.getString("message"))
+                                setError(responseObj.getString("message"), SNACKBAR)
                             }
                         }
                     } catch (e: Exception) {
-                        _error.value = Resource.Error("exception","$TAG ${e.message}")
+                        setError("${e.message}", ALERT)
                     }
                 }
             } else {
-                _error.value = Resource.Error("message","$coins GSP Coins required to get coupon")
+                setError("$coins GSP Coins required to get coupon", SNACKBAR)
             }
         }
     }
@@ -150,8 +183,9 @@ class RewardViewModel(
 
     fun getConfig(key: String): String {
         var value = ""
-        if(user != null && user?.user_id!! > 0) {
-            val configData = user?.config!!
+        val user = getUserData()
+        if(user != null && user.user_id > 0) {
+            val configData = user.config
             if(configData.trim().length > 5) {
                 try {
                     val arr = JSONArray(configData)
@@ -165,7 +199,7 @@ class RewardViewModel(
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = Resource.Error("exception","$TAG ${e.message}")
+                    setError("${e.message}", ALERT)
                 }
             }
         }

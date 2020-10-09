@@ -2,13 +2,11 @@ package `in`.allen.gsp.ui.reward
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Statement
-import `in`.allen.gsp.data.entities.User
-import `in`.allen.gsp.data.repositories.RewardRepository
-import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.FragmentStatementBinding
 import `in`.allen.gsp.databinding.ItemStatementBinding
 import `in`.allen.gsp.utils.show
 import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.toast
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,8 +14,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
@@ -66,7 +64,9 @@ class StatementFragment : Fragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
+        activity?.let {
+            viewModel = ViewModelProvider(it, factory).get(RewardViewModel::class.java)
+        }
 
         if(position == 1) {
             type = "earn"
@@ -76,7 +76,7 @@ class StatementFragment : Fragment(), KodeinAware {
 
         initRecyclerView()
         observeSuccess()
-        viewModel.userData()
+        viewModel.getStatement(type,page)
     }
 
     companion object {
@@ -90,14 +90,10 @@ class StatementFragment : Fragment(), KodeinAware {
     }
 
     private fun observeSuccess() {
-        viewModel.stateSuccess().observe(viewLifecycleOwner, {
+        viewModel.getSuccess().observe(viewLifecycleOwner, {
             tag("TAG _success: $it")
             if(it != null) {
                 when (it.message) {
-                    "user" -> {
-                        viewModel.getStatement(type,page)
-                    }
-
                     "statement" -> {
                         loading = true
                         binding.progressBar.show(false)
