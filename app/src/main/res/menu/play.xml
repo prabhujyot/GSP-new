@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_close"
-        android:icon="@drawable/ic_close"
-        android:title="@string/lblExit"
+        android:id="@+id/menu_translate"
+        android:icon="@drawable/ic_translate"
+        android:title="@string/lblTranslate"
         app:showAsAction="always"
         app:iconTint="@color/white"/>
 </menu>

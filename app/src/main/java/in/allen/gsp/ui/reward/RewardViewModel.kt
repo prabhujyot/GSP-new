@@ -70,6 +70,8 @@ class RewardViewModel(
             if (dbUser != null) {
                 setUserData(dbUser)
                 setSuccess(dbUser,"user")
+
+                getDailyReward()
             } else {
                 setError("Not Found",TAG)
             }

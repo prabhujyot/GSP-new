@@ -17,10 +17,10 @@ class BannerRepository(
     private val db: AppDatabase
 ): SafeApiRequest() {
 
-    private val contest = MutableLiveData<List<Banner>>()
+    private val banner = MutableLiveData<List<Banner>>()
 
     init {
-        contest.observeForever {
+        banner.observeForever {
             setDBList(it)
         }
     }
@@ -28,7 +28,7 @@ class BannerRepository(
     suspend fun getList(user_id: Int): LiveData<List<Banner>> {
         return withContext(Dispatchers.IO) {
             fetchList(user_id)
-            db.getBannerDao().getList()
+            getDBList()
         }
     }
 
@@ -37,13 +37,15 @@ class BannerRepository(
             val response = apiRequest {
                 api.banners(user_id)
             }
-            contest.postValue(response?.let { createData(it) })
+            banner.postValue(response?.let { createData(it) })
         }
     }
 
     private fun isFetchNeeded(): Boolean {
         return true
     }
+
+    private fun getDBList() =db.getBannerDao().getList()
 
     private fun setDBList(list: List<Banner>) {
         Coroutines.io {

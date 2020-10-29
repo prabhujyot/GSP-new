@@ -11,6 +11,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.text.format.DateUtils
 import android.util.Base64
@@ -36,11 +37,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 fun Context.toast(message: String) {
-    Toast.makeText(this,message,Toast.LENGTH_LONG).show()
+    Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 }
 
 fun View.snackbar(message: String) {
-    Snackbar.make(this,message,Snackbar.LENGTH_INDEFINITE).also { snackbar ->
+    Snackbar.make(this, message, Snackbar.LENGTH_INDEFINITE).also { snackbar ->
         snackbar.setAction("Ok") {
             snackbar.dismiss()
         }
@@ -101,7 +102,7 @@ fun Activity.alertDialog(title: String, message: String, alertAction: () -> Unit
 }
 
 fun tag(data: Any) {
-    Log.e("GSP","$data")
+    Log.e("GSP", "$data")
 }
 
 fun View.showProgress() {
@@ -120,18 +121,37 @@ fun View.show(visibilty: Boolean = true) {
     }
 }
 
-fun ImageView.loadImage(url: String, circular: Boolean = false) {
+fun ImageView.loadImage(url: String, circular: Boolean = false, centerInside: Boolean = false) {
     if(circular) {
         Glide.with(this)
             .load(url)
             .circleCrop()
             .into(this)
     } else {
-        Glide.with(this)
-            .load(url)
-            .centerCrop()
-            .into(this)
+        if(centerInside) {
+            Glide.with(this)
+                .load(url)
+                .centerInside()
+                .into(this)
+        } else {
+            Glide.with(this)
+                .load(url)
+                .centerCrop()
+                .into(this)
+        }
     }
+}
+
+fun getMediaDuration(path: String?): Long {
+    var timeInMillisec:Long = 0
+    val retriever = MediaMetadataRetriever()
+    retriever.setDataSource(path, HashMap())
+    val time: String? = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+    if(time != null) {
+        timeInMillisec = time.toLong()
+    }
+    retriever.release()
+    return timeInMillisec
 }
 
 fun milisToFormat(milliseconds: Long, format: String): String {

@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".NotificationActivity" />
-        <activity android:name=".PlayActivity" />
+        <activity android:name=".ui.quiz.QuizActivity" />
         <activity android:name=".WebActivity" />
         <activity android:name=".ui.videos.YTPlayerActivity" />
         <activity android:name=".ui.videos.VideosActivity" />

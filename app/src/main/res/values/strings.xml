@@ -98,4 +98,6 @@
     <string name="dialogMessage">Dialog Message</string>
     <string name="lblClose">Close</string>
     <string name="lblOk">Ok</string>
+    <string name="lblTranslate">Translate</string>
+    <string name="lblQuestionTable">Q. Table</string>
 </resources>

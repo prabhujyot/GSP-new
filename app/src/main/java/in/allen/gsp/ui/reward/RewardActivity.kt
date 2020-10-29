@@ -50,6 +50,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
     private val factory:RewardViewModelFactory by instance()
 
     private lateinit var redeemSheetBehavior: BottomSheetBehavior<View>
+    private var coinsValue = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,10 +79,20 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
         }.attach()
 
+
         observeLoading()
         observeError()
         observeSuccess()
         viewModel.userData()
+    }
+
+    override fun onBackPressed() {
+        if(::redeemSheetBehavior.isInitialized &&
+            redeemSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            redeemSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -160,12 +171,14 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                 when (it.message) {
                     "user" -> {
                         val user = it.data as User
-                        if (user.avatar.isNotBlank())
-                            binding.totalCoins.text = "${user.coins}"
+                        binding.totalCoins.text = "${user.coins}"
+
+                        if(viewModel.getConfig("coin-value").isNotEmpty()) {
+                            coinsValue = viewModel.getConfig("coin-value").toInt()
+                        }
+                        binding.coinValue.text = "Cash: ${user.coins.div(coinsValue)} INR"
 
                         initBottomSheet()
-
-                        viewModel.getDailyReward()
                     }
 
                     "getDailyReward" -> {
@@ -196,16 +209,22 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun createFragment(position: Int): Fragment {
-            var frg:Fragment ?= null
-
-            if(position == 0) {
-                frg = PrizeFragment.newInstance(position)
-            } else if(position > 0) {
-                frg = StatementFragment.newInstance(position)
+            val frg: Fragment? = when (position) {
+                0 -> {
+                    PrizeFragment.newInstance(position)
+                }
+                1 -> {
+                    StatementFragment.newInstance("earn")
+                }
+                else -> {
+                    StatementFragment.newInstance("redeem")
+                }
             }
 
             if(fragmentList.size < itemCount && !fragmentList.contains(frg)) {
-                fragmentList.add(frg!!)
+                if (frg != null) {
+                    fragmentList.add(frg)
+                }
             }
             return frg!!
         }
@@ -237,12 +256,6 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         binding.rootLayout.bottomSheetRedeem.webView.settings.javaScriptEnabled = true
         val url = BuildConfig.BASE_URL + "gsp-admin/index.php/site/page/redemption-rule"
         binding.rootLayout.bottomSheetRedeem.webView.loadUrl(url)
-
-
-        var coinsValue = 1
-        if(viewModel.getConfig("coin-value").isNotEmpty()) {
-            coinsValue = viewModel.getConfig("coin-value").toInt()
-        }
 
         binding.rootLayout.bottomSheetRedeem.card50.apply {
             val coins: Int = 50 * coinsValue

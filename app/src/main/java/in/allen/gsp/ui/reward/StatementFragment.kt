@@ -2,6 +2,7 @@ package `in`.allen.gsp.ui.reward
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Statement
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.databinding.FragmentStatementBinding
 import `in`.allen.gsp.databinding.ItemStatementBinding
 import `in`.allen.gsp.utils.show
@@ -33,8 +34,6 @@ class StatementFragment : Fragment(), KodeinAware {
     override val kodein by kodein()
     private val factory:RewardViewModelFactory by instance()
 
-    private var position = 0
-
     private var type = ""
     private var page = 1
     private var nomore = false
@@ -49,7 +48,7 @@ class StatementFragment : Fragment(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            position = it.getInt("position")
+            type = it.getString("type",null)
         }
     }
 
@@ -64,27 +63,29 @@ class StatementFragment : Fragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity?.let {
-            viewModel = ViewModelProvider(it, factory).get(RewardViewModel::class.java)
-        }
+//        activity?.let {
+//            viewModel = ViewModelProvider(it, factory).get(RewardViewModel::class.java)
+//        }
 
-        if(position == 1) {
-            type = "earn"
-        } else if(position == 2) {
-            type = "redeem"
-        }
+        viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
 
         initRecyclerView()
         observeSuccess()
-        viewModel.getStatement(type,page)
+        viewModel.userData()
+    }
+
+    private fun reset() {
+        page = 1
+        list.clear()
+        recyclerAdapter.notifyDataSetChanged()
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(position: Int) =
+        fun newInstance(type: String) =
             StatementFragment().apply {
                 arguments = Bundle().apply {
-                    putInt("position", position)
+                    putString("type", type)
                 }
             }
     }
@@ -94,6 +95,11 @@ class StatementFragment : Fragment(), KodeinAware {
             tag("TAG _success: $it")
             if(it != null) {
                 when (it.message) {
+                    "user" -> {
+                        reset()
+                        viewModel.getStatement(type,page)
+                    }
+
                     "statement" -> {
                         loading = true
                         binding.progressBar.show(false)
@@ -124,7 +130,7 @@ class StatementFragment : Fragment(), KodeinAware {
                                 }
 
                                 page = data.getInt("page")
-                                binding.recyclerView.adapter?.notifyDataSetChanged()
+                                recyclerAdapter.notifyDataSetChanged()
                             } else {
                                 nomore = true
                             }

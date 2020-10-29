@@ -1,6 +1,7 @@
 package `in`.allen.gsp.data.network
 
 import `in`.allen.gsp.BuildConfig
+import `in`.allen.gsp.data.entities.Quiz
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -8,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.*
+import java.util.concurrent.TimeUnit
 
 interface Api {
 
@@ -19,6 +21,7 @@ interface Api {
             val okHttpClient = OkHttpClient.Builder()
                 .addInterceptor(networkConnectionInterceptor)
                 .addInterceptor(logging)
+                .connectTimeout(1, TimeUnit.MINUTES)
                 .build()
 
             return Retrofit.Builder()
@@ -104,10 +107,38 @@ interface Api {
 
     // redeem coins
     @FormUrlEncoded
-    @POST("dailyreward")
+    @POST("redeem")
     suspend fun redeem(
         @Field("user_id") user_id: Int,
         @Field("value") value: Int
+    ): Response<String>
+
+    // preview question set
+    @GET("preview")
+    suspend fun getPreview(
+        @Query("user_id") user_id: Int
+    ): Response<String>
+
+    // game question set
+    @GET("quiz")
+    suspend fun getQuiz(
+        @Query("game_no") game_no: Int,
+        @Query("qid") qid: String,
+        @Query("question_cat") question_cat: String,
+    ): Response<String>
+
+    // wild question set
+    @GET("wset")
+    suspend fun getWQset(
+        @Query("user_id") user_id: Int,
+        @Query("value") value: Int
+    ): Response<String>
+
+    // save game
+    @FormUrlEncoded
+    @POST("quiz")
+    suspend fun postQuiz(
+        @Body quiz: Quiz,
     ): Response<String>
 
 }

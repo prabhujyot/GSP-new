@@ -18,8 +18,6 @@ class ProfileViewModel(
     private val repository: UserRepository
 ): ViewModel() {
 
-    private val TAG = ProfileViewModel::class.java.name
-
     private var user: User?= null
 
     // interaction with activity
