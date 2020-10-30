@@ -2,12 +2,10 @@ package `in`.allen.gsp.ui.reward
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Statement
-import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.databinding.FragmentStatementBinding
 import `in`.allen.gsp.databinding.ItemStatementBinding
 import `in`.allen.gsp.utils.show
 import `in`.allen.gsp.utils.tag
-import `in`.allen.gsp.utils.toast
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -63,10 +60,6 @@ class StatementFragment : Fragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-//        activity?.let {
-//            viewModel = ViewModelProvider(it, factory).get(RewardViewModel::class.java)
-//        }
-
         viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
 
         initRecyclerView()

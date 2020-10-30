@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin16"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textStyle="bold"
             android:text="@{comment.name}"
             app:layout_constraintEnd_toStartOf="@id/date"

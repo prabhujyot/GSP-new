@@ -158,10 +158,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                     "lock" -> {
                         tag("$TAG lock: ${it.data}")
-//                        if(it.data as Boolean) {
-//                            tag("$TAG lock: ${it.data}")
-                            binding.lock.show(it.data as Boolean)
-//                        }
+                        binding.lock.show(it.data as Boolean)
                     }
 
                     "quizData" -> {
@@ -214,7 +211,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                     "calculateScore" -> {
                         if(it.data is Long) {
-                            binding.textScore.text = "${it.data}"
+//                            binding.textScore.text = "${it.data}"
                             viewModel.moveToNext()
                         }
                     }
@@ -230,6 +227,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             }
                             if(it.data.equals("displayAttachment",true)) {
                                 displayAttachment(viewModel.currentq)
+                            }
+                            if(it.data.equals("closeAttachment",true)) {
+                                binding.layoutAttachment.btnClose.performClick()
                             }
                             if(it.data.equals("displayOption",true)) {
                                 displayOption(viewModel.currentq)
@@ -361,7 +361,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.progressTimer.max = currentQ.qTime * 1000
         binding.progressTimer.progress = 1
 
-        binding.textMultiplier.text = 10.toString()
         binding.progressMultiplier.max = 10 * 1000
         binding.progressMultiplier.progress = 10 * 1000
 
@@ -689,6 +688,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 attachmentSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
 
+            viewModel.attachmentTimerCancel()
             viewModel.displayOption()
         }
 
@@ -748,14 +748,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     binding.layoutAttachment.progressTimer.max = viewModel.TIME_ATTACHMENT.toInt()
                     binding.layoutAttachment.progressTimer.progress = viewModel.TIME_ATTACHMENT.toInt()
                     viewModel.attachmentTimerStart(viewModel.TIME_ATTACHMENT)
-//                    viewModel.attachmentProgress.observe(this, {
-//                        binding.layoutAttachment.progressTimer.progress = it.toInt()
-//                        tag("$TAG attachment progressTimer $it")
-//                        if(it <= 100) {
-//                            viewModel.attachmentTimerCancel()
-//                            binding.layoutAttachment.btnClose.performClick()
-//                        }
-//                    })
                 }
             }
 
@@ -793,9 +785,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
 
-
-
-
     private fun stateLifeline(view: View, enable: Boolean) {
         view.isEnabled = enable
         view.isClickable = enable
@@ -818,5 +807,4 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             viewModel.saveFile(localFile, sourceFileName)
         }
     }
-
 }

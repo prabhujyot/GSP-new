@@ -1,5 +1,6 @@
 package `in`.allen.gsp.ui.splash
 
+import `in`.allen.gsp.IntroActivity
 import `in`.allen.gsp.NotificationActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.repositories.UserRepository
@@ -37,11 +38,14 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
     override val kodein by kodein()
     private val repository: UserRepository by instance()
 
+    private lateinit var preferences: AppPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
         viewModel = SplashViewModel(repository)
+        preferences = AppPreferences(this)
 
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(5, 137, 229)
@@ -153,11 +157,20 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             tag("$TAG viewModel._success: ${it.data}")
             binding.rootLayout.hideProgress()
             if (it.data != null) {
-                Intent(this, HomeActivity::class.java)
-                    .also { it1 ->
-                        it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(it1)
-                    }
+                if(!preferences.appIntro) {
+                    Intent(this, IntroActivity::class.java)
+                        .also { it1 ->
+                            it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(it1)
+                        }
+//                    preferences.appIntro = true
+                } else {
+                    Intent(this, HomeActivity::class.java)
+                        .also { it1 ->
+                            it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(it1)
+                        }
+                }
             }
         })
     }

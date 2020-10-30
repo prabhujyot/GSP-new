@@ -2,11 +2,12 @@ package `in`.allen.gsp.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 
 class AppPreferences(context: Context) {
 
-    private val sharedpreferences: SharedPreferences = context.getSharedPreferences("App_" + context.packageName, Context.MODE_PRIVATE)
-    private val editor: SharedPreferences.Editor = sharedpreferences.edit()
+    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val editor = sharedPreferences.edit()
 
     fun clear() {
         editor.clear().commit()
@@ -14,7 +15,7 @@ class AppPreferences(context: Context) {
 
     var firebaseToken: String
         get() {
-            return sharedpreferences.getString("firebaseToken","")!!
+            return sharedPreferences.getString("firebaseToken","")!!
         }
         set(value) {
             editor.putString("firebaseToken", value).commit()
@@ -22,7 +23,7 @@ class AppPreferences(context: Context) {
 
     var appIntro: Boolean
         get() {
-            return  sharedpreferences.getBoolean("appIntro", false)
+            return  sharedPreferences.getBoolean("appIntro", false)
         }
         set(value) {
             editor.putBoolean("appIntro", value).commit()
@@ -30,7 +31,7 @@ class AppPreferences(context: Context) {
 
     var appMute: Boolean
         get() {
-            return  sharedpreferences.getBoolean("appMute", false)
+            return  sharedPreferences.getBoolean("appMute", false)
         }
         set(value) {
             editor.putBoolean("appMute", value).commit()

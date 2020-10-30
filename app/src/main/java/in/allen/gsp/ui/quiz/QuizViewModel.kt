@@ -116,6 +116,10 @@ class QuizViewModel(
     }
 
     fun setQuizData(quizData: Quiz) {
+        index = 0
+        score.clear()
+        lifeline.clear()
+
         quiz = quizData
         qset = quizRepository.getQset(quiz!!)
         wset = quizRepository.getWset(quiz!!)
@@ -173,8 +177,6 @@ class QuizViewModel(
 
         // set to quiz data
         user?.played_qid.plus("${currentq.qid},")
-
-//        tag("calculateScore ${currentq.qTime.minus(duration)} $multiplier")
 
         val cscore: Long = currentq.qTime.minus(duration)
             .times(
@@ -254,6 +256,7 @@ class QuizViewModel(
 
             override fun onFinish() {
                 attachmentTimerCancel()
+                closeAttachment()
             }
         }
         (attachmentTimer as CountDownTimer).start()
@@ -261,6 +264,13 @@ class QuizViewModel(
 
     fun attachmentTimerCancel() {
         attachmentTimer?.cancel()
+    }
+
+    private fun closeAttachment() {
+        viewModelScope.launch {
+            delay(TIME_MOVE_TO_NEXT)
+            setSuccess("closeAttachment","quizStatus")
+        }
     }
 
 

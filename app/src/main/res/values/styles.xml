@@ -18,4 +18,6 @@
         <item name="android:tint">@color/white</item>
     </style>
 
+    <style name="BlackNoTitleBarTheme" parent="android:Theme.Black.NoTitleBar"/>
+
 </resources>
