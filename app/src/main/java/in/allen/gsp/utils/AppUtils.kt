@@ -29,6 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.messaging.FirebaseMessaging
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.security.MessageDigest
@@ -48,7 +49,12 @@ fun View.snackbar(message: String) {
     }.show()
 }
 
-fun Activity.confirmDialog(title: String, message: String, confirmAction: () -> Unit) {
+fun Activity.confirmDialog(
+    title: String,
+    message: String,
+    actionYes: () -> Unit,
+    actionNo: () -> Unit
+) {
     val dialogBuilder = AlertDialog.Builder(this)
     val inflater = this.layoutInflater
     val dialogView = inflater.inflate(R.layout.dialog_confirm, null)
@@ -66,14 +72,16 @@ fun Activity.confirmDialog(title: String, message: String, confirmAction: () -> 
     //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
     alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     alertDialog.setCanceledOnTouchOutside(false)
+    alertDialog.setCancelable(false)
     alertDialog.show()
     btnYes.setOnClickListener {
         alertDialog.dismiss()
-        confirmAction()
+        actionYes()
     }
 
     btnNo.setOnClickListener {
         alertDialog.dismiss()
+        actionNo()
     }
 }
 
@@ -94,12 +102,40 @@ fun Activity.alertDialog(title: String, message: String, alertAction: () -> Unit
     //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
     alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     alertDialog.setCanceledOnTouchOutside(false)
+    alertDialog.setCancelable(false)
     alertDialog.show()
     btnOk.setOnClickListener {
         alertDialog.dismiss()
         alertAction()
     }
 }
+
+fun Activity.showSystemUI() {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        window.setDecorFitsSystemWindows(true)
+    } else {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+    }
+}
+
+fun Activity.hideSystemUI() {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        window.setDecorFitsSystemWindows(false)
+    } else {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                // Set the content to appear under the system bars so that the
+                // content doesn't resize when the system bars hide and show.
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                // Hide the nav bar and status bar
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+    }
+}
+
 
 fun tag(data: Any) {
     Log.e("GSP", "$data")

@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.lang.Exception
 
 
 class BannerRepository(
@@ -34,10 +35,12 @@ class BannerRepository(
 
     private suspend fun fetchList(user_id: Int) {
         if(isFetchNeeded()) {
-            val response = apiRequest {
-                api.banners(user_id)
-            }
-            banner.postValue(response?.let { createData(it) })
+            try {
+                val response = apiRequest {
+                    api.banners(user_id)
+                }
+                banner.postValue(response?.let { createData(it) })
+            } catch (e: Exception) {}
         }
     }
 

@@ -16,32 +16,47 @@ class HomeViewModel(
     private val bannerRepository: BannerRepository
 ): ViewModel() {
 
-    private val TAG = HomeViewModel::class.java.name
+    val ALERT = "alert"
+    val SNACKBAR = "snackbar"
+    val TAG = "tag"
+    val TOAST = "toast"
 
     // interaction with activity
-    private val _loading = MutableLiveData<Resource.Loading<String>>()
+    private val _loading = MutableLiveData<Resource.Loading<Any>>()
     private val _success = MutableLiveData<Resource.Success<Any>>()
     private val _error = MutableLiveData<Resource.Error<String>>()
 
-    fun stateLoading(): LiveData<Resource.Loading<String>> {
+    fun getLoading(): LiveData<Resource.Loading<Any>> {
         return _loading
     }
 
-    fun stateError(): LiveData<Resource.Error<String>> {
+    fun getError(): LiveData<Resource.Error<String>> {
         return _error
     }
 
-    fun stateSuccess(): LiveData<Resource.Success<Any>> {
+    fun getSuccess(): LiveData<Resource.Success<Any>> {
         return _success
+    }
+
+    fun setLoading(loading: Boolean) {
+        _loading.value = Resource.Loading(loading)
+    }
+
+    fun setError(data: String, filter: String) {
+        _error.postValue(Resource.Error(filter, data))
+    }
+
+    fun setSuccess(data: Any, filter: String) {
+        _success.value = Resource.Success(data, filter)
     }
 
     fun userData() {
         viewModelScope.launch {
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
-                _success.value = Resource.Success(dbUser,"user")
+                setSuccess(dbUser,"user")
             } else {
-                _error.value = Resource.Error("Not found")
+                setError("Not found",SNACKBAR)
             }
         }
     }
@@ -50,6 +65,6 @@ class HomeViewModel(
         val response by lazyDeferred {
             bannerRepository.getList(user_id)
         }
-        _success.value = Resource.Success(response,"banner")
+        setSuccess(response,"banner")
     }
 }

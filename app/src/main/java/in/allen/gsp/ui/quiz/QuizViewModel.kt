@@ -46,6 +46,13 @@ class QuizViewModel(
     val lifeline = HashMap<String, Boolean>()
     val score = HashMap<Int, Long>()
 
+    private var timerRemainingTime:Long = 0
+    private var lock = false
+    private var isPause = false
+    private var isResumable = true
+
+    var isPopupOpen = false
+
     var acorrect = 0
     var isLastQuestion: Boolean = false
 
@@ -57,9 +64,6 @@ class QuizViewModel(
     val TIME_EXTRA_POPUP: Long = 0
     val TIME_OPTIONS_SHOWING: Long = 1500
     var TIME_ATTACHMENT: Long = 15000
-    val TIME_EASY: Long = 30000
-    val TIME_MEDIUM: Long = 45000
-    val TIME_HARD: Long = 60000
 
     private val firebaseStorage = FirebaseStorage.getInstance("gs://firebase-gyan-se-pehchan.appspot.com")
     private val storageReference = firebaseStorage.reference
@@ -156,6 +160,8 @@ class QuizViewModel(
         viewModelScope.launch {
             delay(TIME_READING)
             if(currentq.qattach.trim().isNotEmpty() && !currentq.qattach.trim().equals("null", true)) {
+                isResumable = false
+                isPopupOpen = true
                 setSuccess("displayAttachment", "quizStatus")
             } else {
                 displayOption()
@@ -166,6 +172,7 @@ class QuizViewModel(
     fun displayOption() {
         viewModelScope.launch {
             delay(300)
+            isResumable = true
             setSuccess("displayOption", "quizStatus")
         }
     }
@@ -190,15 +197,15 @@ class QuizViewModel(
     fun finishQuiz() {
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
+            isPopupOpen = true
             setSuccess("displayFinish","quizStatus")
         }
     }
 
     fun lock(status: Boolean) {
+        lock = status
         setSuccess(status,"lock")
     }
-
-
 
 
 
@@ -230,6 +237,7 @@ class QuizViewModel(
     fun questionTimerStart(i: Long) {
         questionTimer = object : CountDownTimer(i, 10) {
             override fun onTick(l: Long) {
+                timerRemainingTime = l
                 setSuccess(l, "questionTimer")
             }
 
@@ -267,9 +275,56 @@ class QuizViewModel(
     }
 
     private fun closeAttachment() {
-        viewModelScope.launch {
-            delay(TIME_MOVE_TO_NEXT)
-            setSuccess("closeAttachment","quizStatus")
+        setSuccess("closeAttachment","quizStatus")
+    }
+
+
+    fun onBackPressed() {
+        tag("$TAG onBackPressed: $lock")
+        if(!lock) {
+            if (timerRemainingTime > 500) {
+                isPopupOpen = true
+                setSuccess("onBackPressed","quizStatus")
+            }
+        }
+    }
+
+    fun onPause() {
+        isPause = true
+        if(isPause) {
+            questionTimerCancel()
+            multiplierTimerCancel()
+
+            lock(true)
+
+            if(!isResumable) {
+                setSuccess("exit","quizStatus")
+            }
+        }
+    }
+
+    fun onResume() {
+        // execute only when activity got resumed from pause
+        if(isPause) {
+            isPause = false
+
+            if(isResumable) {
+                if(!isPopupOpen) {
+                    if (timerRemainingTime > 0) {
+                        questionTimerStart(timerRemainingTime)
+                        // release lock
+                        lock(false)
+                        timerRemainingTime = 0
+                    }
+
+                    if (multiplier > 100) {
+                        multiplierTimerStart(multiplier)
+                        multiplier = 1
+                    }
+                } else {
+                    isPause = true
+                }
+            }
         }
     }
 

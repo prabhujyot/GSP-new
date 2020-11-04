@@ -2,12 +2,11 @@ package `in`.allen.gsp.ui.videos
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Video
+import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.repositories.VideosRepository
 import `in`.allen.gsp.databinding.FragmentPlaylistBinding
 import `in`.allen.gsp.databinding.ItemPlaylistBinding
-import `in`.allen.gsp.utils.loadImage
-import `in`.allen.gsp.utils.show
-import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.*
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -33,6 +32,7 @@ class PlaylistFragment : Fragment(), KodeinAware {
     private lateinit var viewModel: VideosViewModel
 
     override val kodein by kodein()
+    private val userRepository: UserRepository by instance()
     private val videosRepository: VideosRepository by instance()
 
     private lateinit var playlistId: String
@@ -54,7 +54,7 @@ class PlaylistFragment : Fragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = VideosViewModel(videosRepository)
+        viewModel = VideosViewModel(userRepository,videosRepository)
 
         observeSuccess()
 
@@ -66,11 +66,41 @@ class PlaylistFragment : Fragment(), KodeinAware {
         viewModel.videoList(hashMap)
     }
 
+    private fun observeLoading() {
+        viewModel.getLoading().observe(this, {
+            tag("$TAG _loading: ${it.message}")
+            binding.tinyProgressBar.show(false)
+            if (it.data is Boolean && it.data) {
+                binding.tinyProgressBar.show()
+            }
+        })
+    }
+
+    private fun observeError() {
+        viewModel.getError().observe(this, {
+            tag("$TAG _error: ${it.message}")
+            if (it != null) {
+                when (it.message) {
+                    "alert" -> {
+                        it.data?.let { it1 -> activity?.alertDialog("Error", it1) {} }
+                    }
+                    "tag" -> {
+                        it.data?.let { it1 -> tag("$TAG $it1") }
+                    }
+                    "toast" -> {
+                        it.data?.let { it1 -> activity?.toast(it1) }
+                    }
+                    "snackbar" -> {
+//                        it.data?.let { it1 -> binding. rootLayout.snackbar(it1) }
+                    }
+                }
+            }
+        })
+    }
+
     private fun observeSuccess() {
-        viewModel.stateSuccess().observe(viewLifecycleOwner, {
-            tag("$TAG viewModel._success: ${it.data}")
+        viewModel.getSuccess().observe(viewLifecycleOwner, {
             if(it != null) {
-                binding.tinyProgressBar.show(false)
                 when (it.message) {
                     "videoList" -> {
                         if(it.data is Deferred<*>) {

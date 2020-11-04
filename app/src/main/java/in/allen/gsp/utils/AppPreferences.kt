@@ -37,4 +37,19 @@ class AppPreferences(context: Context) {
             editor.putBoolean("appMute", value).commit()
         }
 
+    var timestampVideos: Long
+        get() {
+            return  sharedPreferences.getLong("timestampVideos", 0)
+        }
+        set(value) {
+            editor.putLong("timestampVideos", value).commit()
+        }
+
+    var timestampLeaderboard: Long
+        get() {
+            return  sharedPreferences.getLong("timestampLeaderboard", 0)
+        }
+        set(value) {
+            editor.putLong("timestampLeaderboard", value).commit()
+        }
 }

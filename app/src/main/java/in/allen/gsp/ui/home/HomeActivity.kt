@@ -23,6 +23,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
+import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -44,6 +45,13 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = HomeViewModel(userRepository,bannerRepository)
 
+        setSupportActionBar(binding.layoutToolbar.myToolbar)
+        binding.layoutToolbar.btnBack.setOnClickListener {
+            onBackPressed()
+        }
+
+        binding.rootLayout.setOnClickListener { hideSystemUI() }
+
         binding.viewpagerBanner.pageMargin = 16
 
         observeLoading()
@@ -52,29 +60,52 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         viewModel.userData()
     }
 
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
+    }
+
+    override fun onBackPressed() {
+        confirmDialog("Exit!","Tap on Yes to exit.",{
+            super.onBackPressed()
+        },{})
+    }
 
     private fun observeLoading() {
-        viewModel.stateLoading().observe(this, {
-            tag("$TAG viewModel._loading: ${it.message}")
-            binding.rootLayout.showProgress()
+        viewModel.getLoading().observe(this, {
+            tag("$TAG _loading: ${it.message}")
+            binding.rootLayout.hideProgress()
+            if (it.data is Boolean && it.data) {
+                binding.rootLayout.showProgress()
+            }
         })
     }
 
     private fun observeError() {
-        viewModel.stateError().observe(this, {
-            tag("$TAG viewModel._error: ${it.message}")
-            binding.rootLayout.hideProgress()
-
-            it.message?.let { it1 ->
-                if(it1.isNotBlank())
-                    binding.rootLayout.snackbar(it1.trim())
+        viewModel.getError().observe(this, {
+            tag("$TAG _error: ${it.message}")
+            if (it != null) {
+                when (it.message) {
+                    "alert" -> {
+                        it.data?.let { it1 -> alertDialog("Error", it1) {} }
+                    }
+                    "tag" -> {
+                        it.data?.let { it1 -> tag("$TAG $it1") }
+                    }
+                    "toast" -> {
+                        it.data?.let { it1 -> toast(it1) }
+                    }
+                    "snackbar" -> {
+                        it.data?.let { it1 -> binding.rootLayout.snackbar(it1) }
+                    }
+                }
             }
         })
     }
 
     private fun observeSuccess() {
-        viewModel.stateSuccess().observe(this, {
-            tag("$TAG viewModel._success: ${it.data}")
+        viewModel.getSuccess().observe(this, {
+            tag("$TAG ._success: ${it.data}")
             if(it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
@@ -120,7 +151,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             val binding: ItemBannerBinding = DataBindingUtil.inflate(inflater,R.layout.item_banner,container,false)
 
             val item = list[position]
-            binding.image.loadImage("https://www.klipinterest.com/gsp-admin/uploads/banners/${item.image}")
+            binding.image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item.image}")
             binding.title.text = item.title
             binding.btnGo.setOnClickListener {  }
 
@@ -159,7 +190,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
-                i.putExtra("url",BuildConfig.BASE_URL + "category/quiz-time/")
+                i.putExtra("url","${BuildConfig.BASE_URL}category/quiz-time/")
             }
             R.id.btnSetting -> {
                 i.setClass(this@HomeActivity, RewardActivity::class.java)

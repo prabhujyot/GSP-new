@@ -17,7 +17,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.util.logging.Handler
 
 
 class SplashViewModel(

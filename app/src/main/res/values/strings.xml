@@ -100,4 +100,5 @@
     <string name="lblOk">Ok</string>
     <string name="lblTranslate">Translate</string>
     <string name="lblQuestionTable">Q. Table</string>
+    <string name="txt0">0</string>
 </resources>

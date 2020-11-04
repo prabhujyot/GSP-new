@@ -295,8 +295,10 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
     private fun confirmRedeem(coins: Int) {
         confirmDialog(
             "Coins Redeem",
-            "$coins coins will be redeem, are you agree with terms and conditions?"
-        ) { viewModel.redeem(coins) }
+            "$coins coins will be redeem, are you agree with terms and conditions?",
+            { viewModel.redeem(coins) },
+            {}
+        )
     }
 
     fun btnActionReward(view: View) {

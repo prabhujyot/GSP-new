@@ -48,8 +48,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private val TAG = QuizActivity::class.java.name
     private lateinit var binding: ActivityQuizBinding
-    private lateinit var bindingSingleChoice: OptionLinearBinding
-//    private lateinit var bindingTrueFalse: OptionTrueFalseBinding
     private lateinit var viewModel: QuizViewModel
 
     override val kodein by kodein()
@@ -69,6 +67,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     // Question Table
     private val questionTable = ArrayList<View>()
+
+    private lateinit var mp: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,6 +113,21 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        viewModel.onBackPressed()
+    }
+
+    override fun onPause() {
+        viewModel.onPause()
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
+        viewModel.onResume()
     }
 
     private fun observeLoading() {
@@ -211,7 +226,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                     "calculateScore" -> {
                         if(it.data is Long) {
-//                            binding.textScore.text = "${it.data}"
+                            binding.textScore.text = "${it.data}"
                             viewModel.moveToNext()
                         }
                     }
@@ -236,6 +251,27 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             }
                             if(it.data.equals("displayFinish",true)) {
                                 displayFinish()
+                            }
+                            if(it.data.equals("onBackPressed",true)) {
+                                onPause()
+                                confirmDialog(
+                                    "Exit",
+                                    "Are you sure want to exit, you will lose all your progress",
+                                    {
+                                        viewModel.setSuccess("exit","quizStatus")
+                                    },
+                                    {
+                                        viewModel.isPopupOpen = false
+                                        onResume()
+                                    }
+                                )
+                            }
+                            if(it.data.equals("exit",true)) {
+                                if(mp.isPlaying) {
+                                    mp.stop()
+                                }
+                                mp.release()
+                                finish()
                             }
                         }
                     }
@@ -294,6 +330,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.level3.show(false)
 
         questionTable.clear()
+        binding.layoutLevel1.removeAllViews()
+        binding.layoutLevel2.removeAllViews()
+        binding.layoutLevel3.removeAllViews()
 
         viewModel.qset.reverse()
         for(i in viewModel.qset) {
@@ -409,7 +448,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.layoutOption.removeAllViews()
-        bindingSingleChoice = DataBindingUtil.inflate(
+        val bindingSingleChoice: OptionLinearBinding = DataBindingUtil.inflate(
             layoutInflater, R.layout.option_linear, binding.layoutOption, false
         )
 
@@ -665,9 +704,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.layoutAttachment.image.show(false)
         binding.layoutAttachment.video.show(false)
 
-        val mp = MediaPlayer()
         var url = currentQ.qattach.trim()
-
+        mp = MediaPlayer()
         binding.layoutAttachment.btnClose.setOnClickListener {
             when(currentQ.qtype) {
                 "audio" -> {
@@ -770,7 +808,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.layoutFinish.btnQuit.setOnClickListener {
-            finish()
+            viewModel.setSuccess("exit","quizStatus")
         }
 
         binding.layoutFinish.msg.text = "Congratulations!"

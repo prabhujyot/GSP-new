@@ -4,6 +4,7 @@ import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.entities.Video
 import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.data.network.YTApi
+import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
@@ -15,7 +16,8 @@ import org.json.JSONObject
 
 class VideosRepository(
     private val api: YTApi,
-    private val db: AppDatabase
+    private val db: AppDatabase,
+    private val preferences: AppPreferences
 ): SafeApiRequest() {
 
     private val videos = MutableLiveData<List<Video>>()
@@ -27,27 +29,33 @@ class VideosRepository(
     }
 
     suspend fun getVideos(
-        params:Map<String, String>
+        params: Map<String, String>,
+        fetchInterval: Int
     ): LiveData<List<Video>> {
         return withContext(Dispatchers.IO) {
-            fetchVideos(params)
+            fetchVideos(params,fetchInterval)
             db.getVideoDao().getList(params["playlistId"] ?: error(""))
         }
     }
 
     private suspend fun fetchVideos(
-        params:Map<String, String>
+        params:Map<String, String>,
+        fetchInterval: Int
     ) {
-        if(isFetchNeeded()) {
-            val response = apiRequest {
-                api.playlist(params)
-            }
-            videos.postValue(response?.let { createData(it) })
+        if(isFetchNeeded(fetchInterval)) {
+            try {
+                val response = apiRequest {
+                    api.playlist(params)
+                }
+                videos.postValue(response?.let { createData(it,fetchInterval) })
+            } catch (e: Exception) {}
         }
     }
 
-    private fun isFetchNeeded(): Boolean {
-        return true
+    private fun isFetchNeeded(fetchInterval: Int): Boolean {
+        val savedAt = preferences.timestampVideos
+        val diff: Long = System.currentTimeMillis() - savedAt
+        return diff > fetchInterval
     }
 
     private fun saveDBVideos(video: List<Video>) {
@@ -56,7 +64,7 @@ class VideosRepository(
         }
     }
 
-    private fun createData(data: String): List<Video> {
+    private fun createData(data: String, fetchInterval: Int): List<Video> {
         val list = mutableListOf<Video>()
         val response = JSONObject(data)
         if(!response.has("error")) {
@@ -82,10 +90,11 @@ class VideosRepository(
                     list.add(video)
                 }
             }
+            val timestamp = System.currentTimeMillis().plus(fetchInterval)
+            preferences.timestampVideos = timestamp
         }
         return list
     }
-
 
     suspend fun getVideoDetails(params: Map<String, String>): String? {
         return apiRequest {
@@ -98,5 +107,4 @@ class VideosRepository(
             api.comments(params)
         }
     }
-
 }

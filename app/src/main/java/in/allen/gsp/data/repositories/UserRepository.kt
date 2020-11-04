@@ -4,6 +4,10 @@ import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
+import `in`.allen.gsp.utils.lazyDeferred
+import `in`.allen.gsp.utils.tag
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class UserRepository(
@@ -45,27 +49,22 @@ class UserRepository(
         }
     }
 
-
-//    fun login(name: String, email: String, avatar: String, firebaseUid: String): LiveData<String> {
-//        val loginResponse = MutableLiveData<String>()
-//        api.authentication(name,email,avatar,firebaseUid)
-//            .enqueue(object: Callback<ResponseBody> {
-//                override fun onResponse(
-//                    call: Call<ResponseBody>?,
-//                    response: Response<ResponseBody>?
-//                ) {
-//                    if(response?.isSuccessful!!) {
-//                        loginResponse.value = response.body().string()
-//                    } else {
-//                        loginResponse.value = response.errorBody().string()
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
-//                    loginResponse.value = t?.message
-//                }
-//            })
-//        return loginResponse
-//    }
+    suspend fun config(key: String): String {
+        var value = "1440"
+        val dbUser = getDBUser()
+        if (dbUser != null) {
+            try {
+                val arr = JSONArray(dbUser.config)
+                for(i in 0 until arr.length()) {
+                    val item = arr.get(i) as JSONObject
+                    if(item.getString("key").equals("fetch-interval",true)) {
+                        value = item.getString("value")
+                        break
+                    }
+                }
+            } catch (e: Exception) {}
+        }
+        return value
+    }
 
 }

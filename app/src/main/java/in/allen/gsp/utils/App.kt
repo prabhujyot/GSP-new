@@ -29,10 +29,11 @@ class App: Application(), KodeinAware {
         bind() from singleton { Api(instance()) }
         bind() from singleton { YTApi(instance()) }
         bind() from singleton { AppDatabase(instance()) }
+        bind() from singleton { AppPreferences(instance()) }
         bind() from singleton { UserRepository(instance(),instance()) }
         bind() from singleton { BannerRepository(instance(),instance()) }
-        bind() from singleton { LeaderboardRepository(instance(),instance()) }
-        bind() from singleton { VideosRepository(instance(),instance()) }
+        bind() from singleton { LeaderboardRepository(instance(),instance(),instance()) }
+        bind() from singleton { VideosRepository(instance(),instance(),instance()) }
         bind() from singleton { RewardRepository(instance()) }
         bind() from provider { RewardViewModelFactory(instance(),instance()) }
         bind() from singleton { QuizRepository(instance(),instance()) }

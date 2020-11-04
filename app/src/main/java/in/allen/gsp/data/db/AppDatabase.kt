@@ -48,5 +48,4 @@ abstract class AppDatabase: RoomDatabase() {
                 "gspDatabase.db"
             ).build()
     }
-
 }

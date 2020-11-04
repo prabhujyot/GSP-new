@@ -37,15 +37,13 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
     private val repository: UserRepository by instance()
-
-    private lateinit var preferences: AppPreferences
+    private val preferences: AppPreferences by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
         viewModel = SplashViewModel(repository)
-        preferences = AppPreferences(this)
 
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(5, 137, 229)
@@ -78,6 +76,11 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         observeError()
 
         catchNotification()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,6 +1,7 @@
 package `in`.allen.gsp
 
 import `in`.allen.gsp.ui.home.HomeActivity
+import `in`.allen.gsp.utils.hideSystemUI
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,6 +27,11 @@ class IntroActivity : AppCompatActivity() {
 //        pager.addMovementToView(R.id.description, 0.2f) // Move Little
         parallaxViewPager.addMovementToView(R.id.image, 0.8f) // Move Much
         parallaxViewPager.adapter = IntroAdapter(layoutInflater)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
     }
 
     private class IntroAdapter(private val inflater: LayoutInflater): PagerAdapter() {
