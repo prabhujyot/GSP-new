@@ -60,17 +60,25 @@ class StatementFragment : Fragment(), KodeinAware {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+//        viewModel = activity?.run {
+//            ViewModelProvider(this, factory).get(RewardViewModel::class.java)
+//        } ?: throw Exception("Invalid Activity")
         viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
 
-        initRecyclerView()
         observeSuccess()
+
         viewModel.userData()
+        initRecyclerView()
+        reset()
+        viewModel.getStatement(type,page)
     }
 
     private fun reset() {
         page = 1
         list.clear()
-        recyclerAdapter.notifyDataSetChanged()
+        if (::recyclerAdapter.isInitialized){
+            recyclerAdapter.notifyDataSetChanged()
+        }
     }
 
     companion object {

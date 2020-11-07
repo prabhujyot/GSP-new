@@ -91,12 +91,10 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 try {
                     val account = task.getResult(ApiException::class.java)
                     account?.apply {
-                        tag("$TAG firebaseAuthWithGoogle:" + account.id)
                         viewModel.firebaseAuthWithGoogle(account.idToken!!)
                     }
                 } catch (e: ApiException) {
-                    tag("$TAG Google sign in failed $e")
-                    viewModel.setError("Google sign in failed $e")
+                    viewModel.setError("Google sign in failed $e", TAG)
                 }
             }
         }
@@ -118,17 +116,15 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         LoginManager.getInstance().registerCallback(callbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
-                    tag("$TAG FB Login Success")
                     viewModel.firebaseAuthWithFB(loginResult.accessToken)
                 }
 
                 override fun onCancel() {
-                    viewModel.setError("FB Login cancel")
+                    viewModel.setError("FB Login cancel", TAG)
                 }
 
                 override fun onError(exception: FacebookException) {
-                    tag("$TAG FB Error ${exception.message}")
-                    viewModel.setError("FB Error ${exception.message}")
+                    viewModel.setError("FB Error ${exception.message}", TAG)
                 }
             })
         LoginManager.getInstance().logInWithReadPermissions(this, listOf("email", "public_profile"))
@@ -136,43 +132,61 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun observeLoading() {
-        viewModel.stateLoading().observe(this, {
-            tag("$TAG viewModel._loading: ${it.message}")
-            binding.rootLayout.showProgress()
+        viewModel.getLoading().observe(this, {
+            tag("$TAG _loading: ${it.message}")
+            binding.rootLayout.hideProgress()
+            if (it.data is Boolean && it.data) {
+                binding.rootLayout.showProgress()
+            }
         })
     }
 
     private fun observeError() {
-        viewModel.stateError().observe(this, {
-            tag("$TAG viewModel._error: ${it.message}")
-            binding.rootLayout.hideProgress()
-            askToLogin()
-
-            it.message?.let { it1 ->
-                if (it1.isNotBlank())
-                    binding.rootLayout.snackbar(it1.trim())
+        viewModel.getError().observe(this, {
+            tag("$TAG _error: ${it.message}")
+            if (it != null) {
+                binding.rootLayout.hideProgress()
+                askToLogin()
+                when (it.message) {
+                    "alert" -> {
+                        it.data?.let { it1 -> alertDialog("Error", it1) {} }
+                    }
+                    "tag" -> {
+                        it.data?.let { it1 -> tag("$TAG $it1") }
+                    }
+                    "toast" -> {
+                        it.data?.let { it1 -> toast(it1) }
+                    }
+                    "snackbar" -> {
+                        it.data?.let { it1 -> binding.rootLayout.snackbar(it1) }
+                    }
+                }
             }
         })
     }
 
     private fun observeSuccess() {
-        viewModel.stateSuccess().observe(this, {
-            tag("$TAG viewModel._success: ${it.data}")
-            binding.rootLayout.hideProgress()
-            if (it.data != null) {
-                if(!preferences.appIntro) {
-                    Intent(this, IntroActivity::class.java)
-                        .also { it1 ->
-                            it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            startActivity(it1)
+        viewModel.getSuccess().observe(this, {
+            tag("$TAG _success: ${it.data}")
+            if (it != null) {
+                binding.rootLayout.hideProgress()
+                when (it.message) {
+                    "user" -> {
+                        if(!preferences.appIntro) {
+                            Intent(this, IntroActivity::class.java)
+                                .also { it1 ->
+                                    it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(it1)
+                                }
+                            preferences.appIntro = true
+                        } else {
+                            Intent(this, HomeActivity::class.java)
+                                .also { it1 ->
+                                    it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    startActivity(it1)
+                                }
                         }
-//                    preferences.appIntro = true
-                } else {
-                    Intent(this, HomeActivity::class.java)
-                        .also { it1 ->
-                            it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            startActivity(it1)
-                        }
+                    }
                 }
             }
         })

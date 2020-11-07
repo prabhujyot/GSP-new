@@ -56,7 +56,6 @@ class ProfileViewModel(
         viewModelScope.launch {
             try {
                 val response = repository.profile(user_id)
-                tag("response: $response")
                 if (response != null) {
                     val responseObj = JSONObject(response)
                     tag("responseObj: $responseObj")

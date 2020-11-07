@@ -66,38 +66,6 @@ class PlaylistFragment : Fragment(), KodeinAware {
         viewModel.videoList(hashMap)
     }
 
-    private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
-            tag("$TAG _loading: ${it.message}")
-            binding.tinyProgressBar.show(false)
-            if (it.data is Boolean && it.data) {
-                binding.tinyProgressBar.show()
-            }
-        })
-    }
-
-    private fun observeError() {
-        viewModel.getError().observe(this, {
-            tag("$TAG _error: ${it.message}")
-            if (it != null) {
-                when (it.message) {
-                    "alert" -> {
-                        it.data?.let { it1 -> activity?.alertDialog("Error", it1) {} }
-                    }
-                    "tag" -> {
-                        it.data?.let { it1 -> tag("$TAG $it1") }
-                    }
-                    "toast" -> {
-                        it.data?.let { it1 -> activity?.toast(it1) }
-                    }
-                    "snackbar" -> {
-//                        it.data?.let { it1 -> binding. rootLayout.snackbar(it1) }
-                    }
-                }
-            }
-        })
-    }
-
     private fun observeSuccess() {
         viewModel.getSuccess().observe(viewLifecycleOwner, {
             if(it != null) {
@@ -107,6 +75,7 @@ class PlaylistFragment : Fragment(), KodeinAware {
                             val deferredList = it.data as Deferred<LiveData<List<Video>>>
                             lifecycleScope.launch {
                                 deferredList.await().observe(viewLifecycleOwner, { list->
+                                    binding.tinyProgressBar.show(false)
                                     val recyclerAdapter = context?.let { it1 -> RecyclerViewAdapter(list, it1) }
                                     binding.recyclerView.apply {
                                         layoutManager =  LinearLayoutManager(context)
@@ -121,7 +90,6 @@ class PlaylistFragment : Fragment(), KodeinAware {
             }
         })
     }
-
 
     companion object {
         @JvmStatic

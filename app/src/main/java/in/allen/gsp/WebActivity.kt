@@ -1,12 +1,11 @@
 package `in`.allen.gsp
 
+import `in`.allen.gsp.utils.hideSystemUI
 import android.os.Bundle
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import kotlinx.android.synthetic.main.activity_web.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
@@ -42,5 +41,10 @@ class WebActivity : AppCompatActivity() {
                 webView.loadUrl(url)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
     }
 }

@@ -6,7 +6,6 @@ import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.utils.Coroutines
-import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
@@ -38,11 +37,11 @@ class VideosRepository(
         }
     }
 
-    private suspend fun fetchVideos(
+    suspend fun fetchVideos(
         params:Map<String, String>,
         fetchInterval: Int
     ) {
-        if(isFetchNeeded(fetchInterval)) {
+        if(isFetchNeeded(fetchInterval,params["playlistId"] ?: error(""))) {
             try {
                 val response = apiRequest {
                     api.playlist(params)
@@ -52,9 +51,12 @@ class VideosRepository(
         }
     }
 
-    private fun isFetchNeeded(fetchInterval: Int): Boolean {
-        val savedAt = preferences.timestampVideos
-        val diff: Long = System.currentTimeMillis() - savedAt
+    private fun isFetchNeeded(fetchInterval: Int, playlist: String): Boolean {
+        var savedAt = preferences.timestampPlaylist1
+        if(playlist.equals("PLQ2YKhBryYByhl0Zh-gluJ0uHpq3frZWy",true)) {
+            savedAt = preferences.timestampPlaylist2
+        }
+        val diff: Long = System.currentTimeMillis()/1000 - savedAt
         return diff > fetchInterval
     }
 
@@ -69,7 +71,7 @@ class VideosRepository(
         val response = JSONObject(data)
         if(!response.has("error")) {
             val arr = response.getJSONArray("items")
-            tag(""+ arr + " : " + arr.length())
+            var listId = ""
             if(arr.length() > 0) {
                 for(i in 0 until arr.length()) {
                     val item = arr.get(i) as JSONObject
@@ -88,10 +90,15 @@ class VideosRepository(
                         thumbnails
                     )
                     list.add(video)
+                    listId = item.getJSONObject("snippet").getString("playlistId")
                 }
             }
             val timestamp = System.currentTimeMillis().plus(fetchInterval)
-            preferences.timestampVideos = timestamp
+            if(listId.equals("PLQ2YKhBryYByhl0Zh-gluJ0uHpq3frZWy",true)) {
+                preferences.timestampPlaylist2 = timestamp
+            } else {
+                preferences.timestampPlaylist1 = timestamp
+            }
         }
         return list
     }

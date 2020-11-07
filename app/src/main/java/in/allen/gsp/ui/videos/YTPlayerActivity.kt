@@ -58,6 +58,10 @@ class YTPlayerActivity: YouTubeBaseActivity(),
             // get comments
             getComments()
         }
+
+        binding.commentLayout.setOnClickListener {
+            showSystemUI()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -83,6 +87,11 @@ class YTPlayerActivity: YouTubeBaseActivity(),
             val error = String.format("Error initializing YouTube player: %s", p1.toString())
             toast(error)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
     }
 
     private fun reset() {
@@ -175,8 +184,6 @@ class YTPlayerActivity: YouTubeBaseActivity(),
                                     item.getJSONObject("snippet").getString("description")
                                 )
                             }
-
-                            getComments()
                         }
                     } else {
                         binding.rootLayout.snackbar(

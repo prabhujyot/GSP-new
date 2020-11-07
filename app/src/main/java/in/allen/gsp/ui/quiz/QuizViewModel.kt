@@ -18,7 +18,6 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.concurrent.TimeUnit
 import kotlin.math.ceil
 
 
@@ -40,11 +39,13 @@ class QuizViewModel(
     lateinit var attachmentList: ArrayList<Attachment>
     lateinit var currentq: Question
     var index = 0
+    var doubleDip = false
     var lang = "eng"
     private var multiplier: Long = 1
 
     val lifeline = HashMap<String, Boolean>()
     val score = HashMap<Int, Long>()
+    val statsData = ArrayList<HashMap<String, Int>>()
 
     private var timerRemainingTime:Long = 0
     private var lock = false
@@ -55,7 +56,6 @@ class QuizViewModel(
 
     var acorrect = 0
     var isLastQuestion: Boolean = false
-
 
     var TIME_DELAY: Long = 1000
     var TIME_READING: Long = 2000
@@ -123,6 +123,8 @@ class QuizViewModel(
         index = 0
         score.clear()
         lifeline.clear()
+        statsData.clear()
+        doubleDip = false
 
         quiz = quizData
         qset = quizRepository.getQset(quiz!!)
@@ -182,6 +184,18 @@ class QuizViewModel(
         stats["qid"] = currentq.qid
         stats["duration"] = if(duration == 0) 1 else duration
 
+        // check existing qid before adding
+        var exists = false
+        for(sd in statsData) {
+            if(sd.containsKey(currentq.qid)) {
+                exists = true
+                break
+            }
+        }
+        if(!exists) {
+            statsData.add(stats)
+        }
+
         // set to quiz data
         user?.played_qid.plus("${currentq.qid},")
 
@@ -196,7 +210,7 @@ class QuizViewModel(
 
     fun finishQuiz() {
         viewModelScope.launch {
-            delay(TIME_MOVE_TO_NEXT)
+            delay(TIME_DELAY)
             isPopupOpen = true
             setSuccess("displayFinish","quizStatus")
         }
@@ -328,8 +342,33 @@ class QuizViewModel(
         }
     }
 
+    fun validateLifeline(type: String) {
+        if (lifeline[type]!! && !lock) {
+            if (timerRemainingTime > 500) {
+                lifeline[type] = false
+                setSuccess(type,"validateLifeline")
+            }
+        }
+    }
 
-
+    fun flipQuestion() {
+        if (fset.size > 2) {
+            // check is segment is easy medium or hard
+            currentq = when (currentq.qdifficulty_level) {
+                1 -> {
+                    fset[0]
+                }
+                2 -> {
+                    fset[1]
+                }
+                else -> {
+                    fset[2]
+                }
+            }
+        }
+        currentq = qset[index]
+        setSuccess("setQuestion", "quizStatus")
+    }
 
     fun saveFile(destination: File, filepath: String) {
         val pathReference = storageReference.child(filepath)

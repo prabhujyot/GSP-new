@@ -194,7 +194,7 @@
                         android:id="@+id/btnProfile"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight=".2"
+                        android:layout_weight=".25"
                         android:gravity="center_horizontal"
                         android:onClick="btnActionHome"
                         android:orientation="vertical">
@@ -223,7 +223,7 @@
                         android:id="@+id/btnCoins"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight=".2"
+                        android:layout_weight=".25"
                         android:gravity="center_horizontal"
                         android:onClick="btnActionHome"
                         android:orientation="vertical">
@@ -252,7 +252,7 @@
                         android:id="@+id/btnNotification"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight=".2"
+                        android:layout_weight=".25"
                         android:gravity="center_horizontal"
                         android:onClick="btnActionHome"
                         android:orientation="vertical">
@@ -281,7 +281,7 @@
                         android:id="@+id/btnContests"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight=".2"
+                        android:layout_weight=".25"
                         android:gravity="center_horizontal"
                         android:onClick="btnActionHome"
                         android:orientation="vertical">
@@ -305,36 +305,168 @@
                             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                             android:textColor="@color/black" />
                     </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/btnSetting"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight=".2"
-                        android:gravity="center_horizontal"
-                        android:onClick="btnActionHome"
-                        android:orientation="vertical">
-
-                        <ImageButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="24dp"
-                            android:adjustViewBounds="true"
-                            android:background="@android:color/transparent"
-                            android:contentDescription="@string/lblSetting"
-                            android:scaleType="center"
-                            android:src="@drawable/ic_setting"
-                            android:tint="@color/black"
-                            android:clickable="false"/>
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_horizontal"
-                            android:text="@string/lblSetting"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
                 </LinearLayout>
+
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/layoutAction"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="@color/white"-->
+<!--                    android:baselineAligned="false"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:paddingTop="@dimen/margin4"-->
+<!--                    android:paddingBottom="@dimen/margin4"-->
+<!--                    android:weightSum="1"-->
+<!--                    app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@id/guidelineBottom"-->
+<!--                    app:layout_constraintVertical_bias="1.0">-->
+
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/btnProfile"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight=".2"-->
+<!--                        android:gravity="center_horizontal"-->
+<!--                        android:onClick="btnActionHome"-->
+<!--                        android:orientation="vertical">-->
+
+<!--                        <ImageButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="24dp"-->
+<!--                            android:adjustViewBounds="true"-->
+<!--                            android:background="@android:color/transparent"-->
+<!--                            android:contentDescription="@string/lblProfile"-->
+<!--                            android:scaleType="center"-->
+<!--                            android:src="@drawable/ic_profile"-->
+<!--                            android:tint="@color/black"-->
+<!--                            android:clickable="false"/>-->
+
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:gravity="center_horizontal"-->
+<!--                            android:text="@string/lblProfile"-->
+<!--                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
+<!--                            android:textColor="@color/black" />-->
+<!--                    </LinearLayout>-->
+
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/btnCoins"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight=".2"-->
+<!--                        android:gravity="center_horizontal"-->
+<!--                        android:onClick="btnActionHome"-->
+<!--                        android:orientation="vertical">-->
+
+<!--                        <ImageButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="24dp"-->
+<!--                            android:adjustViewBounds="true"-->
+<!--                            android:background="@android:color/transparent"-->
+<!--                            android:contentDescription="@string/lblEarnCoins"-->
+<!--                            android:scaleType="center"-->
+<!--                            android:src="@drawable/ic_coins"-->
+<!--                            android:tint="@color/black"-->
+<!--                            android:clickable="false"/>-->
+
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:gravity="center_horizontal"-->
+<!--                            android:text="@string/lblEarnCoins"-->
+<!--                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
+<!--                            android:textColor="@color/black" />-->
+<!--                    </LinearLayout>-->
+
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/btnNotification"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight=".2"-->
+<!--                        android:gravity="center_horizontal"-->
+<!--                        android:onClick="btnActionHome"-->
+<!--                        android:orientation="vertical">-->
+
+<!--                        <ImageButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="24dp"-->
+<!--                            android:adjustViewBounds="true"-->
+<!--                            android:background="@android:color/transparent"-->
+<!--                            android:contentDescription="@string/lblNotification"-->
+<!--                            android:scaleType="center"-->
+<!--                            android:src="@drawable/ic_notification"-->
+<!--                            android:tint="@color/black"-->
+<!--                            android:clickable="false"/>-->
+
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:gravity="center_horizontal"-->
+<!--                            android:text="@string/lblNotification"-->
+<!--                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
+<!--                            android:textColor="@color/black" />-->
+<!--                    </LinearLayout>-->
+
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/btnContests"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight=".2"-->
+<!--                        android:gravity="center_horizontal"-->
+<!--                        android:onClick="btnActionHome"-->
+<!--                        android:orientation="vertical">-->
+
+<!--                        <ImageButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="24dp"-->
+<!--                            android:adjustViewBounds="true"-->
+<!--                            android:background="@android:color/transparent"-->
+<!--                            android:contentDescription="@string/lblMoreContests"-->
+<!--                            android:scaleType="center"-->
+<!--                            android:src="@drawable/ic_contest"-->
+<!--                            android:tint="@color/black"-->
+<!--                            android:clickable="false"/>-->
+
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:gravity="center_horizontal"-->
+<!--                            android:text="@string/lblMoreContests"-->
+<!--                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
+<!--                            android:textColor="@color/black" />-->
+<!--                    </LinearLayout>-->
+
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/btnSetting"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight=".2"-->
+<!--                        android:gravity="center_horizontal"-->
+<!--                        android:onClick="btnActionHome"-->
+<!--                        android:orientation="vertical">-->
+
+<!--                        <ImageButton-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="24dp"-->
+<!--                            android:adjustViewBounds="true"-->
+<!--                            android:background="@android:color/transparent"-->
+<!--                            android:contentDescription="@string/lblSetting"-->
+<!--                            android:scaleType="center"-->
+<!--                            android:src="@drawable/ic_setting"-->
+<!--                            android:tint="@color/black"-->
+<!--                            android:clickable="false"/>-->
+
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:gravity="center_horizontal"-->
+<!--                            android:text="@string/lblSetting"-->
+<!--                            android:textAppearance="@style/TextAppearance.AppCompat.Caption"-->
+<!--                            android:textColor="@color/black" />-->
+<!--                    </LinearLayout>-->
+<!--                </LinearLayout>-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

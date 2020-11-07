@@ -192,9 +192,9 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
                 i.putExtra("url","${BuildConfig.BASE_URL}category/quiz-time/")
             }
-            R.id.btnSetting -> {
-                i.setClass(this@HomeActivity, RewardActivity::class.java)
-            }
+//            R.id.btnSetting -> {
+//                i.setClass(this@HomeActivity, RewardActivity::class.java)
+//            }
         }
         startActivity(i)
     }

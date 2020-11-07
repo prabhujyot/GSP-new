@@ -2,7 +2,6 @@ package `in`.allen.gsp.ui.leaderboard
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Leaderboard
-import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.LeaderboardRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityLeaderboardBinding
@@ -49,7 +48,6 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
         observeLoading()
         observeError()
         observeSuccess()
-        viewModel.userData()
     }
 
     override fun onResume() {
@@ -93,14 +91,8 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
         viewModel.getSuccess().observe(this, {
             if(it != null) {
                 when (it.message) {
-                    "user" -> {
-                        val user = it.data as User
-                        viewModel.leaderboard(user)
-                    }
-
                     "leaderboard" -> {
                         if(it.data is Deferred<*>) {
-                            tag(it.data)
                             val deferredList = it.data as Deferred<LiveData<List<Leaderboard>>>
                             lifecycleScope.launch {
                                 deferredList.await().observe(this@LeaderboardActivity, { list->

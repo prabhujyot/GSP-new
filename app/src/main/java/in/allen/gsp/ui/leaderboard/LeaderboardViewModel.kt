@@ -1,6 +1,5 @@
 package `in`.allen.gsp.ui.leaderboard
 
-import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.LeaderboardRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
@@ -11,8 +10,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 
 
 class LeaderboardViewModel(
@@ -54,39 +51,19 @@ class LeaderboardViewModel(
         _success.value = Resource.Success(data, filter)
     }
 
-    fun userData() {
-        viewModelScope.launch {
-            val dbUser = userRepository.getDBUser()
-            if (dbUser != null) {
-                setSuccess(dbUser,"user")
-            } else {
-                setError("Not found",SNACKBAR)
-            }
-        }
+    init {
+        leaderboard()
     }
 
-    fun leaderboard(user: User) {
-        try {
-            val arr = JSONArray(user.config)
-            var minutes = 1440
-
-            for(i in 0 until arr.length()) {
-                val item = arr.get(i) as JSONObject
-                if(item.getString("key").equals("fetch-interval",true)) {
-                    minutes = item.getInt("value")
-                    break
-                }
-            }
-
-            val fetchInterval = minutes.times(1000)
+    fun leaderboard() {
+        viewModelScope.launch {
+            val minutes= userRepository.config("fetch-interval")
+            val fetchInterval = minutes.toInt().times(1000)
             tag("leaderboard fetchInterval: $fetchInterval")
             val response by lazyDeferred {
                 repository.getList(fetchInterval)
             }
             setSuccess(response,"leaderboard")
-        } catch (e: Exception) {
-            setLoading(false)
-            setError(e.message.toString(),SNACKBAR)
         }
     }
 }

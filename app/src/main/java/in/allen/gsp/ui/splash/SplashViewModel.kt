@@ -23,27 +23,38 @@ class SplashViewModel(
     private val repository: UserRepository
 ): ViewModel() {
 
-    private val TAG = SplashViewModel::class.java.name
+    val ALERT = "alert"
+    val SNACKBAR = "snackbar"
+    val TAG = "tag"
+    val TOAST = "toast"
 
     // interaction with activity
-    private val _loading = MutableLiveData<Resource.Loading<String>>()
-    private val _success = MutableLiveData<Resource.Success<User>>()
+    private val _loading = MutableLiveData<Resource.Loading<Any>>()
+    private val _success = MutableLiveData<Resource.Success<Any>>()
     private val _error = MutableLiveData<Resource.Error<String>>()
 
-    fun stateLoading(): LiveData<Resource.Loading<String>> {
+    fun getLoading(): LiveData<Resource.Loading<Any>> {
         return _loading
     }
 
-    fun stateError(): LiveData<Resource.Error<String>> {
+    fun getError(): LiveData<Resource.Error<String>> {
         return _error
     }
 
-    fun stateSuccess(): LiveData<Resource.Success<User>> {
+    fun getSuccess(): LiveData<Resource.Success<Any>> {
         return _success
     }
 
-    fun setError(error: String) {
-        _error.value = Resource.Error(error)
+    fun setLoading(loading: Boolean) {
+        _loading.value = Resource.Loading(loading)
+    }
+
+    fun setError(data: String, filter: String) {
+        _error.postValue(Resource.Error(filter, data))
+    }
+
+    fun setSuccess(data: Any, filter: String) {
+        _success.value = Resource.Success(data, filter)
     }
 
     // check firebase uid
@@ -59,32 +70,23 @@ class SplashViewModel(
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    tag("signInWithCredential:success")
                     val firebaseUser = auth.currentUser
                     authToServer(firebaseUser)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    tag("signInWithCredential:failure ${task.exception}")
-                    _error.value = Resource.Error("${task.exception}")
+                    setError("signInWithCredential:failure ${task.exception}",TAG)
                 }
             }
     }
 
     fun firebaseAuthWithFB(token: AccessToken) {
-        tag("handleFacebookAccessToken:$token")
         val credential = FacebookAuthProvider.getCredential(token.token)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    tag("signInWithCredential:success")
                     val firebaseUser = auth.currentUser
                     authToServer(firebaseUser)
                 } else {
-                    // If sign in fails, display a message to the user.
-                    tag("signInWithCredential:failure ${task.exception}")
-                    _error.value = Resource.Error("${task.exception}")
+                    setError("signInWithCredential:failure ${task.exception}",TAG)
                 }
             }
     }
@@ -101,10 +103,8 @@ class SplashViewModel(
             val uid = firebaseUser?.uid
             val providerData = firebaseUser?.providerId
 
-            tag("user: $displayName : $email : $emailVerified : $photoURL : $isAnonymous : $uid : $providerData")
-
             viewModelScope.launch {
-                _loading.value = Resource.Loading()
+                setLoading(true)
                 try {
                     val params = HashMap<String,String>()
                     params["name"] = firebaseUser?.displayName!!
@@ -112,10 +112,8 @@ class SplashViewModel(
                     params["avatar"] = firebaseUser.photoUrl.toString()
                     params["firebase_uid"] = firebaseUser.uid
                     val response = repository.login(params)
-                    tag("response: $response")
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if(responseObj.getInt("status") == 1) {
                             val data = responseObj.getJSONObject("data")
                             val user = User(
@@ -139,13 +137,13 @@ class SplashViewModel(
                                 data.getString("config_data")
                             )
                             repository.setDBUser(user)
-                            _success.value = Resource.Success(user)
+                            setSuccess(user,"user")
                         } else {
-                            _error.value = Resource.Error(responseObj.getString("message"))
+                            setError(responseObj.getString("message"),TAG)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = e.message?.let { Resource.Error(it) }
+                    setError(e.message.toString(),TAG)
                 }
             }
         }
@@ -157,13 +155,11 @@ class SplashViewModel(
 
     private fun authUser(firebaseUser: FirebaseUser?) {
         val isSignedIn = firebaseUser != null
-        tag("authUser $isSignedIn")
         // Status text
         if (isSignedIn) {
             // check if firebase uid match with db user
             viewModelScope.launch {
                 val dbUser = repository.getDBUser()
-                tag("authUser: dbUser $isSignedIn")
                 if (dbUser != null) {
                     tag("authUser: dbUser uid ${dbUser.firebase_uid.equals(firebaseUser?.uid,true)}")
                     if(dbUser.firebase_uid.equals(firebaseUser?.uid,true)) {
@@ -173,30 +169,28 @@ class SplashViewModel(
                             val obj = JSONObject(sessionToken.toString())
                             val sysTime = System.currentTimeMillis() / 1000L
                             val expireTime = obj.getLong("expire_on")
-                            tag("dbUser: sysTime: $sysTime expireTime: $expireTime  -- ${(sysTime > expireTime)}")
                             if (sysTime > expireTime) {
                                 authToServer(firebaseUser)
                             } else {
                                 viewModelScope.launch {
                                     delay(2*1000)
-                                    _success.value = Resource.Success(dbUser)
+                                    setSuccess(dbUser,"user")
                                 }
                             }
                         } catch (e: Exception) {
-                            tag("authUser: ${e.message}")
-                            _error.value = Resource.Error("${e.message}")
+                            setError("authUser: ${e.message}",TAG)
                         }
                     } else {
                         // logout old user and ask login
                         logout()
-                        _error.value = Resource.Error("")
+                        setError("","")
                     }
                 } else {
                     authToServer(firebaseUser)
                 }
             }
         } else {
-            _error.value = Resource.Error("")
+            setError("","")
         }
     }
 

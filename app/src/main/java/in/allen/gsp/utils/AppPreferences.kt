@@ -37,12 +37,20 @@ class AppPreferences(context: Context) {
             editor.putBoolean("appMute", value).commit()
         }
 
-    var timestampVideos: Long
+    var timestampPlaylist1: Long
         get() {
-            return  sharedPreferences.getLong("timestampVideos", 0)
+            return  sharedPreferences.getLong("timestampPlaylist1", 0)
         }
         set(value) {
-            editor.putLong("timestampVideos", value).commit()
+            editor.putLong("timestampPlaylist1", value).commit()
+        }
+
+    var timestampPlaylist2: Long
+        get() {
+            return  sharedPreferences.getLong("timestampPlaylist2", 0)
+        }
+        set(value) {
+            editor.putLong("timestampPlaylist2", value).commit()
         }
 
     var timestampLeaderboard: Long

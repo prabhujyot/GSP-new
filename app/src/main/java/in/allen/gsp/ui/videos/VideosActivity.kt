@@ -2,6 +2,7 @@ package `in`.allen.gsp.ui.videos
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.databinding.ActivityVideosBinding
+import `in`.allen.gsp.utils.hideSystemUI
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +36,11 @@ class VideosActivity : AppCompatActivity() {
                 tab.text = "Incredible India"
             }
         }.attach()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
     }
 
     private class FragmentAdapter(

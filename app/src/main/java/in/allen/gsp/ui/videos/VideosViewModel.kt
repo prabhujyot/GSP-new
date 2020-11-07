@@ -1,18 +1,14 @@
 package `in`.allen.gsp.ui.videos
 
-import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.repositories.VideosRepository
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.lazyDeferred
-import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import org.json.JSONArray
-import org.json.JSONObject
 
 class VideosViewModel(
     private val userRepository: UserRepository,

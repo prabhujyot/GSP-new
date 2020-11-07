@@ -11,8 +11,11 @@ import `in`.allen.gsp.databinding.OptionLinearBinding
 import `in`.allen.gsp.databinding.OptionSpellingBinding
 import `in`.allen.gsp.databinding.OptionTrueFalseBinding
 import `in`.allen.gsp.utils.*
+import android.animation.ObjectAnimator
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -26,7 +29,9 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
@@ -42,12 +47,17 @@ import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 import java.io.File
 import java.io.IOException
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private val TAG = QuizActivity::class.java.name
     private lateinit var binding: ActivityQuizBinding
+    private lateinit var bindingSingleChoice: OptionLinearBinding
+    private lateinit var bindingTrueFalse: OptionTrueFalseBinding
     private lateinit var viewModel: QuizViewModel
 
     override val kodein by kodein()
@@ -180,8 +190,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         if (it.data is Deferred<*>) {
                             val deferredQuiz = it.data as Deferred<LiveData<Quiz>>
                             lifecycleScope.launch {
-                                deferredQuiz.await().observe(this@QuizActivity, {it1 ->
-                                    if(it1 != null) {
+                                deferredQuiz.await().observe(this@QuizActivity, { it1 ->
+                                    if (it1 != null) {
                                         viewModel.setQuizData(it1)
                                     }
                                 })
@@ -193,14 +203,14 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         if (it.data is ArrayList<*>) {
                             val list = it.data as ArrayList<Attachment>
                             for (file in list) {
-                                downloadFile(file.filename,file.qid.toString())
+                                downloadFile(file.filename, file.qid.toString())
                             }
                             initQuiz()
                         }
                     }
 
                     "questionTimer" -> {
-                        if(it.data is Long) {
+                        if (it.data is Long) {
                             val hms = String.format(
                                 "%02d",
                                 TimeUnit.MILLISECONDS.toSeconds(it.data) - TimeUnit.MINUTES.toSeconds(
@@ -208,57 +218,58 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                 )
                             )
                             binding.textTimer.text = hms
-                            binding.progressTimer.progress = (binding.progressTimer.max - it.data).toInt()
+                            binding.progressTimer.progress =
+                                (binding.progressTimer.max - it.data).toInt()
                         }
                     }
 
                     "multiplierTimer" -> {
-                        if(it.data is Long) {
+                        if (it.data is Long) {
                             binding.progressMultiplier.progress = it.data.toInt()
                         }
                     }
 
                     "attachmentTimer" -> {
-                        if(it.data is Long) {
+                        if (it.data is Long) {
                             binding.layoutAttachment.progressTimer.progress = it.data.toInt()
                         }
                     }
 
                     "calculateScore" -> {
-                        if(it.data is Long) {
+                        if (it.data is Long) {
                             binding.textScore.text = "${it.data}"
                             viewModel.moveToNext()
                         }
                     }
 
                     "quizStatus" -> {
-                        if(it.data is String) {
-                            if(it.data.equals("setQuestion",true)) {
+                        if (it.data is String) {
+                            if (it.data.equals("setQuestion", true)) {
                                 setQuestion(viewModel.currentq)
                                 viewModel.displayQuestion()
                             }
-                            if(it.data.equals("displayQuestion",true)) {
+                            if (it.data.equals("displayQuestion", true)) {
                                 displayQuestion(viewModel.currentq)
                             }
-                            if(it.data.equals("displayAttachment",true)) {
+                            if (it.data.equals("displayAttachment", true)) {
                                 displayAttachment(viewModel.currentq)
                             }
-                            if(it.data.equals("closeAttachment",true)) {
+                            if (it.data.equals("closeAttachment", true)) {
                                 binding.layoutAttachment.btnClose.performClick()
                             }
-                            if(it.data.equals("displayOption",true)) {
+                            if (it.data.equals("displayOption", true)) {
                                 displayOption(viewModel.currentq)
                             }
-                            if(it.data.equals("displayFinish",true)) {
+                            if (it.data.equals("displayFinish", true)) {
                                 displayFinish()
                             }
-                            if(it.data.equals("onBackPressed",true)) {
+                            if (it.data.equals("onBackPressed", true)) {
                                 onPause()
                                 confirmDialog(
                                     "Exit",
                                     "Are you sure want to exit, you will lose all your progress",
                                     {
-                                        viewModel.setSuccess("exit","quizStatus")
+                                        viewModel.setSuccess("exit", "quizStatus")
                                     },
                                     {
                                         viewModel.isPopupOpen = false
@@ -266,12 +277,74 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                     }
                                 )
                             }
-                            if(it.data.equals("exit",true)) {
-                                if(mp.isPlaying) {
+                            if (it.data.equals("exit", true)) {
+                                if (mp.isPlaying) {
                                     mp.stop()
                                 }
                                 mp.release()
                                 finish()
+                            }
+                        }
+                    }
+
+                    "validateLifeline" -> {
+                        if (it.data is String) {
+                            onPause()
+                            displayLifeline(it.data)
+                        }
+                    }
+
+                    "performLifeline" -> {
+                        if (it.data is String) {
+                            if (it.data.equals("fifty_fifty", true)) {
+                                val temp = ArrayList<Any>()
+                                if (bindingSingleChoice.optionA.tag != 1) {
+                                    temp.add(bindingSingleChoice.optionA)
+                                }
+                                if (bindingSingleChoice.optionB.tag != 1) {
+                                    temp.add(bindingSingleChoice.optionB)
+                                }
+                                if (bindingSingleChoice.optionC.tag != 1) {
+                                    temp.add(bindingSingleChoice.optionC)
+                                }
+                                if (bindingSingleChoice.optionD.tag != 1) {
+                                    temp.add(bindingSingleChoice.optionD)
+                                }
+
+                                val random = Random()
+
+                                val intSet = HashSet<Int>()
+                                while (intSet.size < 2) {
+                                    intSet.add(random.nextInt(temp.size))
+                                }
+                                val iter = intSet.iterator()
+                                while (iter.hasNext()) {
+                                    val i = iter.next()
+                                    val v = temp[i] as AppCompatTextView
+                                    v.setTextColor(
+                                        ResourcesCompat.getColor(
+                                            resources,
+                                            R.color.disable,
+                                            null
+                                        )
+                                    )
+                                    v.isClickable = false
+                                }
+                                onResume()
+                            }
+
+                            if (it.data.equals("double_dip", true)) {
+                                viewModel.doubleDip = true
+                                onResume()
+                            }
+
+                            if (it.data.equals("flip", true)) {
+                                viewModel.flipQuestion()
+                                onResume()
+                            }
+
+                            if (it.data.equals("quit", true)) {
+                                viewModel.finishQuiz()
                             }
                         }
                     }
@@ -283,15 +356,17 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     fun btnActionPlay(view: View) {
         when (view.id) {
             R.id.btnDoubleDip -> {
-                viewModel.moveToNext()
+                viewModel.validateLifeline("double_dip")
             }
             R.id.btnFiftyFifty -> {
-
+                viewModel.validateLifeline("fifty_fifty")
             }
             R.id.btnFlip -> {
-
+                viewModel.validateLifeline("flip")
             }
-            R.id.btnQuit -> {}
+            R.id.btnQuit -> {
+                viewModel.validateLifeline("quit")
+            }
         }
     }
 
@@ -317,10 +392,11 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private fun initQuiz() {
         initQusetionTable()
         initLifelines()
+        binding.textScore.text = "0"
 
         viewModel.qset.reverse()
         viewModel.currentq = viewModel.qset[viewModel.index]
-        viewModel.setSuccess("setQuestion","quizStatus")
+        viewModel.setSuccess("setQuestion", "quizStatus")
     }
 
     private fun initQusetionTable() {
@@ -383,12 +459,14 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         viewModel.lifeline["flip"] = true
         viewModel.lifeline["quit"] = true
 
-        stateLifeline(binding.btnFlip, false)
-        if(viewModel.fset.size > 2) {
-            stateLifeline(binding.btnFlip, true)
+        stateLifeline(binding.btnDoubleDip,true)
+        stateLifeline(binding.btnFiftyFifty,true)
+        stateLifeline(binding.btnQuit,true)
+        stateLifeline(binding.btnFlip,true)
+        if(viewModel.fset.size < 3) {
+            stateLifeline(binding.btnFlip,false)
         }
     }
-
 
     private fun setQuestion(currentQ: Question) {
         tag("$TAG setQuestion ${currentQ.qno} ${viewModel.index}")
@@ -448,7 +526,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.layoutOption.removeAllViews()
-        val bindingSingleChoice: OptionLinearBinding = DataBindingUtil.inflate(
+        bindingSingleChoice = DataBindingUtil.inflate(
             layoutInflater, R.layout.option_linear, binding.layoutOption, false
         )
 
@@ -509,19 +587,41 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         viewModel.questionTimerCancel()
         viewModel.multiplierTimerCancel()
 
-        view.background = ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_blue,null)
-        (view as TextView).setTextColor(ResourcesCompat.getColor(resources,R.color.white,null))
+        view.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_btn_blue, null)
+        (view as TextView).setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
 
         lifecycleScope.launch {
             delay(viewModel.TIME_DELAY)
             if(view.tag == 1) {
-                view.background = ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_orange,null)
+                view.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_btn_orange,
+                    null
+                )
 
-                val duration = viewModel.currentq.qTime.minus(binding.textTimer.text.toString().toInt())
+                val duration = viewModel.currentq.qTime.minus(
+                    binding.textTimer.text.toString().toInt()
+                )
                 viewModel.calculateScore(duration)
             } else {
-                view.background = ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_black,null)
-                viewModel.finishQuiz()
+                if(viewModel.doubleDip) {
+                    viewModel.doubleDip = false
+                    onPause()
+                    view.background = ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.bg_btn_gray,
+                        null
+                    )
+                    view.setTextColor(ResourcesCompat.getColor(resources, R.color.disable, null))
+                    onResume()
+                } else {
+                    view.background = ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.bg_btn_black,
+                        null
+                    )
+                    viewModel.finishQuiz()
+                }
             }
             view.startAnimation(animBlink)
         }
@@ -534,7 +634,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         stateLifeline(binding.btnDoubleDip, false)
 
         binding.layoutOption.removeAllViews()
-        val bindingTrueFalse: OptionTrueFalseBinding = DataBindingUtil.inflate(
+        bindingTrueFalse = DataBindingUtil.inflate(
             layoutInflater, R.layout.option_true_false, binding.layoutOption, false
         )
 
@@ -675,8 +775,18 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         for(v in questionTable) {
             if(v.tag == currentQ.qno) {
-                v.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_btn_yellow, null)
-                (v as TextView).setTextColor(ResourcesCompat.getColor(resources, R.color.black, null))
+                v.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_btn_yellow,
+                    null
+                )
+                (v as TextView).setTextColor(
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.black,
+                        null
+                    )
+                )
                 v.setPadding(16, 2, 16, 2)
                 break
             }
@@ -709,7 +819,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.layoutAttachment.btnClose.setOnClickListener {
             when(currentQ.qtype) {
                 "audio" -> {
-                    if(mp.isPlaying) {
+                    if (mp.isPlaying) {
                         mp.stop()
                     }
                     mp.release()
@@ -735,7 +845,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             binding.layoutAttachment.question.text = currentQ.qdesc_hindi
         }
 
-
         val localFile = File(getExternalFilesDir("quiz"), currentQ.qid.toString())
         if(localFile.exists()) {
             url = localFile.path
@@ -749,7 +858,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         // Set the media player audio stream type
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             mp.setAudioAttributes(
-                                AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
+                                AudioAttributes.Builder()
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
+                            )
                         } else {
                             mp.setAudioStreamType(AudioManager.STREAM_MUSIC)
                         }
@@ -764,7 +875,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     }
 
                     binding.layoutAttachment.image.loadImage(
-                        "${BuildConfig.BASE_URL}gsp-admin/uploads/audio-quiz.jpg",false,true
+                        "${BuildConfig.BASE_URL}gsp-admin/uploads/audio-quiz.jpg", false, true
                     )
                     binding.layoutAttachment.image.show()
                 }
@@ -778,7 +889,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 }
                 else -> {
                     binding.layoutAttachment.image.loadImage(
-                        url,false,true
+                        url, false, true
                     )
                     binding.layoutAttachment.image.show()
 
@@ -808,11 +919,18 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.layoutFinish.btnQuit.setOnClickListener {
-            viewModel.setSuccess("exit","quizStatus")
+            viewModel.setSuccess("exit", "quizStatus")
         }
 
+        binding.layoutFinish.progressScore.max = viewModel.qset.size * 1000
+        ObjectAnimator.ofInt(binding.layoutFinish.progressScore,"progress", viewModel.statsData.size * 1000)
+            .setDuration(viewModel.TIME_DELAY)
+            .start()
+        binding.layoutFinish.progressText.text = "Achieved No. of Q. ${viewModel.statsData.size}"
+
+
         binding.layoutFinish.msg.text = "Congratulations!"
-        if(binding.textScore.text.toString().equals("0",true)) {
+        if(binding.textScore.text.toString().equals("0", true)) {
             binding.layoutFinish.msg.text = "Oops!"
         }
         binding.layoutFinish.msgScore.text = "Your score is ${binding.textScore.text}"
@@ -836,6 +954,55 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 ResourcesCompat.getColor(resources, R.color.disable, null),
                 PorterDuff.Mode.SRC_ATOP
             )
+        }
+    }
+
+    private fun displayLifeline(type: String) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.dialog_lifeline, null)
+        dialogBuilder.setView(dialogView)
+
+        val ttle: TextView = dialogView.findViewById(R.id.title)
+        val alertDialog = dialogBuilder.create()
+
+        if (type.equals("fifty_fifty", true)) {
+            stateLifeline(binding.btnFiftyFifty, false)
+            ttle.text = "Fifty Fifty"
+        }
+
+        if (type.equals("double_dip", true)) {
+            stateLifeline(binding.btnDoubleDip, false)
+            ttle.text = "Double Dip"
+        }
+
+        if (type.equals("flip", true)) {
+            stateLifeline(binding.btnFlip, false)
+            ttle.text = "Flip the question"
+        }
+
+        if (type.equals("quit", true)) {
+            stateLifeline(binding.btnQuit, false)
+            ttle.text = "Quit"
+        }
+
+        //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
+        alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        alertDialog.setCanceledOnTouchOutside(false)
+        alertDialog.setCancelable(false)
+
+        if (alertDialog.window != null)
+            alertDialog.window!!.attributes.windowAnimations = R.style.SlidingDialogAnimation
+
+        alertDialog.show()
+        viewModel.isPopupOpen = true
+        lifecycleScope.launch {
+            delay(viewModel.TIME_POPUP)
+            if(alertDialog.isShowing) {
+                alertDialog.dismiss()
+                viewModel.isPopupOpen = false
+                viewModel.setSuccess(type, "performLifeline")
+            }
         }
     }
 

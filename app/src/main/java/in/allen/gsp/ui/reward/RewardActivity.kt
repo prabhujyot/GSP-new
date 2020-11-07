@@ -4,6 +4,7 @@ import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.WebActivity
 import `in`.allen.gsp.data.entities.User
+import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityRewardBinding
 import `in`.allen.gsp.utils.*
 import android.content.Intent
@@ -25,6 +26,7 @@ import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
@@ -35,6 +37,7 @@ import kotlinx.android.synthetic.main.checkin.view.*
 import kotlinx.android.synthetic.main.fragment_prize.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -48,9 +51,11 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
     private val factory:RewardViewModelFactory by instance()
+    private val userRepository: UserRepository by instance()
 
     private lateinit var redeemSheetBehavior: BottomSheetBehavior<View>
     private var coinsValue = 1
+    private var dailyReward = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,11 +84,16 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
         }.attach()
 
-
         observeLoading()
         observeError()
         observeSuccess()
+
         viewModel.userData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
     }
 
     override fun onBackPressed() {
@@ -173,11 +183,16 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                         val user = it.data as User
                         binding.totalCoins.text = "${user.coins}"
 
-                        if(viewModel.getConfig("coin-value").isNotEmpty()) {
-                            coinsValue = viewModel.getConfig("coin-value").toInt()
+                        lifecycleScope.launch {
+                            if(userRepository.config("coin-value").isNotEmpty()) {
+                                coinsValue = userRepository.config("coin-value").toInt()
+                            }
+                            binding.coinValue.text = "Cash: ${user.coins.div(coinsValue)} INR"
                         }
-                        binding.coinValue.text = "Cash: ${user.coins.div(coinsValue)} INR"
-
+                        if(!dailyReward) {
+                            viewModel.getDailyReward()
+                            dailyReward = true
+                        }
                         initBottomSheet()
                     }
 
