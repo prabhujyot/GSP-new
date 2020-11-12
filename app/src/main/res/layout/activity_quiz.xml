@@ -222,7 +222,7 @@
                 app:layout_constraintTop_toBottomOf="@id/guidelineQuestion">
                 <include
                     android:id="@+id/layoutOptionInclude"
-                    layout="@layout/option_linear" />
+                    layout="@layout/option_spelling" />
             </LinearLayout>
 
             <androidx.constraintlayout.widget.Guideline

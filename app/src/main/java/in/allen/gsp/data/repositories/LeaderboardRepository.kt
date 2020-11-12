@@ -47,7 +47,7 @@ class LeaderboardRepository(
 
     private fun isFetchNeeded(fetchInterval: Int): Boolean {
         val savedAt = preferences.timestampLeaderboard
-        val diff: Long = System.currentTimeMillis()/1000 - savedAt
+        val diff: Long = System.currentTimeMillis() - savedAt
         return diff > fetchInterval
     }
 

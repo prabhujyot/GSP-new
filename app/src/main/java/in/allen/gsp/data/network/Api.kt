@@ -119,7 +119,7 @@ interface Api {
         @Query("user_id") user_id: Int
     ): Response<String>
 
-    // game question set
+    // quiz question set
     @GET("quiz")
     suspend fun getQuiz(
         @Query("game_no") game_no: Int,
@@ -134,7 +134,7 @@ interface Api {
         @Query("value") value: Int
     ): Response<String>
 
-    // save game
+    // save quiz data
     @FormUrlEncoded
     @POST("quiz")
     suspend fun postQuiz(

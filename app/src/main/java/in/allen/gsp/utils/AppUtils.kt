@@ -17,6 +17,7 @@ import android.text.format.DateUtils
 import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -69,11 +70,6 @@ fun Activity.confirmDialog(
     ttle.text = title
     msg.text = message
 
-    //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
-    alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    alertDialog.setCanceledOnTouchOutside(false)
-    alertDialog.setCancelable(false)
-    alertDialog.show()
     btnYes.setOnClickListener {
         alertDialog.dismiss()
         actionYes()
@@ -83,6 +79,28 @@ fun Activity.confirmDialog(
         alertDialog.dismiss()
         actionNo()
     }
+
+    //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
+    alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    alertDialog.setCanceledOnTouchOutside(false)
+    alertDialog.setCancelable(false)
+
+    alertDialog.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+    alertDialog.show()
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        alertDialog.window?.setDecorFitsSystemWindows(false)
+    } else {
+        alertDialog.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                // Set the content to appear under the system bars so that the
+                // content doesn't resize when the system bars hide and show.
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                // Hide the nav bar and status bar
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+    }
+    alertDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
 }
 
 fun Activity.alertDialog(title: String, message: String, alertAction: () -> Unit) {
@@ -99,15 +117,32 @@ fun Activity.alertDialog(title: String, message: String, alertAction: () -> Unit
     ttle.text = title
     msg.text = message
 
-    //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
-    alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    alertDialog.setCanceledOnTouchOutside(false)
-    alertDialog.setCancelable(false)
-    alertDialog.show()
     btnOk.setOnClickListener {
         alertDialog.dismiss()
         alertAction()
     }
+
+    //In Android, AlertDialog insert into another container, to avoid that, we need to make back ground transparent
+    alertDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    alertDialog.setCanceledOnTouchOutside(false)
+    alertDialog.setCancelable(false)
+
+    alertDialog.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+    alertDialog.show()
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+        alertDialog.window?.setDecorFitsSystemWindows(false)
+    } else {
+        alertDialog.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                // Set the content to appear under the system bars so that the
+                // content doesn't resize when the system bars hide and show.
+                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                // Hide the nav bar and status bar
+                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+    }
+    alertDialog.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
 }
 
 fun Activity.showSystemUI() {

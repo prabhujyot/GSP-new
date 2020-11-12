@@ -50,14 +50,14 @@ class UserRepository(
     }
 
     suspend fun config(key: String): String {
-        var value = "1440"
+        var value = ""
         val dbUser = getDBUser()
         if (dbUser != null) {
             try {
                 val arr = JSONArray(dbUser.config)
                 for(i in 0 until arr.length()) {
                     val item = arr.get(i) as JSONObject
-                    if(item.getString("key").equals("fetch-interval",true)) {
+                    if(item.getString("key").equals(key,true)) {
                         value = item.getString("value")
                         break
                     }

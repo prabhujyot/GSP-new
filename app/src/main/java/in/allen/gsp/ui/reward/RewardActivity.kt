@@ -4,7 +4,6 @@ import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.WebActivity
 import `in`.allen.gsp.data.entities.User
-import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityRewardBinding
 import `in`.allen.gsp.utils.*
 import android.content.Intent
@@ -26,7 +25,6 @@ import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
@@ -37,7 +35,6 @@ import kotlinx.android.synthetic.main.checkin.view.*
 import kotlinx.android.synthetic.main.fragment_prize.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
@@ -51,11 +48,8 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
     private val factory:RewardViewModelFactory by instance()
-    private val userRepository: UserRepository by instance()
 
     private lateinit var redeemSheetBehavior: BottomSheetBehavior<View>
-    private var coinsValue = 1
-    private var dailyReward = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -182,16 +176,11 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                     "user" -> {
                         val user = it.data as User
                         binding.totalCoins.text = "${user.coins}"
+                        binding.coinValue.text = "Cash: ${user.coins.div(viewModel.coinsValue)} INR"
 
-                        lifecycleScope.launch {
-                            if(userRepository.config("coin-value").isNotEmpty()) {
-                                coinsValue = userRepository.config("coin-value").toInt()
-                            }
-                            binding.coinValue.text = "Cash: ${user.coins.div(coinsValue)} INR"
-                        }
-                        if(!dailyReward) {
+                        if(!viewModel.dailyReward) {
                             viewModel.getDailyReward()
-                            dailyReward = true
+                            viewModel.dailyReward = true
                         }
                         initBottomSheet()
                     }
@@ -207,6 +196,12 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                         if (it.data is JSONObject) {
                             val obj = it.data
                             setDailyCheckinViews(obj.getInt("diff"),obj.getInt("today_value"))
+                        }
+                    }
+
+                    "redeem" -> {
+                        if (it.data is String) {
+                            viewModel.setError(it.data,"snackbar")
                         }
                     }
                 }
@@ -273,7 +268,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         binding.rootLayout.bottomSheetRedeem.webView.loadUrl(url)
 
         binding.rootLayout.bottomSheetRedeem.card50.apply {
-            val coins: Int = 50 * coinsValue
+            val coins: Int = 50 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins50).text = "$coins"
             setOnClickListener {
                 confirmRedeem(coins)
@@ -281,7 +276,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.rootLayout.bottomSheetRedeem.card100.apply {
-            val coins: Int = 100 * coinsValue
+            val coins: Int = 100 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins100).text = "$coins"
             setOnClickListener {
                 confirmRedeem(coins)
@@ -289,7 +284,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.rootLayout.bottomSheetRedeem.card150.apply {
-            val coins: Int = 150 * coinsValue
+            val coins: Int = 150 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins150).text = "$coins"
             setOnClickListener {
                 confirmRedeem(coins)
@@ -297,7 +292,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.rootLayout.bottomSheetRedeem.card200.apply {
-            val coins: Int = 200 * coinsValue
+            val coins: Int = 200 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins200).text = "$coins"
             setOnClickListener {
                 confirmRedeem(coins)

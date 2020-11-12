@@ -44,17 +44,11 @@ class QuizRepository(
         }
     }
 
-//    suspend fun getWildQuiz(user_id: Int, value: Int): Quiz? {
-//        return withContext(Dispatchers.IO) {
-//            val response = apiRequest {
-//                api.getWQset(user_id, value)
-//            }
-//
-//            response?.let {
-//                createWildQuizData(it)
-//            }
-//        }
-//    }
+    suspend fun getWildQuiz(user_id: Int, value: Int): String? {
+        return apiRequest {
+            api.getWQset(user_id, value)
+        }
+    }
 
     suspend fun getPreview(user_id: Int): LiveData<Quiz> {
         return withContext(Dispatchers.IO) {
@@ -173,85 +167,6 @@ class QuizRepository(
         }
         return quiz
     }
-
-//    private fun createWildQuizData(data: String): Quiz? {
-//        var quiz: Quiz? = null
-//
-//        quiz = getDBQuiz()
-//        if(quiz != null) {
-//            val response = JSONObject(data)
-//            if(response.getInt("status") == 1) {
-//                val dataObj = response.getJSONObject("data")
-//                var arr = dataObj.getJSONArray("qset")
-//                if(arr.length() > 0) {
-//                    quiz!!.wset = ""
-//                    val list = ArrayList<Question>()
-//                    for(i in 0 until arr.length()) {
-//                        val item = arr.get(i) as JSONObject
-//
-//                        // setting options
-//                        val optionsArr: JSONArray = item.getJSONArray("options")
-//                        val options: MutableList<Option> = ArrayList()
-//                        for (j in 0 until optionsArr.length()) {
-//                            val obj2 = optionsArr[j] as JSONObject
-//                            val option = Option(
-//                                obj2.getInt("aid"),
-//                                obj2.getInt("aqid"),
-//                                obj2.getString("adesc"),
-//                                obj2.getString("adesc_hindi"),
-//                                "",
-//                                obj2.getInt("acorrect")
-//                            )
-//                            options.add(option)
-//                        }
-//
-//                        val wset = Question(
-//                            item.getInt("qid"),
-//                            item.getString("qdesc"),
-//                            item.getString("qdesc_hindi"),
-//                            item.getString("qtype"),
-//                            item.getString("qcat"),
-//                            item.getString("qattach"),
-//                            item.getString("qsummary"),
-//                            item.getInt("qdifficulty_level"),
-//                            item.getString("qformat"),
-//                            item.getString("qfile"),
-//                            1,
-//                            options
-//                        )
-//                        list.add(wset)
-//                        quiz!!.wset = gson.toJson(list)
-//                    }
-//                }
-//
-//                // attachment
-//                if(!dataObj.getString("attachment").equals("false",true)) {
-//                    arr = dataObj.getJSONArray("attachment")
-//                    if(arr.length() > 0) {
-//                        var list = ArrayList<Attachment>()
-//                        if(quiz!!.attachment.trim().isNotEmpty()) {
-//                            list = gson.fromJson(
-//                                quiz!!.attachment, object: TypeToken<ArrayList<Attachment>>(){}.type)
-//                        }
-//
-//                        for(i in 0 until arr.length()) {
-//                            val item = arr.get(i) as JSONObject
-//                            val attachment = Attachment(
-//                                item.getInt("qid"),
-//                                item.getString("type"),
-//                                item.getString("data"),
-//                                item.getString("filename")
-//                            )
-//                            list.add(attachment)
-//                        }
-//                        quiz!!.attachment = gson.toJson(list)
-//                    }
-//                }
-//            }
-//        }
-//
-//        return quiz
-//    }
 
     private fun createFsetData(data: String): List<Question> {
         val list = ArrayList<Question>()

@@ -23,6 +23,8 @@ class RewardViewModel(
     private val TOAST = "toast"
 
     private var user: User?= null
+    var coinsValue = 1
+    var dailyReward = false
 
     // interaction with activity
     private val _loading = MutableLiveData<Resource.Loading<Any>>()
@@ -58,6 +60,9 @@ class RewardViewModel(
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
                 user = dbUser
+                if(userRepository.config("coin-value").isNotEmpty()) {
+                    coinsValue = userRepository.config("coin-value").toInt()
+                }
                 setSuccess(dbUser,"user")
             } else {
                 setError("Not Found",TAG)

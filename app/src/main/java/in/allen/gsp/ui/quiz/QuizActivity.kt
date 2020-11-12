@@ -2,10 +2,8 @@ package `in`.allen.gsp.ui.quiz
 
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
-import `in`.allen.gsp.data.entities.Attachment
 import `in`.allen.gsp.data.entities.Question
 import `in`.allen.gsp.data.entities.Quiz
-import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.databinding.ActivityQuizBinding
 import `in`.allen.gsp.databinding.OptionLinearBinding
 import `in`.allen.gsp.databinding.OptionSpellingBinding
@@ -52,6 +50,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
+
 class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private val TAG = QuizActivity::class.java.name
@@ -71,6 +70,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     // animations
     private lateinit var animZoomIn: Animation
     private lateinit var animFadeIn: Animation
+    private lateinit var animFadeOut: Animation
     private lateinit var animBlink: Animation
     private lateinit var animMoveLeft: Animation
     private lateinit var animMoveRight: Animation
@@ -177,7 +177,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             if (it != null) {
                 when (it.message) {
                     "user" -> {
-                        val user = it.data as User
                         viewModel.previewData()
                     }
 
@@ -200,13 +199,19 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     }
 
                     "downloadAttachment" -> {
-                        if (it.data is ArrayList<*>) {
-                            val list = it.data as ArrayList<Attachment>
-                            for (file in list) {
+//                        if (it.data is ArrayList<*>) {
+//                            val list = it.data as ArrayList<Attachment>
+//                            for (file in list) {
+//                                downloadFile(file.filename, file.qid.toString())
+//                            }
+//                            initQuiz()
+//                        }
+                        if(viewModel.attachmentList.size > 0) {
+                            for (file in viewModel.attachmentList) {
                                 downloadFile(file.filename, file.qid.toString())
                             }
-                            initQuiz()
                         }
+                        initQuiz()
                     }
 
                     "questionTimer" -> {
@@ -235,6 +240,24 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         }
                     }
 
+                    "shuffleWild" -> {
+                        tag("shuffleWild")
+                        binding.layoutCategory.cat1Text.text = viewModel.wset[0].qcat
+                        binding.layoutCategory.cat1.tag = viewModel.wset[0]
+
+                        binding.layoutCategory.cat2Text.text = viewModel.wset[1].qcat
+                        binding.layoutCategory.cat2.tag = viewModel.wset[1]
+
+                        binding.layoutCategory.cat3Text.text = viewModel.wset[2].qcat
+                        binding.layoutCategory.cat3.tag = viewModel.wset[2]
+
+                        if(viewModel.attachmentList.size > 0) {
+                            for (file in viewModel.attachmentList) {
+                                downloadFile(file.filename, file.qid.toString())
+                            }
+                        }
+                    }
+
                     "calculateScore" -> {
                         if (it.data is Long) {
                             binding.textScore.text = "${it.data}"
@@ -253,6 +276,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             }
                             if (it.data.equals("displayAttachment", true)) {
                                 displayAttachment(viewModel.currentq)
+                            }
+                            if(it.data.equals("displayWild",true)) {
+                                displayWild()
                             }
                             if (it.data.equals("closeAttachment", true)) {
                                 binding.layoutAttachment.btnClose.performClick()
@@ -278,10 +304,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                 )
                             }
                             if (it.data.equals("exit", true)) {
-                                if (mp.isPlaying) {
-                                    mp.stop()
-                                }
-                                mp.release()
+                                try {
+                                    if (mp.isPlaying) {
+                                        mp.stop()
+                                        mp.release()
+                                    }
+                                } catch (e: Exception) {}
                                 finish()
                             }
                         }
@@ -334,7 +362,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             }
 
                             if (it.data.equals("double_dip", true)) {
-                                viewModel.doubleDip = true
+                                viewModel.isDoubleDip = true
                                 onResume()
                             }
 
@@ -384,6 +412,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private fun initAnimations() {
         animZoomIn = AnimationUtils.loadAnimation(applicationContext, R.anim.zoomin)
         animFadeIn = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein)
+        animFadeOut = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout)
         animBlink = AnimationUtils.loadAnimation(applicationContext, R.anim.blink)
         animMoveLeft = AnimationUtils.loadAnimation(applicationContext, R.anim.move_left)
         animMoveRight = AnimationUtils.loadAnimation(applicationContext, R.anim.move_right)
@@ -602,10 +631,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 val duration = viewModel.currentq.qTime.minus(
                     binding.textTimer.text.toString().toInt()
                 )
-                viewModel.calculateScore(duration)
+
+                if(viewModel.isWild) {
+                    viewModel.moveToNext()
+                } else {
+                    viewModel.calculateScore(duration)
+                }
             } else {
-                if(viewModel.doubleDip) {
-                    viewModel.doubleDip = false
+                if(viewModel.isDoubleDip) {
+                    viewModel.isDoubleDip = false
                     onPause()
                     view.background = ResourcesCompat.getDrawable(
                         resources,
@@ -630,8 +664,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun setTrueFalse(currentQ: Question) {
-        stateLifeline(binding.btnFiftyFifty, false)
-        stateLifeline(binding.btnDoubleDip, false)
+        stateLifeline(binding.btnFiftyFifty,false)
+        stateLifeline(binding.btnDoubleDip,false)
 
         binding.layoutOption.removeAllViews()
         bindingTrueFalse = DataBindingUtil.inflate(
@@ -678,7 +712,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         for (element in shuffled) {
             val textView2 = TextView(this)
             val params2 = LinearLayout.LayoutParams(100, 100)
-            params2.setMargins(2, 0, 2, 0)
             textView2.layoutParams = params2
             textView2.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
             textView2.setTypeface(textView2.typeface, Typeface.BOLD)
@@ -718,7 +751,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             }
             val textView = TextView(this)
             val params = LinearLayout.LayoutParams(90, 90)
-            params.setMargins(8, 0, 8, 0)
             textView.layoutParams = params
             textView.text = element.toString()
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
@@ -732,7 +764,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             )
             textView.tag = true
             textView.isAllCaps = true
-            bindingSpelling.spelLayout.addView(textView)
+            bindingSpelling.charLayout.addView(textView)
             textView.setOnClickListener { v ->
                 var spelling = ""
                 if (v.tag as Boolean) {
@@ -744,7 +776,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             bindingSpelling.spelLayout.getChildAt(j).background =
                                 ResourcesCompat.getDrawable(
                                     resources,
-                                    R.drawable.bg_circle_orange,
+                                    R.drawable.bg_circle_blue,
                                     null
                                 )
                             v.setTag(false)
@@ -757,6 +789,48 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     spelling += (bindingSpelling.spelLayout.getChildAt(k) as TextView).text.toString()
                         .trim { it <= ' ' }
                 }
+                tag("spelling: $spelling length: ${spelling.length}, ${shuffled.length} :: ${spelling.length == shuffled.length}")
+                // check answer
+                if(spelling.length == shuffled.length) {
+                    // lock
+                    viewModel.lock(true)
+                    //stop progessbar
+                    viewModel.questionTimerCancel()
+                    viewModel.multiplierTimerCancel()
+
+                    lifecycleScope.launch {
+                        delay(viewModel.TIME_DELAY)
+                        if(spelling.equals(currentQ.option[0].adesc,true)) {
+                            for (k in 0 until bindingSpelling.spelLayout.childCount) {
+                                (bindingSpelling.spelLayout.getChildAt(k) as TextView).background = ResourcesCompat.getDrawable(
+                                    resources,
+                                    R.drawable.bg_circle_orange,
+                                    null
+                                )
+                            }
+
+                            val duration = viewModel.currentq.qTime.minus(
+                                binding.textTimer.text.toString().toInt()
+                            )
+
+                            if(viewModel.isWild) {
+                                viewModel.moveToNext()
+                            } else {
+                                viewModel.calculateScore(duration)
+                            }
+                        } else {
+                            for (k in 0 until bindingSpelling.spelLayout.childCount) {
+                                (bindingSpelling.spelLayout.getChildAt(k) as TextView).background = ResourcesCompat.getDrawable(
+                                    resources,
+                                    R.drawable.bg_circle_black,
+                                    null
+                                )
+                            }
+                            viewModel.finishQuiz()
+                        }
+                        bindingSpelling.spelLayout.startAnimation(animBlink)
+                    }
+                }
             }
         }
         binding.layoutOption.addView(bindingSpelling.root)
@@ -764,8 +838,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun displayQuestion(currentQ: Question) {
-        binding.question.show()
         binding.question.startAnimation(animFadeIn)
+        binding.question.show()
 
         // highlight table
         for(v in questionTable) {
@@ -841,7 +915,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.layoutAttachment.question.text = currentQ.qdesc
-        if(viewModel.lang.equals("hindi", true)) {
+        if(viewModel.lang.equals("hindi",true)) {
             binding.layoutAttachment.question.text = currentQ.qdesc_hindi
         }
 
@@ -866,7 +940,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         }
                         mp.setDataSource(url)
                         mp.prepare()
-                        mp.start()
+                        if(!mp.isPlaying) {
+                            mp.start()
+                        }
                         mp.setOnCompletionListener {
                             binding.layoutAttachment.btnClose.performClick()
                         }
@@ -902,8 +978,71 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
             if (attachmentSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                 attachmentSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                hideSystemUI()
             }
         }
+    }
+
+    private fun displayWild() {
+        binding.layoutCategory.shuffleCost.text = "Shuffle at ${viewModel.shuffleCoins} coins."
+        binding.layoutCategory.cat1Text.text = viewModel.wset[0].qcat
+        binding.layoutCategory.cat1.tag = viewModel.wset[0]
+
+        binding.layoutCategory.cat2Text.text = viewModel.wset[1].qcat
+        binding.layoutCategory.cat2.tag = viewModel.wset[1]
+
+        binding.layoutCategory.cat3Text.text = viewModel.wset[2].qcat
+        binding.layoutCategory.cat3.tag = viewModel.wset[2]
+
+        binding.layoutCategory.cat1.setOnClickListener {
+            viewModel.setWildQuestion(it.tag as Question)
+            if (categorySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                categorySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        binding.layoutCategory.cat2.setOnClickListener {
+            viewModel.setWildQuestion(it.tag as Question)
+            if (categorySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                categorySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        binding.layoutCategory.cat3.setOnClickListener {
+            viewModel.setWildQuestion(it.tag as Question)
+            if (categorySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                categorySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        binding.layoutCategory.btnShuffle.setOnClickListener {
+            shuffleWild(viewModel.shuffleCoins)
+        }
+
+        binding.layoutCategory.btnQuit.setOnClickListener {
+            if (categorySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                categorySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            lifecycleScope.launch {
+                delay(viewModel.TIME_DELAY)
+                displayLifeline("quit")
+            }
+        }
+
+        if (categorySheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            categorySheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            hideSystemUI()
+        }
+    }
+
+    private fun shuffleWild(coins: Int) {
+        confirmDialog(
+            "Coins Redeem",
+            "$coins coins will be redeem",
+            { viewModel.shuffleWild(coins) },
+            {}
+        )
     }
 
     private fun displayFinish() {
@@ -937,6 +1076,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         if (finishSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
             finishSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            hideSystemUI()
         }
     }
 
@@ -968,11 +1108,13 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         if (type.equals("fifty_fifty", true)) {
             stateLifeline(binding.btnFiftyFifty, false)
+            stateLifeline(binding.btnDoubleDip, false)
             ttle.text = "Fifty Fifty"
         }
 
         if (type.equals("double_dip", true)) {
             stateLifeline(binding.btnDoubleDip, false)
+            stateLifeline(binding.btnFiftyFifty, false)
             ttle.text = "Double Dip"
         }
 
@@ -1004,6 +1146,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 viewModel.setSuccess(type, "performLifeline")
             }
         }
+
+        hideSystemUI()
     }
 
     private fun downloadFile(sourceFileName: String, destinationFileName: String) {

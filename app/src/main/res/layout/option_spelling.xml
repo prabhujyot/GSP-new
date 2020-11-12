@@ -14,29 +14,26 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.55" />
 
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/spelLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
+            app:flexWrap="wrap"
+            app:justifyContent="center"
+            app:layout_constraintBottom_toTopOf="@id/guideSpellingsH"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/guideSpellingsH"
-            android:layout_marginBottom="@dimen/margin8"/>
+            app:layout_constraintStart_toStartOf="parent"/>
 
-        <LinearLayout
+        <com.google.android.flexbox.FlexboxLayout
             android:id="@+id/charLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
+            app:flexWrap="wrap"
+            android:layout_marginTop="@dimen/margin24"
+            app:justifyContent="center"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideSpellingsH">
-
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@id/guideSpellingsH"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

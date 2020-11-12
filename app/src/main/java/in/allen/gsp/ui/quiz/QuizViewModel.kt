@@ -1,14 +1,12 @@
 package `in`.allen.gsp.ui.quiz
 
-import `in`.allen.gsp.data.entities.Attachment
-import `in`.allen.gsp.data.entities.Question
-import `in`.allen.gsp.data.entities.Quiz
-import `in`.allen.gsp.data.entities.User
+import `in`.allen.gsp.data.entities.*
 import `in`.allen.gsp.data.repositories.QuizRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.lazyDeferred
 import `in`.allen.gsp.utils.tag
+import android.media.MediaPlayer
 import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,6 +15,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import kotlin.math.ceil
 
@@ -38,21 +38,24 @@ class QuizViewModel(
     lateinit var fset: ArrayList<Question>
     lateinit var attachmentList: ArrayList<Attachment>
     lateinit var currentq: Question
+
     var index = 0
-    var doubleDip = false
     var lang = "eng"
-    private var multiplier: Long = 1
+    var shuffleCoins = 1
 
     val lifeline = HashMap<String, Boolean>()
     val score = HashMap<Int, Long>()
     val statsData = ArrayList<HashMap<String, Int>>()
 
+    private var multiplier: Long = 1
     private var timerRemainingTime:Long = 0
     private var lock = false
     private var isPause = false
     private var isResumable = true
 
+    var isWild = false
     var isPopupOpen = false
+    var isDoubleDip = false
 
     var acorrect = 0
     var isLastQuestion: Boolean = false
@@ -64,6 +67,8 @@ class QuizViewModel(
     val TIME_EXTRA_POPUP: Long = 0
     val TIME_OPTIONS_SHOWING: Long = 1500
     var TIME_ATTACHMENT: Long = 15000
+
+    var mp = MediaPlayer()
 
     private val firebaseStorage = FirebaseStorage.getInstance("gs://firebase-gyan-se-pehchan.appspot.com")
     private val storageReference = firebaseStorage.reference
@@ -102,6 +107,9 @@ class QuizViewModel(
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
                 user = dbUser
+                if(userRepository.config("shuffle-value").isNotEmpty()) {
+                    shuffleCoins = userRepository.config("shuffle-value").toInt()
+                }
                 setSuccess(dbUser, "user")
             } else {
                 setError("Not Found", TAG)
@@ -124,7 +132,7 @@ class QuizViewModel(
         score.clear()
         lifeline.clear()
         statsData.clear()
-        doubleDip = false
+        isDoubleDip = false
 
         quiz = quizData
         qset = quizRepository.getQset(quiz!!)
@@ -133,7 +141,7 @@ class QuizViewModel(
         attachmentList = quizRepository.getAttachmentList(quiz!!)
 
         // save attachment
-        setSuccess(attachmentList, "downloadAttachment")
+        setSuccess("downloadAttachment", "downloadAttachment")
     }
 
     // display quiz
@@ -141,10 +149,21 @@ class QuizViewModel(
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
             if(index < qset.size) {
-                index ++
-                currentq = qset[index]
+                //check level achievement
+                if(!isWild && (index == 4 || index == 9)) {
+                    setSuccess("displayWild","quizStatus")
+                } else {
+                    // reset current question to qset if current question is wild
+                    if(isWild && index == 4) {
+                        // store wild qset
+                        getWild()
+                    }
+                    isWild = false
 
-                setSuccess("setQuestion", "quizStatus")
+                    index++
+                    currentq = qset[index]
+                    setSuccess("setQuestion", "quizStatus")
+                }
             } else {
                 setSuccess("finish", "quizStatus")
             }
@@ -207,6 +226,184 @@ class QuizViewModel(
 
         setSuccess(score.values.sum(),"calculateScore")
     }
+
+
+    fun setWildQuestion(question: Question) {
+        isWild = true
+        val qno = currentq.qno
+        currentq = question
+        currentq.qno = qno
+        currentq.qTime = 30
+        setSuccess("setQuestion", "quizStatus")
+    }
+
+    fun shuffleWild(coins: Int) {
+        if(user != null && user?.user_id!! > 0) {
+            if(coins <= user?.coins!!) {
+                viewModelScope.launch {
+                    setLoading(true)
+                    lock(true)
+                    try {
+                        val response = quizRepository.getWildQuiz(user?.user_id!!, coins)
+                        setLoading(false)
+                        lock(false)
+                        if (response != null) {
+                            val responseObj = JSONObject(response)
+                            if(responseObj.getInt("status") == 1) {
+                                val dataObj = responseObj.getJSONObject("data")
+                                var arr = dataObj.getJSONArray("qset")
+                                if(arr.length() > 0) {
+                                    wset.clear()
+                                    for(i in 0 until arr.length()) {
+                                        val item = arr.get(i) as JSONObject
+
+                                        // setting options
+                                        val optionsArr: JSONArray = item.getJSONArray("options")
+                                        val options: MutableList<Option> = ArrayList()
+                                        for (j in 0 until optionsArr.length()) {
+                                            val obj2 = optionsArr[j] as JSONObject
+                                            val option = Option(
+                                                obj2.getInt("aid"),
+                                                obj2.getInt("aqid"),
+                                                obj2.getString("adesc"),
+                                                obj2.getString("adesc_hindi"),
+                                                "",
+                                                obj2.getInt("acorrect")
+                                            )
+                                            options.add(option)
+                                        }
+
+                                        val qset = Question(
+                                            item.getInt("qid"),
+                                            item.getString("qdesc"),
+                                            item.getString("qdesc_hindi"),
+                                            item.getString("qtype"),
+                                            item.getString("qcat"),
+                                            item.getString("qattach"),
+                                            item.getString("qsummary"),
+                                            item.getInt("qdifficulty_level"),
+                                            item.getString("qformat"),
+                                            item.getString("qfile"),
+                                            1,
+                                            options
+                                        )
+                                        wset.add(qset)
+                                    }
+                                }
+
+                                // attachment
+                                if(!dataObj.getString("attachment").equals("false",true)) {
+                                    arr = dataObj.getJSONArray("attachment")
+                                    if(arr.length() > 0) {
+                                        for(i in 0 until arr.length()) {
+                                            val item = arr.get(i) as JSONObject
+                                            val attachment = Attachment(
+                                                item.getInt("qid"),
+                                                item.getString("type"),
+                                                item.getString("data"),
+                                                item.getString("filename")
+                                            )
+                                            attachmentList.add(attachment)
+                                        }
+                                    }
+                                }
+                                user?.coins = dataObj.getInt("coins")
+                                userRepository.setDBUser(user!!)
+                                setSuccess(wset,"shuffleWild")
+                            } else {
+                                setError(responseObj.getString("message"), ALERT)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        setLoading(false)
+                        lock(false)
+                        setError("${e.message}", ALERT)
+                    }
+                }
+            } else {
+                setError("$coins GSP Coins required to shuffle", ALERT)
+            }
+        }
+    }
+
+    fun getWild() {
+        if(user != null && user?.user_id!! > 0) {
+            viewModelScope.launch {
+                try {
+                    val response = quizRepository.getWildQuiz(user?.user_id!!, 0)
+                    if (response != null) {
+                        val responseObj = JSONObject(response)
+                        if(responseObj.getInt("status") == 1) {
+                            val dataObj = responseObj.getJSONObject("data")
+                            var arr = dataObj.getJSONArray("qset")
+                            if(arr.length() > 0) {
+                                wset.clear()
+                                for(i in 0 until arr.length()) {
+                                    val item = arr.get(i) as JSONObject
+
+                                    // setting options
+                                    val optionsArr: JSONArray = item.getJSONArray("options")
+                                    val options: MutableList<Option> = ArrayList()
+                                    for (j in 0 until optionsArr.length()) {
+                                        val obj2 = optionsArr[j] as JSONObject
+                                        val option = Option(
+                                            obj2.getInt("aid"),
+                                            obj2.getInt("aqid"),
+                                            obj2.getString("adesc"),
+                                            obj2.getString("adesc_hindi"),
+                                            "",
+                                            obj2.getInt("acorrect")
+                                        )
+                                        options.add(option)
+                                    }
+
+                                    val qset = Question(
+                                        item.getInt("qid"),
+                                        item.getString("qdesc"),
+                                        item.getString("qdesc_hindi"),
+                                        item.getString("qtype"),
+                                        item.getString("qcat"),
+                                        item.getString("qattach"),
+                                        item.getString("qsummary"),
+                                        item.getInt("qdifficulty_level"),
+                                        item.getString("qformat"),
+                                        item.getString("qfile"),
+                                        1,
+                                        options
+                                    )
+                                    wset.add(qset)
+                                }
+                            }
+
+                            // attachment
+                            if(!dataObj.getString("attachment").equals("false",true)) {
+                                arr = dataObj.getJSONArray("attachment")
+                                if(arr.length() > 0) {
+                                    for(i in 0 until arr.length()) {
+                                        val item = arr.get(i) as JSONObject
+                                        val attachment = Attachment(
+                                            item.getInt("qid"),
+                                            item.getString("type"),
+                                            item.getString("data"),
+                                            item.getString("filename")
+                                        )
+                                        attachmentList.add(attachment)
+                                    }
+                                }
+                            }
+                            user?.coins = dataObj.getInt("coins")
+                            userRepository.setDBUser(user!!)
+                        } else {
+                            setError(responseObj.getString("message"), TAG)
+                        }
+                    }
+                } catch (e: Exception) {
+                    setError("${e.message}", TAG)
+                }
+            }
+        }
+    }
+
 
     fun finishQuiz() {
         viewModelScope.launch {

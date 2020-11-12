@@ -58,7 +58,7 @@ class LeaderboardViewModel(
     fun leaderboard() {
         viewModelScope.launch {
             val minutes= userRepository.config("fetch-interval")
-            val fetchInterval = minutes.toInt().times(1000)
+            val fetchInterval = minutes.toInt().times(60).times(1000)
             tag("leaderboard fetchInterval: $fetchInterval")
             val response by lazyDeferred {
                 repository.getList(fetchInterval)

@@ -56,7 +56,7 @@ class VideosRepository(
         if(playlist.equals("PLQ2YKhBryYByhl0Zh-gluJ0uHpq3frZWy",true)) {
             savedAt = preferences.timestampPlaylist2
         }
-        val diff: Long = System.currentTimeMillis()/1000 - savedAt
+        val diff: Long = System.currentTimeMillis() - savedAt
         return diff > fetchInterval
     }
 

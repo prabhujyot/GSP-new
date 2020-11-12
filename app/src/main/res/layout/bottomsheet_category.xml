@@ -43,7 +43,7 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textColor="@color/orange"
                     android:textStyle="bold"
-                    android:text="Level 1 cleared"/>
+                    android:text="Level cleared"/>
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/msg"
                     android:layout_width="wrap_content"
@@ -113,6 +113,7 @@
                         android:background="@drawable/bg_circle_grey"
                         android:gravity="center"/>
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/cat3Text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -148,6 +149,7 @@
                         android:background="@drawable/bg_circle_grey"
                         android:gravity="center"/>
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/cat2Text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
@@ -183,6 +185,7 @@
                         android:background="@drawable/bg_circle_grey"
                         android:gravity="center"/>
                     <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/cat1Text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"

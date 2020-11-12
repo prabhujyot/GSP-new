@@ -52,7 +52,7 @@ class VideosViewModel(
     fun videoList(params: HashMap<String,String>) {
         viewModelScope.launch {
             val minutes= userRepository.config("fetch-interval")
-            val fetchInterval = minutes.toInt().times(1000)
+            val fetchInterval = minutes.toInt().times(60).times(1000)
             val response by lazyDeferred {
                 repository.getVideos(params,fetchInterval)
             }
