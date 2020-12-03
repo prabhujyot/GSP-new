@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -23,11 +24,11 @@ class QuizRepository(
     private val gson = Gson()
     private val quiz = MutableLiveData<Quiz>()
 
-    init {
-        quiz.observeForever {
-            setDBQuiz(it)
-        }
-    }
+//    init {
+//        quiz.observeForever {
+//            setDBQuiz(it)
+//        }
+//    }
 
     suspend fun getQuiz(quiz_no: Int, qid: String, question_cat: String): LiveData<Quiz> {
         return withContext(Dispatchers.IO) {
@@ -50,18 +51,26 @@ class QuizRepository(
         }
     }
 
-    suspend fun getPreview(user_id: Int): LiveData<Quiz> {
+    suspend fun purchaseOffer(user_id: Int, value: Int): String? {
+        return apiRequest {
+            api.getOffer(user_id, value)
+        }
+    }
+
+    suspend fun getPreview(user_id: Int): Quiz {
         return withContext(Dispatchers.IO) {
-//            val response = apiRequest {
-//                api.getPreview(user_id)
-//            }
-//
-//            quiz.postValue(response?.let {
-//                createData(0,it)
-//            })
+            val response = apiRequest {
+                api.getPreview(user_id)
+            }
+
+            response?.let {
+                createData(0,it)
+            }
+
+            delay(300)
 
             // from database
-            getDBQuiz()
+            selectDBQuiz()
         }
     }
 
@@ -72,6 +81,7 @@ class QuizRepository(
     }
 
     private fun getDBQuiz() = db.getQuizDao().getQuiz()
+    private fun selectDBQuiz() = db.getQuizDao().selectQuiz(0)
 
     private fun setDBQuiz(quiz: Quiz) {
         Coroutines.io {
@@ -165,6 +175,11 @@ class QuizRepository(
                 0,
                 1)
         }
+
+        if (quiz != null) {
+            setDBQuiz(quiz)
+        }
+
         return quiz
     }
 

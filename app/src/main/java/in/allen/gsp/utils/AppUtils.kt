@@ -1,4 +1,4 @@
-package `in`.allen.gsp.utils
+    package `in`.allen.gsp.utils
 
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R

@@ -101,4 +101,6 @@
     <string name="lblTranslate">Translate</string>
     <string name="lblQuestionTable">Q. Table</string>
     <string name="txt0">0</string>
+    <string name="lblRewards">Rewards</string>
+    <string name="full">Full</string>
 </resources>

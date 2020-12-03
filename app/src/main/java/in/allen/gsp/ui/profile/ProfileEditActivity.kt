@@ -2,6 +2,7 @@ package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.User
+import `in`.allen.gsp.data.repositories.RewardRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityProfileEditBinding
 import `in`.allen.gsp.utils.*
@@ -27,6 +28,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
     private val repository: UserRepository by instance()
+    private val rewardRepository: RewardRepository by instance()
 
     private lateinit var otpSheetBehavior: BottomSheetBehavior<View>
 
@@ -34,7 +36,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile_edit)
-        viewModel = ProfileViewModel(repository)
+        viewModel = ProfileViewModel(repository,rewardRepository)
 
         setSupportActionBar(myToolbar)
         myToolbar.btnBack.setOnClickListener {
@@ -53,26 +55,39 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.stateLoading().observe(this, {
-            tag("$TAG viewModel._loading: ${it.message}")
-            binding.rootLayout.showProgress()
+        viewModel.getLoading().observe(this, {
+            tag("$TAG _loading: ${it.message}")
+            binding.rootLayout.hideProgress()
+            if (it.data is Boolean && it.data) {
+                binding.rootLayout.showProgress()
+            }
         })
     }
 
     private fun observeError() {
-        viewModel.stateError().observe(this, {
-            tag("$TAG viewModel._error: ${it.message}")
-            binding.rootLayout.hideProgress()
-            it.message?.let { it1 ->
-                if (it1.isNotBlank()) {
-                    binding.rootLayout.snackbar(it1.trim())
+        viewModel.getError().observe(this, {
+            tag("$TAG _error: ${it.message}")
+            if (it != null) {
+                when (it.message) {
+                    "alert" -> {
+                        it.data?.let { it1 -> alertDialog("Error", it1) {} }
+                    }
+                    "tag" -> {
+                        it.data?.let { it1 -> tag("$TAG $it1") }
+                    }
+                    "toast" -> {
+                        it.data?.let { it1 -> toast(it1) }
+                    }
+                    "snackbar" -> {
+                        it.data?.let { it1 -> binding.rootLayout.snackbar(it1) }
+                    }
                 }
             }
         })
     }
 
     private fun observeSuccess() {
-        viewModel.stateSuccess().observe(this, {
+        viewModel.getSuccess().observe(this, {
             if(it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {

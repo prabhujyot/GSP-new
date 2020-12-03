@@ -69,6 +69,7 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="@color/orange"
                 android:textStyle="bold"
+                android:layout_marginBottom="@dimen/margin16"
                 app:layout_constraintBottom_toTopOf="@+id/msgScore"
                 app:layout_constraintEnd_toEndOf="@id/msgScore"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -79,9 +80,25 @@
                 android:id="@+id/msgScore"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin8"
+                android:gravity="center"
+                android:text="Your score is "
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/xp"
+                app:layout_constraintEnd_toEndOf="@id/btnQuit"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/btnPlay"
+                app:layout_constraintTop_toBottomOf="@+id/msg" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/xp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin48"
                 android:gravity="center"
-                android:text="Your score is 75"
+                android:text="Earned XP: "
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@color/black"
                 android:textStyle="bold"
@@ -89,7 +106,7 @@
                 app:layout_constraintEnd_toEndOf="@id/btnQuit"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="@id/btnPlay"
-                app:layout_constraintTop_toBottomOf="@+id/msg" />
+                app:layout_constraintTop_toBottomOf="@id/msgScore" />
 
             <Button
                 android:id="@+id/btnPlay"
@@ -107,7 +124,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/btnQuit"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/msgScore" />
+                app:layout_constraintTop_toBottomOf="@id/xp" />
 
             <Button
                 android:id="@+id/btnQuit"

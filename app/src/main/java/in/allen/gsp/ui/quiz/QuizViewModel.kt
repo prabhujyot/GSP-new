@@ -4,7 +4,6 @@ import `in`.allen.gsp.data.entities.*
 import `in`.allen.gsp.data.repositories.QuizRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
-import `in`.allen.gsp.utils.lazyDeferred
 import `in`.allen.gsp.utils.tag
 import android.media.MediaPlayer
 import android.os.CountDownTimer
@@ -18,6 +17,12 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.MutableList
+import kotlin.collections.containsKey
+import kotlin.collections.set
+import kotlin.collections.sum
 import kotlin.math.ceil
 
 
@@ -45,27 +50,23 @@ class QuizViewModel(
 
     val lifeline = HashMap<String, Boolean>()
     val score = HashMap<Int, Long>()
+    val xp = HashMap<Int, Long>()
     val statsData = ArrayList<HashMap<String, Int>>()
 
     private var multiplier: Long = 1
     private var timerRemainingTime:Long = 0
     private var lock = false
     private var isPause = false
-    private var isResumable = true
+    var isResumable = true
 
     var isWild = false
     var isPopupOpen = false
     var isDoubleDip = false
 
-    var acorrect = 0
-    var isLastQuestion: Boolean = false
-
     var TIME_DELAY: Long = 1000
     var TIME_READING: Long = 2000
     val TIME_MOVE_TO_NEXT: Long = 2500
     val TIME_POPUP: Long = 2500
-    val TIME_EXTRA_POPUP: Long = 0
-    val TIME_OPTIONS_SHOWING: Long = 1500
     var TIME_ATTACHMENT: Long = 15000
 
     var mp = MediaPlayer()
@@ -120,25 +121,52 @@ class QuizViewModel(
     fun previewData() {
         setLoading(true)
         if(user != null && user!!.user_id > 0) {
-            val response by lazyDeferred {
-                quizRepository.getPreview(user!!.user_id)
+            viewModelScope.launch {
+                try {
+                    if(user?.life!! > 0) {
+                        user?.life = user?.life!!.minus(1)
+                        user?.update_at = System.currentTimeMillis()
+                        userRepository.setDBUser(user!!)
+
+                        val res = quizRepository.getPreview(user!!.user_id)
+                        setQuizData(res)
+                    } else {
+                        setSuccess("showOffers","quizStatus")
+                    }
+                } catch (e: Exception) {
+                    setError("quizdata:${e.message}",ALERT)
+                }
             }
-            setSuccess(response, "quizData")
         }
     }
 
-    fun setQuizData(quizData: Quiz) {
-        index = 0
+    private fun setQuizData(quizData: Quiz) {
+        tag("setQuizData");
         score.clear()
+        xp.clear()
         lifeline.clear()
         statsData.clear()
+
+        multiplier = 1
+        timerRemainingTime = 0
+        lock = false
+        isPause = false
+        isResumable = true
+
         isDoubleDip = false
+        isWild = false
+        isPopupOpen = false
+        index = 0
+
+        multiplierTimerCancel()
+        questionTimerCancel()
+        attachmentTimerCancel()
 
         quiz = quizData
-        qset = quizRepository.getQset(quiz!!)
-        wset = quizRepository.getWset(quiz!!)
-        fset = quizRepository.getFset(quiz!!)
-        attachmentList = quizRepository.getAttachmentList(quiz!!)
+        qset = quizRepository.getQset(this.quiz!!)
+        wset = quizRepository.getWset(this.quiz!!)
+        fset = quizRepository.getFset(this.quiz!!)
+        attachmentList = quizRepository.getAttachmentList(this.quiz!!)
 
         // save attachment
         setSuccess("downloadAttachment", "downloadAttachment")
@@ -148,7 +176,7 @@ class QuizViewModel(
     fun moveToNext() {
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
-            if(index < qset.size) {
+            if(index < qset.size.minus(1)) {
                 //check level achievement
                 if(!isWild && (index == 4 || index == 9)) {
                     setSuccess("displayWild","quizStatus")
@@ -165,7 +193,7 @@ class QuizViewModel(
                     setSuccess("setQuestion", "quizStatus")
                 }
             } else {
-                setSuccess("finish", "quizStatus")
+                setSuccess("displayFinish", "quizStatus")
             }
         }
     }
@@ -192,10 +220,25 @@ class QuizViewModel(
 
     fun displayOption() {
         viewModelScope.launch {
-            delay(300)
+            delay(TIME_DELAY)
             isResumable = true
-            setSuccess("displayOption", "quizStatus")
+            setSuccess("displayOption","quizStatus")
         }
+    }
+
+    fun startTimer() {
+        viewModelScope.launch {
+            delay(TIME_DELAY)
+            questionTimerStart((currentq.qTime * 1000).toLong())
+            multiplierTimerStart(10 * 1000)
+            lock(false)
+        }
+    }
+
+    fun stopTimer() {
+        lock(true)
+        questionTimerCancel()
+        multiplierTimerCancel()
     }
 
     fun calculateScore(duration: Int) {
@@ -218,6 +261,7 @@ class QuizViewModel(
         // set to quiz data
         user?.played_qid.plus("${currentq.qid},")
 
+        xp[currentq.qno] = currentq.qTime.minus(duration).toLong()
         val cscore: Long = currentq.qTime.minus(duration)
             .times(
                 if(multiplier < 100) 100 else multiplier
@@ -326,7 +370,40 @@ class QuizViewModel(
         }
     }
 
-    fun getWild() {
+    fun offerPurchase(offer: String, coins: Int) {
+        if(user != null && user?.user_id!! > 0) {
+            if(coins <= user?.coins!!) {
+                viewModelScope.launch {
+                    setLoading(true)
+                    lock(true)
+                    try {
+                        val response = quizRepository.getWildQuiz(user?.user_id!!, coins)
+                        setLoading(false)
+                        lock(false)
+                        if (response != null) {
+                            val responseObj = JSONObject(response)
+                            if(responseObj.getInt("status") == 1) {
+                                val dataObj = responseObj.getJSONObject("data")
+                                user?.coins = dataObj.getInt("coins")
+                                userRepository.setDBUser(user!!)
+                                setSuccess(offer,"offerPurchase")
+                            } else {
+                                setError(responseObj.getString("message"), ALERT)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        setLoading(false)
+                        lock(false)
+                        setError("${e.message}", ALERT)
+                    }
+                }
+            } else {
+                setError("$coins GSP Coins required", ALERT)
+            }
+        }
+    }
+
+    private fun getWild() {
         if(user != null && user?.user_id!! > 0) {
             viewModelScope.launch {
                 try {
@@ -407,9 +484,16 @@ class QuizViewModel(
 
     fun finishQuiz() {
         viewModelScope.launch {
-            delay(TIME_DELAY)
+            delay(TIME_MOVE_TO_NEXT)
             isPopupOpen = true
             setSuccess("displayFinish","quizStatus")
+        }
+    }
+
+    private fun saveData() {
+        viewModelScope.launch {
+            // update user data
+
         }
     }
 
@@ -422,7 +506,7 @@ class QuizViewModel(
 
     // multiplier timer
     private var multiplierTimer: CountDownTimer?= null
-    fun multiplierTimerStart(i: Long) {
+    private fun multiplierTimerStart(i: Long) {
         multiplierTimer = object : CountDownTimer(i, 10) {
             override fun onTick(l: Long) {
                 if(l > 0) {
@@ -445,7 +529,7 @@ class QuizViewModel(
 
     // Question Timer
     private var questionTimer: CountDownTimer?= null
-    fun questionTimerStart(i: Long) {
+    private fun questionTimerStart(i: Long) {
         questionTimer = object : CountDownTimer(i, 10) {
             override fun onTick(l: Long) {
                 timerRemainingTime = l
@@ -503,11 +587,7 @@ class QuizViewModel(
     fun onPause() {
         isPause = true
         if(isPause) {
-            questionTimerCancel()
-            multiplierTimerCancel()
-
-            lock(true)
-
+            stopTimer()
             if(!isResumable) {
                 setSuccess("exit","quizStatus")
             }
@@ -563,7 +643,7 @@ class QuizViewModel(
                 }
             }
         }
-        currentq = qset[index]
+        tag("fset: $currentq")
         setSuccess("setQuestion", "quizStatus")
     }
 

@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.checkin.view.*
 import kotlinx.android.synthetic.main.fragment_prize.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
+
 import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein

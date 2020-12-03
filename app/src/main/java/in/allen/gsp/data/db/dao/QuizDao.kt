@@ -19,4 +19,7 @@ interface QuizDao {
     @Query("delete from quiz")
     fun delete()
 
+    @Query("select * from quiz where id = :id")
+    fun selectQuiz(id: Int): Quiz
+
 }

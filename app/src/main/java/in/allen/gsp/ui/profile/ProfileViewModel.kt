@@ -1,9 +1,9 @@
 package `in`.allen.gsp.ui.profile
 
 import `in`.allen.gsp.data.entities.User
+import `in`.allen.gsp.data.repositories.RewardRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
-import `in`.allen.gsp.utils.tag
 import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,26 +15,45 @@ import java.util.concurrent.TimeUnit
 
 
 class ProfileViewModel(
-    private val repository: UserRepository
+    private val repository: UserRepository,
+    private val rewardRepository: RewardRepository
 ): ViewModel() {
 
+    val ALERT = "alert"
+    val SNACKBAR = "snackbar"
+    val TAG = "tag"
+    val TOAST = "toast"
+
     private var user: User?= null
+    var flagScratchcard = false
 
     // interaction with activity
-    private val _loading = MutableLiveData<Resource.Loading<String>>()
-    private val _error = MutableLiveData<Resource.Error<String>>()
+    private val _loading = MutableLiveData<Resource.Loading<Any>>()
     private val _success = MutableLiveData<Resource.Success<Any>>()
+    private val _error = MutableLiveData<Resource.Error<String>>()
 
-    fun stateLoading(): LiveData<Resource.Loading<String>> {
+    fun getLoading(): LiveData<Resource.Loading<Any>> {
         return _loading
     }
 
-    fun stateError(): LiveData<Resource.Error<String>> {
+    fun getError(): LiveData<Resource.Error<String>> {
         return _error
     }
 
-    fun stateSuccess(): LiveData<Resource.Success<Any>> {
+    fun getSuccess(): LiveData<Resource.Success<Any>> {
         return _success
+    }
+
+    fun setLoading(loading: Boolean) {
+        _loading.value = Resource.Loading(loading)
+    }
+
+    fun setError(data: String, filter: String) {
+        _error.value = Resource.Error(filter, data)
+    }
+
+    fun setSuccess(data: Any, filter: String) {
+        _success.value = Resource.Success(data, filter)
     }
 
 
@@ -44,58 +63,55 @@ class ProfileViewModel(
             val dbUser = repository.getDBUser()
             if (dbUser != null) {
                 user = dbUser
-                _success.value = Resource.Success(dbUser,"user")
+                setSuccess(dbUser, "user")
             } else {
-                _error.value = Resource.Error("Not found")
+                setError("Not Found", TAG)
             }
         }
     }
 
     fun statsData(user_id: Int) {
-        _loading.value = Resource.Loading("")
+        setLoading(true)
         viewModelScope.launch {
             try {
                 val response = repository.profile(user_id)
                 if (response != null) {
                     val responseObj = JSONObject(response)
-                    tag("responseObj: $responseObj")
                     if (responseObj.getInt("status") == 1) {
                         val data = responseObj.getJSONObject("data")
-                        _success.value = Resource.Success(data,"stats")
+                        setSuccess(data,"stats")
                     } else {
-                        _error.value = Resource.Error(responseObj.getString("message"))
+                        setError(responseObj.getString("message"),TAG)
                     }
                 }
             } catch (e: Exception) {
-                _error.value = e.message?.let { Resource.Error(it) }
+                e.message?.let { setError(it,TAG) }
             }
         }
     }
 
     fun updateProfile(params: HashMap<String, String>) {
         if(user != null && user?.user_id!! > 0) {
-            _loading.value = Resource.Loading("")
+            setLoading(true)
             viewModelScope.launch {
                 try {
                     params["user_id"] = user?.user_id!!.toString()
                     val response = repository.updateProfile(params)
-                    tag("response: $response")
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if (responseObj.getInt("status") == 1) {
-                            val data = responseObj.getString("data")
-                            _success.value = Resource.Success(data,"updateProfile")
-
                             user?.location = params["location"].toString()
                             user?.about = params["about"].toString()
                             repository.setDBUser(user!!)
+
+                            val data = responseObj.getString("data")
+                            setSuccess(data,"updateProfile")
                         } else {
-                            _error.value = Resource.Error(responseObj.getString("message"))
+                            setError(responseObj.getString("message"),TAG)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = e.message?.let { Resource.Error(it) }
+                    e.message?.let { setError(it,TAG) }
                 }
             }
         }
@@ -103,27 +119,25 @@ class ProfileViewModel(
 
     fun verifyMobile(mobile: String, otp: String) {
         if(user != null && user?.user_id!! > 0) {
-            _loading.value = Resource.Loading("")
+            setLoading(true)
             viewModelScope.launch {
                 try {
                     val response = repository.verifyMobile(user?.user_id!!, mobile, otp)
-                    tag("response: $response")
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if (responseObj.getInt("status") == 1) {
-                            val data = responseObj.getString("message")
-                            _success.value = Resource.Success(data,"verifyMobile")
-
                             user?.mobile = mobile
                             user?.is_verified = 1
                             repository.setDBUser(user!!)
+
+                            val data = responseObj.getString("message")
+                            setSuccess(data,"verifyMobile")
                         } else {
-                            _error.value = Resource.Error(responseObj.getString("message"))
+                            setError(responseObj.getString("message"),TAG)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = e.message?.let { Resource.Error(it) }
+                    e.message?.let { setError(it,TAG) }
                 }
             }
         }
@@ -131,29 +145,54 @@ class ProfileViewModel(
 
     fun getOTP(mobile: String) {
         if(user != null && user?.user_id!! > 0) {
-            _loading.value = Resource.Loading("")
+            setLoading(true)
             viewModelScope.launch {
                 try {
                     val response = repository.otp(user?.user_id!!, mobile)
-                    tag("response: $response")
                     if (response != null) {
                         val responseObj = JSONObject(response)
-                        tag("responseObj: $responseObj")
                         if (responseObj.getInt("status") == 1) {
-                            val data = responseObj.getString("data")
-                            _success.value = Resource.Success(data, "getOTP")
-
                             user?.mobile = mobile
                             user?.is_verified = 0
                             repository.setDBUser(user!!)
+
+                            val data = responseObj.getString("data")
+                            setSuccess(data, "getOTP")
                         } else {
-                            _error.value = Resource.Error(responseObj.getString("message"))
+                            setError(responseObj.getString("message"),TAG)
                         }
                     }
                 } catch (e: Exception) {
-                    _error.value = e.message?.let { Resource.Error(it) }
+                    e.message?.let { setError(it,TAG) }
                 }
             }
+        }
+    }
+
+    fun scratchcards(page: Int) {
+        if(user != null && user?.user_id!! > 0) {
+            viewModelScope.launch {
+                try {
+                    val response = rewardRepository.scratchcards(user?.user_id!!, page)
+                    if (response != null) {
+                        val responseObj = JSONObject(response)
+                        if (responseObj.getInt("status") == 1) {
+                            val data = responseObj.getJSONObject("data")
+                            setSuccess(data,"scratchcards")
+                        } else {
+                            setError(responseObj.getString("message"),SNACKBAR)
+                        }
+                    }
+                } catch (e: Exception) {
+                    setError("${e.message}", ALERT)
+                }
+            }
+        }
+    }
+
+    fun setScratchcard(id: Int, status: Int) {
+        viewModelScope.launch {
+            rewardRepository.updateTransactionStatus(id,status)
         }
     }
 
@@ -175,11 +214,11 @@ class ProfileViewModel(
                         )
                     )
                 )
-                _success.value = Resource.Success(hms,"disableOTP")
+                setSuccess(hms,"disableOTP")
             }
 
             override fun onFinish() {
-                _success.value = Resource.Success("Resend OTP","enableOTP")
+                setSuccess("Resend OTP","enableOTP")
                 countDownTimer?.cancel()
             }
         }

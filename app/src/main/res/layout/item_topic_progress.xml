@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_margin="@dimen/margin8"
-    android:gravity="center_vertical">
-
-    <TextView
-        android:id="@+id/topic"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/lblTopics"
-        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        android:textColor="@color/black"
-        android:textStyle="bold"
-        android:padding="@dimen/margin4"/>
-
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1">
-        <TextView
-            android:id="@+id/progressTopic"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:orientation="horizontal"
-            android:layout_weight=".7"
-            android:background="@drawable/right_corner_radius"/>
-    </LinearLayout>
+        android:orientation="vertical"
+        android:layout_margin="@dimen/margin8"
+        android:gravity="center_vertical">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/topic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/lblTopics"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:padding="@dimen/margin4"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <TextView
+                android:id="@+id/progressTopic"
+                android:layout_width="0dp"
+                android:layout_height="4dp"
+                android:orientation="horizontal"
+                android:layout_weight=".7"
+                android:background="@drawable/right_corner_radius"/>
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

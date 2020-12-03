@@ -4,8 +4,7 @@ import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
-import `in`.allen.gsp.utils.lazyDeferred
-import `in`.allen.gsp.utils.tag
+import androidx.lifecycle.MutableLiveData
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -14,6 +13,8 @@ class UserRepository(
     private val api: Api,
     private val db: AppDatabase
 ): SafeApiRequest() {
+
+    val userLife = MutableLiveData<HashMap<String,Long>>()
 
     suspend fun login(params: Map<String, String>): String? {
         return apiRequest {
@@ -66,5 +67,4 @@ class UserRepository(
         }
         return value
     }
-
 }

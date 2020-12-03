@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewModel"
+            type="in.allen.gsp.ui.quiz.QuizViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="0dp"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        android:id="@+id/bottomSheetOffers"
+        android:clickable="true"
+        android:focusable="true">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin16"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="center"
+                android:src="@drawable/ic_close"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:padding="@dimen/margin24"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:padding="@dimen/margin16"
+                android:background="@drawable/bg_gray_corners">
+
+                <LinearLayout
+                    android:id="@+id/offer3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/margin8"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:tag="100">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/like"
+                        android:gravity="center"
+                        android:text="1h"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:layout_marginStart="@dimen/margin8"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/offer3Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="@dimen/margin16"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:text="100 Coins"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:autoSizeMaxTextSize="24sp"
+                        app:autoSizeMinTextSize="10sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/offer2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_white"
+                    android:padding="@dimen/margin8"
+                    app:layout_constraintStart_toStartOf="@id/offer3"
+                    app:layout_constraintEnd_toEndOf="@id/offer3"
+                    app:layout_constraintBottom_toTopOf="@id/offer3"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/margin8"
+                    android:tag="50">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:text="5"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:background="@drawable/like"
+                        android:gravity="center"
+                        android:layout_marginStart="@dimen/margin8"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/cat2Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:text="50 Coins"
+                        android:gravity="center_vertical|center_horizontal"
+                        app:autoSizeMaxTextSize="24sp"
+                        app:autoSizeMinTextSize="10sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform"
+                        android:layout_marginStart="@dimen/margin16"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/offer1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_white"
+                    android:padding="@dimen/margin8"
+                    app:layout_constraintStart_toStartOf="@id/offer2"
+                    app:layout_constraintEnd_toEndOf="@id/offer2"
+                    app:layout_constraintBottom_toTopOf="@id/offer2"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/margin8"
+                    android:tag="20">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:text="1"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/white"
+                        android:textStyle="bold"
+                        android:background="@drawable/like"
+                        android:gravity="center"
+                        android:layout_marginStart="@dimen/margin8"/>
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/offer1Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:text="20 Coins"
+                        app:autoSizeMaxTextSize="24sp"
+                        app:autoSizeMinTextSize="10sp"
+                        app:autoSizeStepGranularity="1sp"
+                        app:autoSizeTextType="uniform"
+                        android:gravity="center_vertical|center_horizontal"
+                        android:layout_marginStart="@dimen/margin16"/>
+                </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutLife"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@id/offer1"
+                    app:layout_constraintEnd_toEndOf="@id/offer1"
+                    app:layout_constraintBottom_toTopOf="@id/offer1"
+                    android:layout_marginBottom="@dimen/margin24">
+
+                    <ImageView
+                        android:id="@+id/lifeIcon"
+                        android:layout_width="72dp"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/like"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/life"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/margin4"
+                        android:text="5"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        app:layout_constraintBottom_toBottomOf="@id/lifeIcon"
+                        app:layout_constraintEnd_toEndOf="@id/lifeIcon"
+                        app:layout_constraintStart_toStartOf="@id/lifeIcon"
+                        app:layout_constraintTop_toTopOf="@id/lifeIcon" />
+
+                    <TextView
+                        android:id="@+id/lifeTimer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/margin4"
+                        android:text="Next life:\nFull"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        app:layout_constraintBottom_toBottomOf="@id/life"
+                        app:layout_constraintStart_toEndOf="@id/lifeIcon"
+                        app:layout_constraintTop_toTopOf="@id/life"
+                        android:layout_marginStart="@dimen/margin8"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:text="Keep Playing."
+                    app:layout_constraintStart_toStartOf="@id/layoutLife"
+                    app:layout_constraintEnd_toEndOf="@id/layoutLife"
+                    app:layout_constraintBottom_toTopOf="@id/layoutLife"
+                    android:layout_marginBottom="@dimen/margin16"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>

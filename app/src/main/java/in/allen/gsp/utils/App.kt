@@ -5,10 +5,12 @@ import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.NetworkConnectionInterceptor
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.data.repositories.*
+import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.ui.quiz.QuizViewModelFactory
 import `in`.allen.gsp.ui.reward.RewardViewModelFactory
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.multidex.MultiDex
 import com.google.android.gms.security.ProviderInstaller

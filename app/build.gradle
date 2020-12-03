@@ -69,10 +69,10 @@ dependencies {
     // facebook
     implementation 'com.facebook.android:facebook-login:5.15.3'
     // google
-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
 
     // google play games service
-    implementation 'com.google.android.gms:play-services-games:20.0.1'
+    implementation 'com.google.android.gms:play-services-games:21.0.0'
 
     implementation 'com.github.Haegon:ParallaxViewPager:1.0.1'
 
@@ -80,6 +80,8 @@ dependencies {
     implementation 'gun0912.ted:tedpermission:2.2.2'
 
     implementation 'com.chaos.view:pinview:1.4.4'
+
+    implementation 'in.codeshuffle.scratchcardlayout:ScratchCardLayout:1.0.8'
 
     // blur
     implementation 'jp.wasabeef:blurry:4.0.0'

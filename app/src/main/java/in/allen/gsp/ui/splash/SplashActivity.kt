@@ -3,7 +3,9 @@ package `in`.allen.gsp.ui.splash
 import `in`.allen.gsp.IntroActivity
 import `in`.allen.gsp.NotificationActivity
 import `in`.allen.gsp.R
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
+import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.databinding.ActivitySplashBinding
 import `in`.allen.gsp.ui.home.HomeActivity
 import `in`.allen.gsp.utils.*
@@ -172,6 +174,10 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
                     "user" -> {
+                        Intent(applicationContext, LifeService::class.java).apply {
+                            startService(this)
+                        }
+
                         if(!preferences.appIntro) {
                             Intent(this, IntroActivity::class.java)
                                 .also { it1 ->

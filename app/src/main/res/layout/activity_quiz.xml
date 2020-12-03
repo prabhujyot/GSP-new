@@ -16,6 +16,8 @@
         android:keepScreenOn="true"
         tools:context=".ui.quiz.QuizActivity">
 
+        <include layout="@layout/toolbar"/>
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/quizLayout"
             android:layout_width="match_parent"
@@ -34,14 +36,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <include
-                android:id="@+id/layoutToolbar"
-                layout="@layout/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin24"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+<!--            <include layout="@layout/toolbar"/>-->
 
             <TextView
                 android:id="@+id/qno"
@@ -222,7 +217,7 @@
                 app:layout_constraintTop_toBottomOf="@id/guidelineQuestion">
                 <include
                     android:id="@+id/layoutOptionInclude"
-                    layout="@layout/option_spelling" />
+                    layout="@layout/option_linear" />
             </LinearLayout>
 
             <androidx.constraintlayout.widget.Guideline
@@ -347,8 +342,11 @@
         <!-- Attachment bottom sheet -->
         <include android:id="@+id/layoutAttachment" layout="@layout/bottomsheet_attachment" />
 
-        <!-- Game finish bottom sheet -->
+        <!-- Quiz finish bottom sheet -->
         <include android:id="@+id/layoutFinish" layout="@layout/bottomsheet_finish" />
+
+        <!-- Offers bottom sheet -->
+        <include android:id="@+id/layoutOffers" layout="@layout/bottomsheet_offers" />
 
         <include android:id="@+id/layoutProgress" layout="@layout/progress"/>
 

@@ -2,9 +2,13 @@ package `in`.allen.gsp.ui.splash
 
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
+import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.utils.Encryption
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,6 +21,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 
 class SplashViewModel(
@@ -73,7 +78,7 @@ class SplashViewModel(
                     val firebaseUser = auth.currentUser
                     authToServer(firebaseUser)
                 } else {
-                    setError("signInWithCredential:failure ${task.exception}",TAG)
+                    setError("signInWithCredential:failure ${task.exception}", TAG)
                 }
             }
     }
@@ -86,7 +91,7 @@ class SplashViewModel(
                     val firebaseUser = auth.currentUser
                     authToServer(firebaseUser)
                 } else {
-                    setError("signInWithCredential:failure ${task.exception}",TAG)
+                    setError("signInWithCredential:failure ${task.exception}", TAG)
                 }
             }
     }
@@ -106,7 +111,7 @@ class SplashViewModel(
             viewModelScope.launch {
                 setLoading(true)
                 try {
-                    val params = HashMap<String,String>()
+                    val params = HashMap<String, String>()
                     params["name"] = firebaseUser?.displayName!!
                     params["email"] = firebaseUser.email!!
                     params["avatar"] = firebaseUser.photoUrl.toString()
@@ -129,6 +134,8 @@ class SplashViewModel(
                                 data.getString("firebase_token"),
                                 data.getString("firebase_uid"),
                                 data.getString("played_qid"),
+                                data.getInt("high_score"),
+                                data.getInt("xp"),
                                 data.getString("create_date"),
                                 data.getString("session_token"),
                                 data.getInt("coins"),
@@ -137,13 +144,13 @@ class SplashViewModel(
                                 data.getString("config_data")
                             )
                             repository.setDBUser(user)
-                            setSuccess(user,"user")
+                            setSuccess(user, "user")
                         } else {
-                            setError(responseObj.getString("message"),TAG)
+                            setError(responseObj.getString("message"), TAG)
                         }
                     }
                 } catch (e: Exception) {
-                    setError(e.message.toString(),TAG)
+                    setError(e.message.toString(), TAG)
                 }
             }
         }
@@ -161,8 +168,15 @@ class SplashViewModel(
             viewModelScope.launch {
                 val dbUser = repository.getDBUser()
                 if (dbUser != null) {
-                    tag("authUser: dbUser uid ${dbUser.firebase_uid.equals(firebaseUser?.uid,true)}")
-                    if(dbUser.firebase_uid.equals(firebaseUser?.uid,true)) {
+                    tag(
+                        "authUser: dbUser uid ${
+                            dbUser.firebase_uid.equals(
+                                firebaseUser?.uid,
+                                true
+                            )
+                        }"
+                    )
+                    if(dbUser.firebase_uid.equals(firebaseUser?.uid, true)) {
                         val encryption = Encryption()
                         try {
                             val sessionToken = encryption.decrypt(dbUser.session_token)
@@ -173,25 +187,24 @@ class SplashViewModel(
                                 authToServer(firebaseUser)
                             } else {
                                 viewModelScope.launch {
-                                    delay(2*1000)
-                                    setSuccess(dbUser,"user")
+                                    delay(2 * 1000)
+                                    setSuccess(dbUser, "user")
                                 }
                             }
                         } catch (e: Exception) {
-                            setError("authUser: ${e.message}",TAG)
+                            setError("authUser: ${e.message}", TAG)
                         }
                     } else {
                         // logout old user and ask login
                         logout()
-                        setError("","")
+                        setError("", "")
                     }
                 } else {
                     authToServer(firebaseUser)
                 }
             }
         } else {
-            setError("","")
+            setError("", "")
         }
     }
-
 }

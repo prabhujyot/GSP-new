@@ -3,13 +3,14 @@ package `in`.allen.gsp.ui.quiz
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Question
-import `in`.allen.gsp.data.entities.Quiz
+import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.databinding.ActivityQuizBinding
 import `in`.allen.gsp.databinding.OptionLinearBinding
 import `in`.allen.gsp.databinding.OptionSpellingBinding
 import `in`.allen.gsp.databinding.OptionTrueFalseBinding
 import `in`.allen.gsp.utils.*
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
@@ -32,12 +33,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.coroutines.Deferred
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -66,6 +65,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private lateinit var categorySheetBehavior: BottomSheetBehavior<FrameLayout>
     private lateinit var attachmentSheetBehavior: BottomSheetBehavior<FrameLayout>
     private lateinit var finishSheetBehavior: BottomSheetBehavior<FrameLayout>
+    private lateinit var offersSheetBehavior: BottomSheetBehavior<FrameLayout>
 
     // animations
     private lateinit var animZoomIn: Animation
@@ -85,8 +85,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_quiz)
         viewModel = ViewModelProvider(this, factory).get(QuizViewModel::class.java)
 
-        setSupportActionBar(binding.layoutToolbar.myToolbar)
-        binding.layoutToolbar.btnBack.setOnClickListener {
+        setSupportActionBar(myToolbar)
+        btnBack.setOnClickListener {
             onBackPressed()
         }
 
@@ -156,7 +156,19 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             if (it != null) {
                 when (it.message) {
                     "alert" -> {
-                        it.data?.let { it1 -> alertDialog("Error", it1) {} }
+                        it.data?.let { it1 ->
+                            var action = ""
+                            var str = ""
+                            if(it1.startsWith("quizdata:")) {
+                                action = "finish"
+                                str = it1.removePrefix("quizdata:")
+                            }
+                            alertDialog("Error!", str) {
+                                if(action.equals("finish",true)) {
+                                    finish()
+                                }
+                            }
+                        }
                     }
                     "tag" -> {
                         it.data?.let { it1 -> tag("$TAG $it1") }
@@ -185,27 +197,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         binding.lock.show(it.data as Boolean)
                     }
 
-                    "quizData" -> {
-                        if (it.data is Deferred<*>) {
-                            val deferredQuiz = it.data as Deferred<LiveData<Quiz>>
-                            lifecycleScope.launch {
-                                deferredQuiz.await().observe(this@QuizActivity, { it1 ->
-                                    if (it1 != null) {
-                                        viewModel.setQuizData(it1)
-                                    }
-                                })
-                            }
-                        }
-                    }
-
                     "downloadAttachment" -> {
-//                        if (it.data is ArrayList<*>) {
-//                            val list = it.data as ArrayList<Attachment>
-//                            for (file in list) {
-//                                downloadFile(file.filename, file.qid.toString())
-//                            }
-//                            initQuiz()
-//                        }
                         if(viewModel.attachmentList.size > 0) {
                             for (file in viewModel.attachmentList) {
                                 downloadFile(file.filename, file.qid.toString())
@@ -289,10 +281,13 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             if (it.data.equals("displayFinish", true)) {
                                 displayFinish()
                             }
+                            if(it.data.equals("showOffers",true)) {
+                                displayOffers()
+                            }
                             if (it.data.equals("onBackPressed", true)) {
                                 onPause()
                                 confirmDialog(
-                                    "Exit",
+                                    "Exit!",
                                     "Are you sure want to exit, you will lose all your progress",
                                     {
                                         viewModel.setSuccess("exit", "quizStatus")
@@ -368,7 +363,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                             if (it.data.equals("flip", true)) {
                                 viewModel.flipQuestion()
-                                onResume()
                             }
 
                             if (it.data.equals("quit", true)) {
@@ -402,9 +396,11 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         categorySheetBehavior = BottomSheetBehavior.from(binding.layoutCategory.bottomSheetCategory)
         attachmentSheetBehavior = BottomSheetBehavior.from(binding.layoutAttachment.bottomSheetAttachment)
         finishSheetBehavior = BottomSheetBehavior.from(binding.layoutFinish.bottomSheetFinish)
+        offersSheetBehavior = BottomSheetBehavior.from(binding.layoutOffers.bottomSheetOffers)
         categorySheetBehavior.isDraggable = false
         attachmentSheetBehavior.isDraggable = false
         finishSheetBehavior.isDraggable = false
+        offersSheetBehavior.isDraggable = false
 
         binding.quizLayout.show(false)
     }
@@ -419,13 +415,23 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initQuiz() {
+        tag("$TAG initQuiz")
+        binding.quizLayout.show(false)
         initQusetionTable()
         initLifelines()
         binding.textScore.text = "0"
+        binding.layoutFinish.progressScore.max = 0
+        binding.layoutFinish.progressScore.clearAnimation()
 
         viewModel.qset.reverse()
         viewModel.currentq = viewModel.qset[viewModel.index]
         viewModel.setSuccess("setQuestion", "quizStatus")
+    }
+
+    private fun saveQuiz() {
+        Intent(applicationContext, LifeService::class.java).apply {
+            startService(this)
+        }
     }
 
     private fun initQusetionTable() {
@@ -510,10 +516,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.progressMultiplier.max = 10 * 1000
         binding.progressMultiplier.progress = 10 * 1000
 
-        binding.question.show(false)
-        binding.layoutOption.show(false)
-
         binding.qno.text = "Q.No.: ${currentQ.qno}"
+
+        binding.layoutOption.clearAnimation()
+        binding.layoutOption.visibility = View.INVISIBLE
 
         switchLanguage(currentQ)
     }
@@ -528,6 +534,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 || currentQ.option[0].adesc_hindi.equals("null", true)
             ) {
                 viewModel.lang = "eng"
+                binding.question.text = currentQ.qdesc
             } else {
                 binding.question.text = currentQ.qdesc_hindi
             }
@@ -547,11 +554,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun setSingleChoice(currentQ: Question) {
-        if (viewModel.lifeline["fifty_fifty"]!!) {
-            stateLifeline(binding.btnFiftyFifty, true)
-        }
-        if (viewModel.lifeline["double_dip"]!!) {
-            stateLifeline(binding.btnDoubleDip, true)
+        stateLifeline(binding.btnFiftyFifty,viewModel.lifeline["fifty_fifty"]!!)
+        stateLifeline(binding.btnDoubleDip,viewModel.lifeline["double_dip"]!!)
+        if(viewModel.fset.size > 2) {
+            stateLifeline(binding.btnFlip,viewModel.lifeline["flip"]!!)
         }
 
         binding.layoutOption.removeAllViews()
@@ -610,11 +616,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun clickOption(view: View) {
-        // lock
-        viewModel.lock(true)
-        //stop progessbar
-        viewModel.questionTimerCancel()
-        viewModel.multiplierTimerCancel()
+        viewModel.stopTimer()
 
         view.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_btn_blue, null)
         (view as TextView).setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
@@ -662,10 +664,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
 
-
     private fun setTrueFalse(currentQ: Question) {
         stateLifeline(binding.btnFiftyFifty,false)
         stateLifeline(binding.btnDoubleDip,false)
+        if(viewModel.fset.size > 2) {
+            stateLifeline(binding.btnFlip,viewModel.lifeline["flip"]!!)
+        }
 
         binding.layoutOption.removeAllViews()
         bindingTrueFalse = DataBindingUtil.inflate(
@@ -702,6 +706,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private fun setSpellings(currentQ: Question) {
         stateLifeline(binding.btnFiftyFifty, false)
         stateLifeline(binding.btnDoubleDip, false)
+        if(viewModel.fset.size > 2) {
+            stateLifeline(binding.btnFlip,viewModel.lifeline["flip"]!!)
+        }
 
         binding.layoutOption.removeAllViews()
         val bindingSpelling: OptionSpellingBinding = DataBindingUtil.inflate(
@@ -838,8 +845,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun displayQuestion(currentQ: Question) {
-        binding.question.startAnimation(animFadeIn)
-        binding.question.show()
+        tag("displayQuestion: ${currentQ.qno}")
+        // if wild question then disable lifelines
+        if(viewModel.isWild) {
+            stateLifeline(binding.btnFiftyFifty, false)
+            stateLifeline(binding.btnDoubleDip, false)
+            stateLifeline(binding.btnFlip, false)
+        }
+
+//        binding.question.startAnimation(animFadeIn)
 
         // highlight table
         for(v in questionTable) {
@@ -870,20 +884,14 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun displayOption(currentQ: Question) {
-        tag("$TAG displayOption ${(currentQ.qTime * 1000).toLong()}")
-        binding.layoutOption.show()
+        tag("displayOption: ${currentQ.qno}")
         binding.layoutOption.startAnimation(animFadeIn)
-
-        lifecycleScope.launch {
-            delay(viewModel.TIME_DELAY)
-            viewModel.questionTimerStart((currentQ.qTime * 1000).toLong())
-            viewModel.multiplierTimerStart(10 * 1000)
-            viewModel.lock(false)
-        }
+        viewModel.startTimer()
     }
 
 
     private fun displayAttachment(currentQ: Question) {
+        tag("displayAttachment: ${currentQ.qno}")
         binding.layoutAttachment.progressTimer.show(false)
         binding.layoutAttachment.image.show(false)
         binding.layoutAttachment.video.show(false)
@@ -1046,6 +1054,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun displayFinish() {
+        saveQuiz()
+
         binding.layoutFinish.btnPlay.setOnClickListener {
             if (finishSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 finishSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -1073,11 +1083,51 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             binding.layoutFinish.msg.text = "Oops!"
         }
         binding.layoutFinish.msgScore.text = "Your score is ${binding.textScore.text}"
+        binding.layoutFinish.xp.text = "Earned XP: ${viewModel.xp.values.sum()}"
 
         if (finishSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
             finishSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             hideSystemUI()
         }
+    }
+
+    private fun displayOffers() {
+        binding.layoutOffers.offer1.setOnClickListener {
+            offerPurchase("1",it.tag as Int)
+        }
+
+        binding.layoutOffers.offer2.setOnClickListener {
+            offerPurchase("5",it.tag as Int)
+        }
+
+        binding.layoutOffers.offer3.setOnClickListener {
+            offerPurchase("1h",it.tag as Int)
+        }
+
+        binding.layoutOffers.btnClose.setOnClickListener {
+            if (offersSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                offersSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        if (offersSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            offersSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            hideSystemUI()
+        }
+    }
+
+    private fun offerPurchase(offer: String,coins: Int) {
+        confirmDialog(
+            "Coins Redeem",
+            "$coins coins will be redeem",
+            {
+                if (offersSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                    offersSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+                viewModel.offerPurchase(offer,coins)
+            },
+            {}
+        )
     }
 
 

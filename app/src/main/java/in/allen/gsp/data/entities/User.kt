@@ -17,10 +17,15 @@ data class User (
     val firebase_token: String,
     val firebase_uid: String,
     val played_qid: String,
+    val high_score: Int,
+    val xp: Int,
     val create_date: String,
     val session_token: String,
     var coins: Int,
     var is_verified: Int,
     val is_admin: Boolean,
     val config: String
-)
+) {
+    var life = 0
+    var update_at = 0L
+}

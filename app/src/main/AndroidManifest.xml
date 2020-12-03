@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="in.allen.gsp">
+    package="in.allen.gsp"> <!-- for Blurry -->
+    <uses-sdk tools:overrideLibrary="jp.wasabeef.blurry" />
 
     <!-- for Blurry -->
-    <uses-sdk tools:overrideLibrary="jp.wasabeef.blurry"/>
-    <!-- for Blurry -->
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -18,13 +16,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <receiver
+            android:name=".data.receivers.LifeReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service
+            android:name=".data.services.LifeService"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity android:name=".NotificationActivity" />
         <activity android:name=".ui.quiz.QuizActivity" />
         <activity android:name=".WebActivity" />
-        <activity android:name=".ui.videos.YTPlayerActivity"
-            android:screenOrientation="sensor"
+        <activity
+            android:name=".ui.videos.YTPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/BlackNoTitleBarTheme"/>
+            android:screenOrientation="sensor"
+            android:theme="@style/BlackNoTitleBarTheme" />
         <activity android:name=".ui.videos.VideosActivity" />
         <activity android:name=".ui.leaderboard.LeaderboardActivity" />
         <activity android:name=".ui.reward.RewardActivity" />

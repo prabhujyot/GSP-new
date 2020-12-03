@@ -88,6 +88,14 @@ interface Api {
         @Query("type") type: String,
         @Query("page") page: Int,
     ): Response<String>
+
+    // transaction status update
+    @FormUrlEncoded
+    @POST("transactions")
+    suspend fun updateTransactionStatus(
+        @Field("id") id: Int,
+        @Field("status") status: Int
+    ): Response<String>
     
     // daily reward get status
     @GET("dailyreward")
@@ -134,11 +142,25 @@ interface Api {
         @Query("value") value: Int
     ): Response<String>
 
+    // offer purchase
+    @GET("offer")
+    suspend fun getOffer(
+        @Query("user_id") user_id: Int,
+        @Query("value") value: Int
+    ): Response<String>
+
     // save quiz data
     @FormUrlEncoded
     @POST("quiz")
     suspend fun postQuiz(
         @Body quiz: Quiz,
+    ): Response<String>
+
+    // scratchcards
+    @GET("scratchcard")
+    suspend fun getScratchcards(
+        @Query("user_id") user_id: Int,
+        @Query("page") page: Int,
     ): Response<String>
 
 }

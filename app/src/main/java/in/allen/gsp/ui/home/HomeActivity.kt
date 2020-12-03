@@ -8,8 +8,8 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityHomeBinding
 import `in`.allen.gsp.databinding.ItemBannerBinding
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
-import `in`.allen.gsp.ui.quiz.QuizActivity
 import `in`.allen.gsp.ui.profile.ProfileActivity
+import `in`.allen.gsp.ui.quiz.QuizActivity
 import `in`.allen.gsp.ui.reward.RewardActivity
 import `in`.allen.gsp.ui.videos.VideosActivity
 import `in`.allen.gsp.utils.*
@@ -24,11 +24,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
 import kotlinx.android.synthetic.main.toolbar.view.*
+import kotlinx.android.synthetic.main.toolbar_home.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import java.util.concurrent.TimeUnit
+
 
 class HomeActivity : AppCompatActivity(), KodeinAware {
 
@@ -43,10 +46,10 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = HomeViewModel(userRepository,bannerRepository)
+        viewModel = HomeViewModel(userRepository, bannerRepository)
 
-        setSupportActionBar(binding.layoutToolbar.myToolbar)
-        binding.layoutToolbar.btnBack.setOnClickListener {
+        setSupportActionBar(myToolbar)
+        btnClose.setOnClickListener {
             onBackPressed()
         }
 
@@ -58,6 +61,27 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         observeError()
         observeSuccess()
         viewModel.userData()
+
+        userRepository.userLife.observe(this, {
+            binding.life.text = "${it["life"]}"
+            if (it["life"]!!.toInt() == 5) {
+                binding.lifeTimer.text = "Full"
+            } else {
+                it["remaining"]?.let {
+                    it1 ->
+                    val m =
+                        TimeUnit.MILLISECONDS.toMinutes(it1) - TimeUnit.HOURS.toMinutes(
+                            TimeUnit.MILLISECONDS.toHours(it1)
+                        )
+                    val s =
+                        TimeUnit.MILLISECONDS.toSeconds(it1) - TimeUnit.MINUTES.toSeconds(
+                            TimeUnit.MILLISECONDS.toMinutes(it1)
+                        )
+                    val hms = String.format("%02d:%02d",m,s)
+                    binding.lifeTimer.text = "$hms"
+                }
+            }
+        })
     }
 
     override fun onResume() {
@@ -66,9 +90,9 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     }
 
     override fun onBackPressed() {
-        confirmDialog("Exit!","Tap on Yes to exit.",{
+        confirmDialog("Exit!", "Tap on Yes to exit.", {
             super.onBackPressed()
-        },{})
+        }, {})
     }
 
     private fun observeLoading() {
@@ -106,23 +130,39 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     private fun observeSuccess() {
         viewModel.getSuccess().observe(this, {
             tag("$TAG ._success: ${it.data}")
-            if(it != null) {
+            if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
+                    "lifeTimer" -> {
+                        if (it.data is Long) {
+                            val m =
+                                TimeUnit.MILLISECONDS.toMinutes(it.data) - TimeUnit.HOURS.toMinutes(
+                                    TimeUnit.MILLISECONDS.toHours(it.data)
+                                )
+                            val s =
+                                TimeUnit.MILLISECONDS.toSeconds(it.data) - TimeUnit.MINUTES.toSeconds(
+                                    TimeUnit.MILLISECONDS.toMinutes(it.data)
+                                )
+                            val hms = String.format("%02d:%02d",m,s)
+                            binding.lifeTimer.text = "$hms"
+                        }
+                    }
+
                     "user" -> {
                         val user = it.data as User
-                        if (user.avatar.isNotBlank())
+                        if (user.avatar.isNotBlank()) {
                             binding.btnProfileTop.loadImage(user.avatar, true)
-
+                        }
                         viewModel.bannerData(user.user_id)
                     }
 
                     "banner" -> {
-                        if(it.data is Deferred<*>) {
+                        if (it.data is Deferred<*>) {
                             val deferredList = it.data as Deferred<LiveData<List<Banner>>>
                             lifecycleScope.launch {
-                                deferredList.await().observe(this@HomeActivity, { list->
-                                    binding.viewpagerBanner.adapter = BannerAdapter(layoutInflater,
+                                deferredList.await().observe(this@HomeActivity, { list ->
+                                    binding.viewpagerBanner.adapter = BannerAdapter(
+                                        layoutInflater,
                                         list
                                     )
                                 })
@@ -148,7 +188,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val binding: ItemBannerBinding = DataBindingUtil.inflate(inflater,R.layout.item_banner,container,false)
+            val binding: ItemBannerBinding = DataBindingUtil.inflate(
+                inflater,
+                R.layout.item_banner,
+                container,
+                false
+            )
 
             val item = list[position]
             binding.image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item.image}")
@@ -190,7 +235,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
-                i.putExtra("url","${BuildConfig.BASE_URL}category/quiz-time/")
+                i.putExtra("url", "${BuildConfig.BASE_URL}category/quiz-time/")
             }
 //            R.id.btnSetting -> {
 //                i.setClass(this@HomeActivity, RewardActivity::class.java)

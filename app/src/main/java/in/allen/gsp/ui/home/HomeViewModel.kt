@@ -4,6 +4,7 @@ import `in`.allen.gsp.data.repositories.BannerRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.lazyDeferred
+import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -66,5 +67,24 @@ class HomeViewModel(
             bannerRepository.getList(user_id)
         }
         setSuccess(response,"banner")
+    }
+
+    // attachment timer
+    private var lifeTimer: CountDownTimer?= null
+    fun lifeTimerStart(i: Long) {
+        lifeTimer = object : CountDownTimer(i, 10) {
+            override fun onTick(l: Long) {
+                setSuccess(l,"lifeTimer")
+            }
+
+            override fun onFinish() {
+                lifeTimerCancel()
+            }
+        }
+        (lifeTimer as CountDownTimer).start()
+    }
+
+    fun lifeTimerCancel() {
+        lifeTimer?.cancel()
     }
 }
