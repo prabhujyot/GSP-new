@@ -23,6 +23,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
+import kotlinx.android.synthetic.main.icon_life.view.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_home.*
 import kotlinx.coroutines.Deferred
@@ -42,6 +43,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     override val kodein by kodein()
     private val userRepository: UserRepository by instance()
     private val bannerRepository: BannerRepository by instance()
+    private val preferences: AppPreferences by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,22 +65,27 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         viewModel.userData()
 
         userRepository.userLife.observe(this, {
-            binding.life.text = "${it["life"]}"
-            if (it["life"]!!.toInt() == 5) {
-                binding.lifeTimer.text = "Full"
-            } else {
-                it["remaining"]?.let {
-                    it1 ->
-                    val m =
-                        TimeUnit.MILLISECONDS.toMinutes(it1) - TimeUnit.HOURS.toMinutes(
-                            TimeUnit.MILLISECONDS.toHours(it1)
-                        )
-                    val s =
-                        TimeUnit.MILLISECONDS.toSeconds(it1) - TimeUnit.MINUTES.toSeconds(
-                            TimeUnit.MILLISECONDS.toMinutes(it1)
-                        )
-                    val hms = String.format("%02d:%02d",m,s)
-                    binding.lifeTimer.text = "$hms"
+            if(it != null) {
+                binding.iconLife.life.text = "${it["life"]}"
+                if(System.currentTimeMillis() < preferences.timestampLife) {
+                    binding.iconLife.life.text = getString(R.string.infinity)
+                    it["life"] = 0
+                }
+                if (it["life"]!!.toInt() == 5) {
+                    binding.lifeTimer.text = "Full"
+                } else {
+                    it["remaining"]?.let { it1 ->
+                        val m =
+                            TimeUnit.MILLISECONDS.toMinutes(it1) - TimeUnit.HOURS.toMinutes(
+                                TimeUnit.MILLISECONDS.toHours(it1)
+                            )
+                        val s =
+                            TimeUnit.MILLISECONDS.toSeconds(it1) - TimeUnit.MINUTES.toSeconds(
+                                TimeUnit.MILLISECONDS.toMinutes(it1)
+                            )
+                        val hms = String.format("%02d:%02d", m, s)
+                        binding.lifeTimer.text = "$hms"
+                    }
                 }
             }
         })

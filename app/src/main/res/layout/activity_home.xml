@@ -94,19 +94,10 @@
                 android:layout_marginTop="@dimen/margin8"
                 android:layout_marginStart="@dimen/margin16">
 
-                <TextView
-                    android:id="@+id/life"
+                <include
+                    android:id="@+id/icon_life" layout="@layout/icon_life"
                     android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:padding="@dimen/margin4"
-                    android:text="@string/txt0"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:background="@drawable/like"
-                    android:gravity="center"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:id="@+id/lifeTimer"
@@ -117,9 +108,9 @@
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textStyle="bold"
                     android:textColor="@color/white"
-                    app:layout_constraintBottom_toBottomOf="@id/life"
-                    app:layout_constraintStart_toEndOf="@id/life"
-                    app:layout_constraintTop_toTopOf="@id/life"
+                    app:layout_constraintBottom_toBottomOf="@id/icon_life"
+                    app:layout_constraintStart_toEndOf="@id/icon_life"
+                    app:layout_constraintTop_toTopOf="@id/icon_life"
                     android:layout_marginStart="@dimen/margin8"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>

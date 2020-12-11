@@ -175,6 +175,10 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 when (it.message) {
                     "user" -> {
                         Intent(applicationContext, LifeService::class.java).apply {
+                            val bundle = Bundle()
+                            bundle.putParcelable("user",it.data as User)
+                            bundle.putLong("timestampLife",preferences.timestampLife)
+                            putExtra("bundle",bundle)
                             startService(this)
                         }
 

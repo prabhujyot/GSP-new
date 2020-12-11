@@ -3,6 +3,7 @@ package `in`.allen.gsp.ui.quiz
 import `in`.allen.gsp.data.entities.*
 import `in`.allen.gsp.data.repositories.QuizRepository
 import `in`.allen.gsp.data.repositories.UserRepository
+import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
 import android.media.MediaPlayer
@@ -28,7 +29,8 @@ import kotlin.math.ceil
 
 class QuizViewModel(
     private val userRepository: UserRepository,
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
+    private val preferences: AppPreferences
 ): ViewModel() {
 
     val ALERT = "alert"
@@ -124,10 +126,6 @@ class QuizViewModel(
             viewModelScope.launch {
                 try {
                     if(user?.life!! > 0) {
-                        user?.life = user?.life!!.minus(1)
-                        user?.update_at = System.currentTimeMillis()
-                        userRepository.setDBUser(user!!)
-
                         val res = quizRepository.getPreview(user!!.user_id)
                         setQuizData(res)
                     } else {
@@ -377,13 +375,35 @@ class QuizViewModel(
                     setLoading(true)
                     lock(true)
                     try {
-                        val response = quizRepository.getWildQuiz(user?.user_id!!, coins)
+                        val response = quizRepository.purchaseOffer(user?.user_id!!, coins)
                         setLoading(false)
-                        lock(false)
+//                        lock(false)
                         if (response != null) {
                             val responseObj = JSONObject(response)
                             if(responseObj.getInt("status") == 1) {
                                 val dataObj = responseObj.getJSONObject("data")
+                                when {
+                                    offer.equals("1",true) -> {
+                                        user?.life = user?.life!!.plus(1)
+                                    }
+                                    offer.equals("5",true) -> {
+                                        user?.life = user?.life!!.plus(5)
+                                    }
+                                    offer.equals("1h",true) -> {
+                                        user?.life = user?.life!!.plus(5)
+                                    }
+                                }
+
+                                val maxChance = userRepository.config("max-game-chance")
+                                var maxLife = 5
+                                if(maxChance.isNotEmpty() && !maxChance.equals("0",true)) {
+                                    maxLife = maxChance.toInt()
+                                }
+                                if(user?.life!! > maxLife) {
+                                    user?.life = maxLife
+                                }
+                                user?.update_at = System.currentTimeMillis()
+
                                 user?.coins = dataObj.getInt("coins")
                                 userRepository.setDBUser(user!!)
                                 setSuccess(offer,"offerPurchase")
@@ -486,6 +506,7 @@ class QuizViewModel(
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
             isPopupOpen = true
+            saveData()
             setSuccess("displayFinish","quizStatus")
         }
     }
@@ -493,7 +514,12 @@ class QuizViewModel(
     private fun saveData() {
         viewModelScope.launch {
             // update user data
-
+//            val user = userRepository.getDBUser()
+            if(user?.life!! > 0 && System.currentTimeMillis() > preferences.timestampLife) {
+                user?.life = user?.life!!.minus(1)
+                user?.update_at = System.currentTimeMillis()
+                userRepository.setDBUser(user!!)
+            }
         }
     }
 

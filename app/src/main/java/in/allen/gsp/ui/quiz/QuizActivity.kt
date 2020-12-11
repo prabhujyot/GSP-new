@@ -3,6 +3,7 @@ package `in`.allen.gsp.ui.quiz
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Question
+import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.databinding.ActivityQuizBinding
 import `in`.allen.gsp.databinding.OptionLinearBinding
@@ -31,11 +32,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.android.synthetic.main.icon_life.view.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,6 +83,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private lateinit var mp: MediaPlayer
 
+    private val userRepository: UserRepository by instance()
+    private val preferences: AppPreferences by instance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_quiz)
@@ -103,6 +109,49 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         observeError()
         observeSuccess()
         viewModel.userData()
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val lifeMenu = menu?.findItem(R.id.menu_life)
+        val itemRoot = lifeMenu?.actionView
+        val lp = ConstraintLayout.LayoutParams(50,50)
+        itemRoot?.layoutParams = lp
+
+        itemRoot?.life?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+        itemRoot?.life?.setTypeface(itemRoot.life?.typeface, Typeface.BOLD)
+
+        userRepository.userLife.observe(this, {
+            if(it != null) {
+                viewModel.user?.life = it["life"]!!.toInt()
+                itemRoot?.life?.text = "${it["life"]}"
+                binding.layoutOffers.layoutLife.life.text = "${it["life"]}"
+
+                if(System.currentTimeMillis() < preferences.timestampLife) {
+                    itemRoot?.life?.text = getString(R.string.infinity)
+                    binding.layoutOffers.layoutLife.life.text = getString(R.string.infinity)
+                    it["life"] = 0
+                }
+
+                if (it["life"]!!.toInt() == 5) {
+                    binding.layoutOffers.lifeTimer.text = "Full"
+                } else {
+                    it["remaining"]?.let { it1 ->
+                        val m =
+                            TimeUnit.MILLISECONDS.toMinutes(it1) - TimeUnit.HOURS.toMinutes(
+                                TimeUnit.MILLISECONDS.toHours(it1)
+                            )
+                        val s =
+                            TimeUnit.MILLISECONDS.toSeconds(it1) - TimeUnit.MINUTES.toSeconds(
+                                TimeUnit.MILLISECONDS.toMinutes(it1)
+                            )
+                        val hms = String.format("%02d:%02d", m, s)
+                        binding.layoutOffers.lifeTimer.text = "$hms"
+                    }
+                }
+            }
+        })
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -246,6 +295,25 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         if(viewModel.attachmentList.size > 0) {
                             for (file in viewModel.attachmentList) {
                                 downloadFile(file.filename, file.qid.toString())
+                            }
+                        }
+                    }
+
+                    "offerPurchase" -> {
+                        if(it.data is String) {
+                            when {
+                                it.data.equals("1h",true) -> {
+                                    val minutes = 60
+                                    val timestamp = System.currentTimeMillis().plus(minutes.times(60).times(1000))
+                                    preferences.timestampLife = timestamp
+                                }
+                            }
+                            startService()
+
+                            lifecycleScope.launch {
+                                delay(viewModel.TIME_DELAY)
+                                tag("preview")
+                                viewModel.previewData()
                             }
                         }
                     }
@@ -428,8 +496,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         viewModel.setSuccess("setQuestion", "quizStatus")
     }
 
-    private fun saveQuiz() {
+    private fun startService() {
         Intent(applicationContext, LifeService::class.java).apply {
+            val bundle = Bundle()
+            bundle.putParcelable("user",viewModel.user)
+            bundle.putLong("timestampLife",preferences.timestampLife)
+            putExtra("bundle",bundle)
             startService(this)
         }
     }
@@ -1054,7 +1126,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun displayFinish() {
-        saveQuiz()
+        startService()
 
         binding.layoutFinish.btnPlay.setOnClickListener {
             if (finishSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -1092,22 +1164,21 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun displayOffers() {
+        viewModel.setLoading(false)
         binding.layoutOffers.offer1.setOnClickListener {
-            offerPurchase("1",it.tag as Int)
+            offerPurchase("1",(it.tag as String).toInt())
         }
 
         binding.layoutOffers.offer2.setOnClickListener {
-            offerPurchase("5",it.tag as Int)
+            offerPurchase("5",(it.tag as String).toInt())
         }
 
         binding.layoutOffers.offer3.setOnClickListener {
-            offerPurchase("1h",it.tag as Int)
+            offerPurchase("1h",(it.tag as String).toInt())
         }
 
         binding.layoutOffers.btnClose.setOnClickListener {
-            if (offersSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                offersSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
+            viewModel.setSuccess("exit", "quizStatus")
         }
 
         if (offersSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {

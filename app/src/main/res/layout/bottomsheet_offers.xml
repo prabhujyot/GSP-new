@@ -56,7 +56,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    android:tag="100">
+                    android:tag="500">
 
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="50dp"
@@ -68,14 +68,13 @@
                         android:textColor="@color/white"
                         android:textStyle="bold"
                         android:layout_marginStart="@dimen/margin8"/>
-
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/offer3Text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="@dimen/margin16"
                         android:gravity="center_vertical|center_horizontal"
-                        android:text="100 Coins"
+                        android:text="500 Coins"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/black"
                         android:textStyle="bold"
@@ -96,7 +95,7 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="@dimen/margin8"
-                    android:tag="50">
+                    android:tag="150">
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
@@ -114,7 +113,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/black"
                         android:textStyle="bold"
-                        android:text="50 Coins"
+                        android:text="150 Coins"
                         android:gravity="center_vertical|center_horizontal"
                         app:autoSizeMaxTextSize="24sp"
                         app:autoSizeMinTextSize="10sp"
@@ -134,7 +133,7 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
                     android:layout_marginBottom="@dimen/margin8"
-                    android:tag="20">
+                    android:tag="50">
                     <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="50dp"
                         android:layout_height="50dp"
@@ -152,7 +151,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                         android:textColor="@color/black"
                         android:textStyle="bold"
-                        android:text="20 Coins"
+                        android:text="50 Coins"
                         app:autoSizeMaxTextSize="24sp"
                         app:autoSizeMinTextSize="10sp"
                         app:autoSizeStepGranularity="1sp"
@@ -170,42 +169,23 @@
                     app:layout_constraintBottom_toTopOf="@id/offer1"
                     android:layout_marginBottom="@dimen/margin24">
 
-                    <ImageView
-                        android:id="@+id/lifeIcon"
+                    <include
+                        android:id="@+id/icon_life" layout="@layout/icon_life"
                         android:layout_width="72dp"
-                        android:layout_height="wrap_content"
-                        android:adjustViewBounds="true"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/like"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/life"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="@dimen/margin4"
-                        android:text="5"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:textStyle="bold"
-                        android:textColor="@color/white"
-                        app:layout_constraintBottom_toBottomOf="@id/lifeIcon"
-                        app:layout_constraintEnd_toEndOf="@id/lifeIcon"
-                        app:layout_constraintStart_toStartOf="@id/lifeIcon"
-                        app:layout_constraintTop_toTopOf="@id/lifeIcon" />
+                        android:layout_height="wrap_content"/>
 
                     <TextView
                         android:id="@+id/lifeTimer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="@dimen/margin4"
-                        android:text="Next life:\nFull"
+                        android:text="Full"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
                         android:textStyle="bold"
                         android:textColor="@color/black"
-                        app:layout_constraintBottom_toBottomOf="@id/life"
-                        app:layout_constraintStart_toEndOf="@id/lifeIcon"
-                        app:layout_constraintTop_toTopOf="@id/life"
+                        app:layout_constraintBottom_toBottomOf="@id/icon_life"
+                        app:layout_constraintStart_toEndOf="@id/icon_life"
+                        app:layout_constraintTop_toTopOf="@id/icon_life"
                         android:layout_marginStart="@dimen/margin8"/>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

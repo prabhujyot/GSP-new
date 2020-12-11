@@ -60,4 +60,12 @@ class AppPreferences(context: Context) {
         set(value) {
             editor.putLong("timestampLeaderboard", value).commit()
         }
+
+    var timestampLife: Long
+        get() {
+            return  sharedPreferences.getLong("timestampLife", 0)
+        }
+        set(value) {
+            editor.putLong("timestampLife", value).commit()
+        }
 }

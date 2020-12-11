@@ -39,7 +39,7 @@ class App: Application(), KodeinAware {
         bind() from singleton { RewardRepository(instance()) }
         bind() from provider { RewardViewModelFactory(instance(),instance()) }
         bind() from singleton { QuizRepository(instance(),instance()) }
-        bind() from provider { QuizViewModelFactory(instance(),instance()) }
+        bind() from provider { QuizViewModelFactory(instance(),instance(),instance()) }
     }
 
     override fun onCreate() {
