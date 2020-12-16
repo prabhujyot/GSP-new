@@ -8,6 +8,7 @@ import `in`.allen.gsp.databinding.ActivityRewardBinding
 import `in`.allen.gsp.utils.*
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -119,17 +120,14 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         }
         if(id == R.id.menu_invite) {
             val share = Intent(Intent.ACTION_SEND)
-            share.type = "image/jpeg"
-            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            val file = screenShot(statistics, "screenshot.jpg")
+            share.type = "text/plain"
             share.putExtra(
-                Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                    this,
-                    applicationContext.packageName + ".provider",
-                    file
-                )
-            )
-            startActivity(Intent.createChooser(share, "Share Image"))
+                Intent.EXTRA_TEXT,
+                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
+                        " Use my referral link to download this game 'Gyan Se Pehchan'" +
+                        " and get coin benefits when you join and play! \n" + Uri.parse(
+                    viewModel.user?.referral_id?.let { getReferralLink(it) }))
+            startActivity(Intent.createChooser(share, "Share with"))
         }
         return super.onOptionsItemSelected(item)
     }

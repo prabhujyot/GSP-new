@@ -54,6 +54,11 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         viewModel.userData()
     }
 
+    override fun onResume() {
+        super.onResume()
+        hideSystemUI()
+    }
+
     private fun observeLoading() {
         viewModel.getLoading().observe(this, {
             tag("$TAG _loading: ${it.message}")

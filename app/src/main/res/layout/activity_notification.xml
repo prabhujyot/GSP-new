@@ -1,25 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".NotificationActivity"
-    android:background="@drawable/gradiant_blue">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent">
-        <include layout="@layout/toolbar"/>
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    tools:context=".ui.message.NotificationActivity">
+    <data>
+        <variable
+            name="viewModel"
+            type="in.allen.gsp.ui.message.NotificationViewModel" />
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/rootLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_overlapTop="0dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:padding="@dimen/margin8"/>
+        android:background="@drawable/gradiant_blue">
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+<!--        <include layout="@layout/toolbar" />-->
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:elevation="0dp">
+
+            <include
+                layout="@layout/toolbar"
+                app:layout_scrollFlags="scroll|enterAlways"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_overlapTop="0dp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:padding="@dimen/margin8"/>
+
+        <!-- Redeem bottom sheet -->
+        <include layout="@layout/bottomsheet_message"/>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

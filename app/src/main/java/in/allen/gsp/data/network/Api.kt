@@ -153,7 +153,7 @@ interface Api {
     @FormUrlEncoded
     @POST("quiz")
     suspend fun postQuiz(
-        @Body quiz: Quiz,
+        @FieldMap params: Map<String, String>
     ): Response<String>
 
     // scratchcards

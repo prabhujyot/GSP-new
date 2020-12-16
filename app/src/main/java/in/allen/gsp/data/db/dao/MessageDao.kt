@@ -20,12 +20,15 @@ interface MessageDao {
     fun delete(id:Int)
 
     @Query("select * from message order by create_date desc")
-    fun getList(): LiveData<List<Message>>
+    fun getList(): List<Message>
 
 //    @Insert
 //    suspend fun setList(messages: List<Message>)
 
-    @Query("select * from message  where id = :id")
-    fun getItem(id:Int): LiveData<Message>
+    @Query("select * from message where id = :id")
+    fun getItem(id:Int): Message
+
+    @Query("select * from message order by id desc limit 1")
+    fun getLastItem(): Message
 
 }

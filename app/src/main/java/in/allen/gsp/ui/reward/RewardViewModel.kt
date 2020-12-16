@@ -22,7 +22,7 @@ class RewardViewModel(
     private val TAG = "tag"
     private val TOAST = "toast"
 
-    private var user: User?= null
+    var user: User?= null
     var coinsValue = 1
     var dailyReward = false
 

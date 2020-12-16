@@ -2,13 +2,9 @@ package `in`.allen.gsp.ui.splash
 
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.utils.Encryption
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,7 +17,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
 
 class SplashViewModel(
@@ -64,6 +59,8 @@ class SplashViewModel(
 
     // check firebase uid
     private val auth = FirebaseAuth.getInstance()
+    var referredById = ""
+    var firebaseToken = ""
 
     init {
         val currentUser = auth.currentUser
@@ -116,6 +113,8 @@ class SplashViewModel(
                     params["email"] = firebaseUser.email!!
                     params["avatar"] = firebaseUser.photoUrl.toString()
                     params["firebase_uid"] = firebaseUser.uid
+                    params["firebase_token"] = firebaseToken
+                    params["referred_by_id"] = referredById
                     val response = repository.login(params)
                     if (response != null) {
                         val responseObj = JSONObject(response)

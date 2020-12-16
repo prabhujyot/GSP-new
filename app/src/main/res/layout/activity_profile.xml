@@ -96,7 +96,8 @@
                             android:textStyle="bold"
                             app:layout_constraintHorizontal_bias="0.5"
                             app:layout_constraintStart_toStartOf="@id/referralId"
-                            app:layout_constraintTop_toBottomOf="@+id/referralId" />
+                            app:layout_constraintTop_toBottomOf="@+id/referralId"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -121,13 +122,13 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/lblTotalGames"
+                                android:text="@string/lblTotalQuiz"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                 android:textColor="@color/white"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/totalGames"
+                                android:id="@+id/totalQuiz"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
@@ -147,13 +148,13 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/lblTotalCoins"
+                                android:text="@string/lblTotalXP"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                                 android:textColor="@color/white"
                                 android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/totalCoins"
+                                android:id="@+id/totalXP"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"

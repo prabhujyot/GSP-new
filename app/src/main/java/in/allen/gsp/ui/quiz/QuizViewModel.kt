@@ -3,9 +3,7 @@ package `in`.allen.gsp.ui.quiz
 import `in`.allen.gsp.data.entities.*
 import `in`.allen.gsp.data.repositories.QuizRepository
 import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.utils.AppPreferences
-import `in`.allen.gsp.utils.Resource
-import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.*
 import android.media.MediaPlayer
 import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
@@ -13,11 +11,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.storage.FirebaseStorage
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.MutableList
@@ -45,6 +45,8 @@ class QuizViewModel(
     lateinit var fset: ArrayList<Question>
     lateinit var attachmentList: ArrayList<Attachment>
     lateinit var currentq: Question
+
+    private lateinit var start_time: String
 
     var index = 0
     var lang = "eng"
@@ -155,6 +157,7 @@ class QuizViewModel(
         isWild = false
         isPopupOpen = false
         index = 0
+        start_time = milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
 
         multiplierTimerCancel()
         questionTimerCancel()
@@ -520,6 +523,26 @@ class QuizViewModel(
                 user?.update_at = System.currentTimeMillis()
                 userRepository.setDBUser(user!!)
             }
+
+            val params = HashMap<String,String>()
+            params["start_time"] = start_time
+            params["end_time"] = milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
+            params["stats_data"] = Gson().toJson(statsData)
+            params["life_lines"] = Gson().toJson(lifeline)
+            params["score"] = score.values.sum().toString()
+            params["xp"] = xp.values.sum().toString()
+
+            if (currentq.qno in 1..5) {
+                params["level"] = "1"
+            }
+            if (currentq.qno in 6..10) {
+                params["level"] = "2"
+            }
+            if (currentq.qno in 11..15) {
+                params["level"] = "3"
+            }
+
+            quizRepository.saveQuiz(params)
         }
     }
 

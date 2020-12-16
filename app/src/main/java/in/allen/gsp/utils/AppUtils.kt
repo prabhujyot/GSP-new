@@ -26,15 +26,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.messaging.FirebaseMessaging
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
+import java.math.RoundingMode
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -242,6 +246,12 @@ fun timeInAgo(dateTime: String?, format: String): String {
     return ago
 }
 
+fun formatNumber(pattern: String,num: Number): String? {
+    val df = DecimalFormat(pattern)
+    df.roundingMode = RoundingMode.CEILING
+    return df.format(num)
+}
+
 fun Context.writeStringToFile(data: String, fileName: String){
     val file = File(getExternalFilesDir(null), fileName)
     tag("Writing to : $file")
@@ -309,23 +319,15 @@ fun Context.printKeyHash() {
     }
 }
 
-fun getReferralLink(referralId: String) {
+fun getReferralLink(referralId: String): String {
     val dynamicLink = FirebaseDynamicLinks.getInstance().createDynamicLink()
         .setLink(Uri.parse("https://gsp.allen.in?referral_id=$referralId"))
-        .setDomainUriPrefix("https://gsp.page.link") // Open links with this app on Android
+        .setDomainUriPrefix("https://allengsp.page.link") // Open links with this app on Android
         .setAndroidParameters(
             DynamicLink.AndroidParameters.Builder(BuildConfig.APPLICATION_ID).build()
         )
         .buildDynamicLink()
-    FirebaseDynamicLinks.getInstance().createDynamicLink()
-        .setLongLink(Uri.parse(dynamicLink.uri.toString()))
-        .buildShortDynamicLink()
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val shortLink = task.result!!.shortLink
-                val flowchartLink = task.result!!.previewLink
-            }
-        }
+    return dynamicLink.uri.toString()
 }
 
 fun subscribeFirebaseTopic(topic: String) {

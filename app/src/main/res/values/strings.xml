@@ -104,4 +104,7 @@
     <string name="lblRewards">Rewards</string>
     <string name="full">Full</string>
     <string name="infinity">&#8734;</string>
+    <string name="lblTotalQuiz">Total Quiz</string>
+    <string name="lblTotalXP">Total XP</string>
+    <string name="default_notification_channel_id">GSP_Notification_Channel</string>
 </resources>

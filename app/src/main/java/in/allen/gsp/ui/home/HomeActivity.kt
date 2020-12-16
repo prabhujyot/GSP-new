@@ -8,6 +8,7 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityHomeBinding
 import `in`.allen.gsp.databinding.ItemBannerBinding
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
+import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.ui.profile.ProfileActivity
 import `in`.allen.gsp.ui.quiz.QuizActivity
 import `in`.allen.gsp.ui.reward.RewardActivity

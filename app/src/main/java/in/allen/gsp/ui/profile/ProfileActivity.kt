@@ -171,7 +171,6 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                             }
                         }
                         binding.referralId.text = "Referral Code: ${user.referral_id}"
-                        binding.totalCoins.text = "${user.coins}"
 
                         viewModel.statsData(user.user_id)
 
@@ -184,7 +183,8 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
 
                     "stats" -> {
                         val obj = it.data as JSONObject
-                        binding.totalGames.text = obj.getString("total")
+                        binding.totalQuiz.text = obj.getString("total")
+                        binding.totalXP.text = obj.getString("xp")
                         setStatistics(obj)
                     }
 
@@ -232,13 +232,13 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         val param1 = binding.layoutWin.layoutParams
         (param1 as LinearLayout.LayoutParams).weight = data.getDouble("won").toFloat()
         binding.layoutWin.layoutParams = param1
-        binding.percentWin.text = "${data.getDouble("won")} %"
+        binding.percentWin.text = "${formatNumber("#.##",data.getDouble("won"))} %"
 
         // played graph
         val param2 = binding.layoutPlayed.layoutParams
         (param2 as LinearLayout.LayoutParams).weight = data.getDouble("played").toFloat()
         binding.layoutPlayed.layoutParams = param2
-        binding.percentPlayed.text = "${data.getDouble("played")} %"
+        binding.percentPlayed.text = "${formatNumber("#.##",data.getDouble("played"))} %"
 
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(253, 195, 0)
@@ -252,7 +252,7 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         val param3 = binding.layoutLose.layoutParams
         (param3 as LinearLayout.LayoutParams).weight = data.getDouble("lose").toFloat()
         binding.layoutLose.layoutParams = param3
-        binding.percentLose.text = "${data.getDouble("lose")} %"
+        binding.percentLose.text = "${formatNumber("#.##",data.getDouble("lose"))} %"
 
         colorList = IntArray(2)
         colorList[0] = Color.rgb(112, 101, 193)
@@ -281,11 +281,6 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                     layoutInflater, R.layout.item_topic_progress, binding.layoutTopics, false
                 )
 
-//                val topicView: View = layoutInflater.inflate(
-//                    R.layout.item_topic_progress,
-//                    binding.layoutTopics,
-//                    false
-//                )
                 colorList = IntArray(2)
                 colorList[0] = Color.rgb(
                     Random.nextInt(255), Random.nextInt(255), Random.nextInt(

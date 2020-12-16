@@ -1,7 +1,7 @@
 package `in`.allen.gsp.ui.splash
 
 import `in`.allen.gsp.IntroActivity
-import `in`.allen.gsp.NotificationActivity
+import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
@@ -24,6 +24,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -73,11 +76,12 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             colorList
         )
 
+        isReferred()
+        catchNotification()
+
         observeSuccess()
         observeLoading()
         observeError()
-
-        catchNotification()
     }
 
     override fun onResume() {
@@ -130,6 +134,23 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 }
             })
         LoginManager.getInstance().logInWithReadPermissions(this, listOf("email", "public_profile"))
+    }
+
+    private fun isReferred() {
+        viewModel.firebaseToken = preferences.firebaseToken
+        FirebaseDynamicLinks
+            .getInstance()
+            .getDynamicLink(intent)
+            .addOnSuccessListener {
+                OnSuccessListener<PendingDynamicLinkData> {
+                    if(it != null) {
+                        val deepLink = it.link
+                        if(deepLink != null && deepLink.getBooleanQueryParameter("referral_id",false)) {
+                            viewModel.referredById = deepLink.getQueryParameter("referral_id").toString()
+                        }
+                    }
+                }
+            }
     }
 
 
