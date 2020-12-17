@@ -19,8 +19,8 @@ interface MessageDao {
     @Query("delete from message where id = :id")
     fun delete(id:Int)
 
-    @Query("select * from message order by create_date desc")
-    fun getList(): List<Message>
+    @Query("select * from message where user_id = :user_id order by create_date desc limit :offset,50")
+    fun getList(user_id: Int, offset: Int): List<Message>
 
 //    @Insert
 //    suspend fun setList(messages: List<Message>)

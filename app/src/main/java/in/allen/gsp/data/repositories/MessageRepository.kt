@@ -17,7 +17,8 @@ class MessageRepository(
 
     suspend fun getList(userId: Int, page: Int): HashMap<String,Any> {
         val hashMap = HashMap<String,Any>()
-        hashMap["list"] = db.getMessageDao().getList()
+        val offset = page.minus(1).times(50)
+        hashMap["list"] = db.getMessageDao().getList(userId,offset)
         hashMap["page"] = page.plus(1)
         return hashMap
     }

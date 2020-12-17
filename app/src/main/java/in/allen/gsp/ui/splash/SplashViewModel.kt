@@ -1,10 +1,10 @@
 package `in`.allen.gsp.ui.splash
 
+import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.data.entities.User
+import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.utils.Encryption
-import `in`.allen.gsp.utils.Resource
-import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,10 +17,13 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.*
+import kotlin.collections.HashMap
 
 
 class SplashViewModel(
-    private val repository: UserRepository
+    private val repository: UserRepository,
+    private val messageRepository: MessageRepository
 ): ViewModel() {
 
     val ALERT = "alert"
@@ -60,6 +63,7 @@ class SplashViewModel(
     // check firebase uid
     private val auth = FirebaseAuth.getInstance()
     var referredById = ""
+    //dql67IOsRhKvLOQu3u5qSN:APA91bG34dn2dT4Sc-0sDKrZ1HG9GV1qmw5yZSULtm3X9UwjVVvns5ag42D6X08SqiWGriUEaCjja62OZDRXLu799JOdFvv6lLO2OIlMuS1Ka51x88PdZb1N1Pfkgk69MK-oAI0dHrfq
     var firebaseToken = ""
 
     init {
@@ -204,6 +208,30 @@ class SplashViewModel(
             }
         } else {
             setError("", "")
+        }
+    }
+
+    fun saveMessage(
+        user: User,
+        messageTitle: String?,
+        messageBody: String?) {
+        Coroutines.io {
+            var notificationId = 0
+            val m = messageRepository.getLastItem()
+            tag("m: $m")
+            if(m != null) {
+                notificationId = m.id.plus(1)
+            }
+
+            val message = Message(
+                notificationId,
+                user.user_id,
+                messageTitle!!,
+                messageBody!!,
+                milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss"),
+                0)
+            messageRepository.setItem(message)
+            tag("message saved")
         }
     }
 }

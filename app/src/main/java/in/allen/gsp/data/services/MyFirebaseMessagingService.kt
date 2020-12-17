@@ -4,6 +4,7 @@ import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.data.repositories.MessageRepository
+import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.milisToFormat
@@ -28,6 +29,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
     override val kodein by kodein()
     private val preferences: AppPreferences by instance()
     private val messageRepository: MessageRepository by instance()
+    private val userRepository: UserRepository by instance()
 
     /**
      * Called when message is received.
@@ -95,18 +97,27 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
      * @param messageBody FCM message body received.
      */
     private fun sendNotification(messageTitle: String, messageBody: String) {
+        tag("sendNotification")
         var notificationId = 0
         Coroutines.io {
-            val m = messageRepository.getLastItem()
-            notificationId = m.id.plus(1)
+            val user = userRepository.getDBUser()
+            if(user != null) {
+                val m = messageRepository.getLastItem()
+                tag("m: $m")
+                if(m != null) {
+                    notificationId = m.id.plus(1)
+                }
 
-            val message = Message(
-                notificationId,
-                messageTitle,
-                messageBody,
-                milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss"),
-                0)
-            messageRepository.setItem(message)
+                val message = Message(
+                    notificationId,
+                    user.user_id,
+                    messageTitle,
+                    messageBody,
+                    milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss"),
+                    0)
+                messageRepository.setItem(message)
+                tag("message saved")
+            }
 
             val intent = Intent(this, NotificationActivity::class.java)
             intent.putExtra("title",messageTitle)
