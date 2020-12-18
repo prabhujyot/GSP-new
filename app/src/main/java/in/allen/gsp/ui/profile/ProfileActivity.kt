@@ -232,13 +232,13 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         val param1 = binding.layoutWin.layoutParams
         (param1 as LinearLayout.LayoutParams).weight = data.getDouble("won").toFloat()
         binding.layoutWin.layoutParams = param1
-        binding.percentWin.text = "${formatNumber("#.##",data.getDouble("won"))} %"
+        binding.percentWin.text = "${formatNumber("#.##",data.getDouble("won").times(100))} %"
 
         // played graph
         val param2 = binding.layoutPlayed.layoutParams
         (param2 as LinearLayout.LayoutParams).weight = data.getDouble("played").toFloat()
         binding.layoutPlayed.layoutParams = param2
-        binding.percentPlayed.text = "${formatNumber("#.##",data.getDouble("played"))} %"
+        binding.percentPlayed.text = "${formatNumber("#.##",data.getDouble("played").times(100))} %"
 
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(253, 195, 0)
@@ -252,7 +252,7 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         val param3 = binding.layoutLose.layoutParams
         (param3 as LinearLayout.LayoutParams).weight = data.getDouble("lose").toFloat()
         binding.layoutLose.layoutParams = param3
-        binding.percentLose.text = "${formatNumber("#.##",data.getDouble("lose"))} %"
+        binding.percentLose.text = "${formatNumber("#.##",data.getDouble("lose").times(100))} %"
 
         colorList = IntArray(2)
         colorList[0] = Color.rgb(112, 101, 193)
