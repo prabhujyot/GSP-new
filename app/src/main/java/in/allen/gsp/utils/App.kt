@@ -5,13 +5,11 @@ import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.NetworkConnectionInterceptor
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.data.repositories.*
-import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.ui.message.NotificationViewModelFactory
 import `in`.allen.gsp.ui.quiz.QuizViewModelFactory
 import `in`.allen.gsp.ui.reward.RewardViewModelFactory
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import androidx.multidex.MultiDex
 import com.google.android.gms.security.ProviderInstaller
@@ -34,7 +32,7 @@ class App: Application(), KodeinAware {
         bind() from singleton { AppDatabase(instance()) }
         bind() from singleton { AppPreferences(instance()) }
         bind() from singleton { UserRepository(instance(),instance()) }
-        bind() from singleton { MessageRepository(instance(),instance()) }
+        bind() from singleton { MessageRepository(instance()) }
         bind() from singleton { BannerRepository(instance(),instance()) }
         bind() from singleton { LeaderboardRepository(instance(),instance(),instance()) }
         bind() from singleton { VideosRepository(instance(),instance(),instance()) }

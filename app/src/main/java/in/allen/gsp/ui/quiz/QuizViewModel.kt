@@ -260,7 +260,11 @@ class QuizViewModel(
         }
 
         // set to quiz data
-        user?.played_qid.plus("${currentq.qid},")
+        user?.played_qid = user?.played_qid!!.plus("${currentq.qid},")
+        Coroutines.io {
+            tag("${currentq.qid} addingqids ${user?.played_qid}")
+            user?.let { userRepository.setDBUser(it) }
+        }
 
         xp[currentq.qno] = currentq.qTime.minus(duration).toLong()
         val cscore: Long = currentq.qTime.minus(duration)
@@ -515,34 +519,40 @@ class QuizViewModel(
     }
 
     private fun saveData() {
-        viewModelScope.launch {
-            // update user data
-//            val user = userRepository.getDBUser()
-            if(user?.life!! > 0 && System.currentTimeMillis() > preferences.timestampLife) {
-                user?.life = user?.life!!.minus(1)
-                user?.update_at = System.currentTimeMillis()
-                userRepository.setDBUser(user!!)
-            }
+        if(user != null && user?.user_id!! > 0) {
+            viewModelScope.launch {
+                // update user data
+                if (user?.life!! > 0 && System.currentTimeMillis() > preferences.timestampLife) {
+                    user?.life = user?.life!!.minus(1)
+                    user?.update_at = System.currentTimeMillis()
+                    userRepository.setDBUser(user!!)
+                }
 
-            val params = HashMap<String,String>()
-            params["start_time"] = start_time
-            params["end_time"] = milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
-            params["stats_data"] = Gson().toJson(statsData)
-            params["life_lines"] = Gson().toJson(lifeline)
-            params["score"] = score.values.sum().toString()
-            params["xp"] = xp.values.sum().toString()
+                val params = HashMap<String, String>()
+                params["start_time"] = start_time
+                params["end_time"] =
+                    milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
+                params["stats_data"] = Gson().toJson(statsData)
+                params["life_lines"] = Gson().toJson(lifeline)
+                params["score"] = score.values.sum().toString()
+                params["xp"] = xp.values.sum().toString()
+                params["user_id"] = user?.user_id!!.toString()
 
-            if (currentq.qno in 1..5) {
-                params["level"] = "1"
-            }
-            if (currentq.qno in 6..10) {
-                params["level"] = "2"
-            }
-            if (currentq.qno in 11..15) {
-                params["level"] = "3"
-            }
+                val usr = userRepository.getDBUser()
+                params["played_qid"] = usr?.played_qid!!
 
-            quizRepository.saveQuiz(params)
+                if (currentq.qno in 1..5) {
+                    params["level"] = "1"
+                }
+                if (currentq.qno in 6..10) {
+                    params["level"] = "2"
+                }
+                if (currentq.qno in 11..15) {
+                    params["level"] = "3"
+                }
+
+                quizRepository.saveQuiz(params)
+            }
         }
     }
 

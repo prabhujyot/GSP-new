@@ -1,14 +1,13 @@
 package `in`.allen.gsp.ui.splash
 
 import `in`.allen.gsp.IntroActivity
-import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.User
-import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.databinding.ActivitySplashBinding
 import `in`.allen.gsp.ui.home.HomeActivity
+import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.utils.*
 import android.content.Intent
 import android.graphics.Color
@@ -43,14 +42,13 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
     override val kodein by kodein()
     private val repository: UserRepository by instance()
-    private val messageRepository: MessageRepository by instance()
     private val preferences: AppPreferences by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
-        viewModel = SplashViewModel(repository,messageRepository)
+        viewModel = SplashViewModel(repository)
 
         var colorList = IntArray(2)
         colorList[0] = Color.rgb(5, 137, 229)
@@ -250,12 +248,6 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
     private fun catchNotification(user: User) {
         if(intent.hasExtra("click_action")
             && (intent.getStringExtra("click_action").equals("ACTION_NOTIFICATION",true))) {
-            viewModel.saveMessage(
-                user,
-                intent.getStringExtra("title"),
-                intent.getStringExtra("body")
-            )
-
             Intent(this, NotificationActivity::class.java).also {
                 it.putExtra("title", intent.getStringExtra("title"))
                 it.putExtra("body", intent.getStringExtra("body"))
@@ -263,18 +255,6 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 startActivity(it)
             }
         }
-
-//
-//        if (intent.hasExtra("click_action")
-//            && (intent.getStringExtra("click_action")
-//                    == "ACTION_NOTIFICATION")) {
-//            Intent(this, NotificationActivity::class.java).also {
-//                it.putExtra("title", intent.getStringExtra("title"))
-//                it.putExtra("body", intent.getStringExtra("body"))
-//                it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-//                startActivity(it)
-//            }
-//        }
     }
 
 }

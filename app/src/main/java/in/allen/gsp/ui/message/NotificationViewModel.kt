@@ -3,6 +3,7 @@ package `in`.allen.gsp.ui.message
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
+import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.Resource
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -72,13 +73,19 @@ class NotificationViewModel(
     fun getNotifications(page: Int) {
         if(user != null && user?.user_id!! > 0) {
             viewModelScope.launch {
-                try {
-                    val response = messageRepository.getList(user?.user_id!!, page)
-                    setSuccess(response,"notifications")
-                } catch (e: Exception) {
-                    setError("${e.message}", TAG)
-                }
+                val response = messageRepository.getList(user?.user_id!!, page)
+                setSuccess(response,"notifications")
             }
+        }
+    }
+
+    fun openMessage(notificationId: Int) {
+        viewModelScope.launch {
+            Coroutines.io {
+                messageRepository.updateItem(notificationId,1)
+            }
+            val response = messageRepository.getItem(notificationId)
+            setSuccess(response,"open")
         }
     }
 

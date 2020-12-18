@@ -32,7 +32,8 @@
             android:layout_height="match_parent"
             app:behavior_overlapTop="0dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:padding="@dimen/margin8"/>
+            android:padding="@dimen/margin8"
+            tools:listitem="@layout/item_notification"/>
 
         <!-- Redeem bottom sheet -->
         <include layout="@layout/bottomsheet_message"/>

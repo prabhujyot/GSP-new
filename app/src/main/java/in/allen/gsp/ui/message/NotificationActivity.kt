@@ -1,12 +1,12 @@
 package `in`.allen.gsp.ui.message
 
-import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.databinding.ActivityNotificationBinding
 import `in`.allen.gsp.databinding.ItemNotificationBinding
 import `in`.allen.gsp.utils.*
 import android.content.Context
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +15,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,7 +60,6 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         }
 
         initBottomSheet()
-        initRecyclerView()
         reset()
 
         observeError()
@@ -114,10 +114,24 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
                             page = it.data["page"] as Int
                             if(mList.size > 0) {
                                 list = mList
-                                recyclerAdapter.notifyDataSetChanged()
+                                if(page == 2) {
+                                    initRecyclerView()
+                                } else {
+                                    recyclerAdapter.notifyDataSetChanged()
+                                }
                             } else {
                                 nomore = true
                             }
+                        }
+                    }
+                    "open" -> {
+                        val msg = it.data as Message
+                        binding.rootLayout.bottomSheetMessage.webView.loadData(
+                            msg.msg,
+                            "text/html; charset=UTF-8",
+                            null)
+                        if(messageSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                            messageSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                         }
                     }
                 }
@@ -139,10 +153,6 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         binding.rootLayout.bottomSheetMessage.webView.webViewClient = object : WebViewClient() {
         }
 
-        binding.rootLayout.bottomSheetMessage.webView.settings.javaScriptEnabled = true
-        val url = BuildConfig.BASE_URL + "gsp-admin/index.php/site/page/redemption-rule"
-        binding.rootLayout.bottomSheetMessage.webView.loadUrl(url)
-
         binding.rootLayout.bottomSheetMessage.btnClose.setOnClickListener {
             if(messageSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 messageSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -150,6 +160,10 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.rootLayout.isClickable = false
+    }
+
+    fun openSheet(notificationId: Int) {
+        viewModel.openMessage(notificationId)
     }
 
     private fun reset() {
@@ -161,7 +175,7 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initRecyclerView() {
-        recyclerAdapter = RecyclerViewAdapter(list,this, messageSheetBehavior)
+        recyclerAdapter = RecyclerViewAdapter(list, this)
         binding.recyclerView.apply {
             layoutManager =  LinearLayoutManager(context)
             setHasFixedSize(true)
@@ -192,7 +206,6 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
     private class RecyclerViewAdapter(
         val items: ArrayList<Message>,
         val context: Context,
-        val sheetBehavior: BottomSheetBehavior<View>,
     ) : RecyclerView.Adapter<RecyclerViewAdapter.ItemViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
             val binding: ItemNotificationBinding = DataBindingUtil.inflate(
@@ -206,7 +219,7 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-            holder.bind(items[position],)
+            holder.bind(items[position])
             if(position == 0) {
                 holder.separator.show(false)
             } else {
@@ -223,6 +236,14 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
             val activity: NotificationActivity
         ) : RecyclerView.ViewHolder(binding.root) {
             fun bind(data: Message) {
+                tag("bind: $data")
+                if(data.status == 0) {
+                    binding.time.typeface = Typeface.DEFAULT_BOLD
+                    binding.title.typeface = Typeface.DEFAULT_BOLD
+                    binding.time.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.white, null))
+                    binding.title.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.white, null))
+                    binding.msg.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.white, null))
+                }
                 binding.message = data
                 binding.time.text = timeInAgo(data.date,"yyyy-MM-dd hh:mm:ss")
 
@@ -236,11 +257,5 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
-    fun openSheet(notificationId: Int) {
-        viewModel.notificationId = notificationId
-        if(messageSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-            messageSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-    }
 
 }

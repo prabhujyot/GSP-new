@@ -18,7 +18,7 @@ data class User (
     val referral_id: String,
     val firebase_token: String,
     val firebase_uid: String,
-    val played_qid: String,
+    var played_qid: String,
     val high_score: Int,
     val xp: Int,
     val create_date: String,

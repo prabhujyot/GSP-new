@@ -22,8 +22,7 @@ import kotlin.collections.HashMap
 
 
 class SplashViewModel(
-    private val repository: UserRepository,
-    private val messageRepository: MessageRepository
+    private val repository: UserRepository
 ): ViewModel() {
 
     val ALERT = "alert"
@@ -211,27 +210,4 @@ class SplashViewModel(
         }
     }
 
-    fun saveMessage(
-        user: User,
-        messageTitle: String?,
-        messageBody: String?) {
-        Coroutines.io {
-            var notificationId = 0
-            val m = messageRepository.getLastItem()
-            tag("m: $m")
-            if(m != null) {
-                notificationId = m.id.plus(1)
-            }
-
-            val message = Message(
-                notificationId,
-                user.user_id,
-                messageTitle!!,
-                messageBody!!,
-                milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss"),
-                0)
-            messageRepository.setItem(message)
-            tag("message saved")
-        }
-    }
 }
