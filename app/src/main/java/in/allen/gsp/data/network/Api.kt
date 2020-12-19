@@ -1,7 +1,6 @@
 package `in`.allen.gsp.data.network
 
 import `in`.allen.gsp.BuildConfig
-import `in`.allen.gsp.data.entities.Quiz
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
@@ -130,9 +129,7 @@ interface Api {
     // quiz question set
     @GET("quiz")
     suspend fun getQuiz(
-        @Query("game_no") game_no: Int,
-        @Query("qid") qid: String,
-        @Query("question_cat") question_cat: String,
+        @Query("user_id") user_id: Int
     ): Response<String>
 
     // wild question set

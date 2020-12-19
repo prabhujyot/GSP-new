@@ -1,10 +1,10 @@
 package `in`.allen.gsp.data.services
 
-import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
+import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.utils.AppPreferences
 import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.milisToFormat

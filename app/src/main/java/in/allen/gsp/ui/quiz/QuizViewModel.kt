@@ -20,10 +20,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.collections.MutableList
-import kotlin.collections.containsKey
 import kotlin.collections.set
-import kotlin.collections.sum
 import kotlin.math.ceil
 
 
@@ -129,6 +126,24 @@ class QuizViewModel(
                 try {
                     if(user?.life!! > 0) {
                         val res = quizRepository.getPreview(user!!.user_id)
+                        setQuizData(res)
+                    } else {
+                        setSuccess("showOffers","quizStatus")
+                    }
+                } catch (e: Exception) {
+                    setError("quizdata:${e.message}",ALERT)
+                }
+            }
+        }
+    }
+
+    fun quizData() {
+        setLoading(true)
+        if(user != null && user!!.user_id > 0) {
+            viewModelScope.launch {
+                try {
+                    if(user?.life!! > 0) {
+                        val res = quizRepository.getQuiz(user!!.user_id)
                         setQuizData(res)
                     } else {
                         setSuccess("showOffers","quizStatus")

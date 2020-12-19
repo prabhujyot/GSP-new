@@ -1,10 +1,10 @@
 package `in`.allen.gsp.ui.splash
 
-import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.data.entities.User
-import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.utils.*
+import `in`.allen.gsp.utils.Encryption
+import `in`.allen.gsp.utils.Resource
+import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,8 +17,6 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.util.*
-import kotlin.collections.HashMap
 
 
 class SplashViewModel(

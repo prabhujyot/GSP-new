@@ -10,7 +10,6 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.lang.Exception
 
 
 class BannerRepository(

@@ -238,7 +238,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             if (it != null) {
                 when (it.message) {
                     "user" -> {
-                        viewModel.previewData()
+//                        viewModel.previewData()
+                        viewModel.quizData()
                     }
 
                     "lock" -> {
@@ -313,7 +314,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             lifecycleScope.launch {
                                 delay(viewModel.TIME_DELAY)
                                 tag("preview")
-                                viewModel.previewData()
+//                                viewModel.previewData()
+                                viewModel.quizData()
                             }
                         }
                     }
@@ -1134,7 +1136,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                 lifecycleScope.launch {
                     delay(viewModel.TIME_DELAY)
-                    viewModel.previewData()
+//                    viewModel.previewData()
+                    viewModel.quizData()
                 }
             }
         }

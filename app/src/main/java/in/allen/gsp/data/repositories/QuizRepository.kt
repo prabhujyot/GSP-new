@@ -1,11 +1,13 @@
 package `in`.allen.gsp.data.repositories
 
 import `in`.allen.gsp.data.db.AppDatabase
-import `in`.allen.gsp.data.entities.*
+import `in`.allen.gsp.data.entities.Attachment
+import `in`.allen.gsp.data.entities.Option
+import `in`.allen.gsp.data.entities.Question
+import `in`.allen.gsp.data.entities.Quiz
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.utils.Coroutines
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -30,20 +32,20 @@ class QuizRepository(
 //        }
 //    }
 
-    suspend fun getQuiz(quiz_no: Int, qid: String, question_cat: String): LiveData<Quiz> {
-        return withContext(Dispatchers.IO) {
-            val response = apiRequest {
-                api.getQuiz(quiz_no, qid, question_cat)
-            }
-
-            quiz.postValue(response?.let {
-                createData(quiz_no,it)
-            })
-
-            // from database
-            getDBQuiz()
-        }
-    }
+//    suspend fun getQuiz(quiz_no: Int, qid: String, question_cat: String): LiveData<Quiz> {
+//        return withContext(Dispatchers.IO) {
+//            val response = apiRequest {
+//                api.getQuiz(quiz_no, qid, question_cat)
+//            }
+//
+//            quiz.postValue(response?.let {
+//                createData(quiz_no,it)
+//            })
+//
+//            // from database
+//            getDBQuiz()
+//        }
+//    }
 
     suspend fun getWildQuiz(user_id: Int, value: Int): String? {
         return apiRequest {
@@ -61,6 +63,23 @@ class QuizRepository(
         return withContext(Dispatchers.IO) {
             val response = apiRequest {
                 api.getPreview(user_id)
+            }
+
+            response?.let {
+                createData(0,it)
+            }
+
+            delay(300)
+
+            // from database
+            selectDBQuiz()
+        }
+    }
+
+    suspend fun getQuiz(user_id: Int): Quiz {
+        return withContext(Dispatchers.IO) {
+            val response = apiRequest {
+                api.getQuiz(user_id)
             }
 
             response?.let {

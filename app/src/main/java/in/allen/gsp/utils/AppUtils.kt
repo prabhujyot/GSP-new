@@ -26,13 +26,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
-import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.messaging.FirebaseMessaging
-import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.math.RoundingMode
@@ -42,7 +39,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun Context.toast(message: String) {
+    fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 }
 

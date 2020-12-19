@@ -1,7 +1,6 @@
 package `in`.allen.gsp.utils
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 
 class AppPreferences(context: Context) {

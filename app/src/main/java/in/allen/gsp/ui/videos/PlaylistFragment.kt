@@ -6,7 +6,8 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.repositories.VideosRepository
 import `in`.allen.gsp.databinding.FragmentPlaylistBinding
 import `in`.allen.gsp.databinding.ItemPlaylistBinding
-import `in`.allen.gsp.utils.*
+import `in`.allen.gsp.utils.loadImage
+import `in`.allen.gsp.utils.show
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
