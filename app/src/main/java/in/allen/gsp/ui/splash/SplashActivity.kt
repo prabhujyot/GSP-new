@@ -34,6 +34,7 @@ import org.kodein.di.generic.instance
 
 private const val GOOGLE_SIGN_IN : Int = 9001
 
+
 class SplashActivity : AppCompatActivity(), KodeinAware {
 
     private val TAG = SplashActivity::class.java.name

@@ -107,4 +107,22 @@
     <string name="lblTotalQuiz">Total Quiz</string>
     <string name="lblTotalXP">Total XP</string>
     <string name="default_notification_channel_id">GSP_Notification_Channel</string>
+    <string name="info_processing">Processing</string>
+    <string name="action_update">Update</string>
+    <string name="info_failed">Failed</string>
+    <string name="info_pending">Pending</string>
+    <string name="info_canceled">Canceled</string>
+    <string name="info_downloading">Downloading</string>
+    <string name="info_installing">Installing</string>
+    <string name="info_installed">Installed</string>
+    <string name="info_restart">Restart</string>
+    <string name="update_available">New version available.</string>
+    <string name="update_title">App Update</string>
+    <string name="update_message">Application successfully updated, you need to restart the app.</string>
+    <string name="action_restart">Restart</string>
+    <string name="toast_updated">Updated</string>
+    <string name="toast_started">Started</string>
+    <string name="toast_cancelled">Canceled</string>
+    <string name="toast_failed">Failed</string>
+    <string name="info_downloaded">Downloaded</string>
 </resources>

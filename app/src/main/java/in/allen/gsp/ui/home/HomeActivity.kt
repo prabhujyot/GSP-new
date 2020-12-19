@@ -19,14 +19,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager.widget.PagerAdapter
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager
+import com.google.android.play.core.install.InstallStateUpdatedListener
+import com.google.android.play.core.install.model.ActivityResult
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.tasks.Task
 import kotlinx.android.synthetic.main.icon_life.view.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.android.synthetic.main.toolbar_home.*
+import kotlinx.android.synthetic.main.update.view.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -34,6 +46,9 @@ import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
 import java.util.concurrent.TimeUnit
 
+
+private const val REQUEST_UPDATE = 100
+private const val APP_UPDATE_TYPE_SUPPORTED = AppUpdateType.FLEXIBLE
 
 class HomeActivity : AppCompatActivity(), KodeinAware {
 
@@ -59,6 +74,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         binding.rootLayout.setOnClickListener { hideSystemUI() }
 
         binding.viewpagerBanner.pageMargin = 16
+
+        if (BuildConfig.DEBUG) {
+            testingInAppUpdate()
+        }
+
+//        checkInAppUpdate()
 
         observeLoading()
         observeError()
@@ -102,6 +123,29 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             super.onBackPressed()
         }, {})
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (REQUEST_UPDATE == requestCode) {
+            when (resultCode) {
+                RESULT_OK -> {
+                    if (APP_UPDATE_TYPE_SUPPORTED == AppUpdateType.IMMEDIATE) {
+                        toast(getString(R.string.toast_updated))
+                    } else {
+                        toast(getString(R.string.toast_started))
+                    }
+                }
+                RESULT_CANCELED -> {
+                    toast(getString(R.string.toast_cancelled))
+                }
+                ActivityResult.RESULT_IN_APP_UPDATE_FAILED -> {
+                    toast(getString(R.string.toast_failed))
+                }
+            }
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+
 
     private fun observeLoading() {
         viewModel.getLoading().observe(this, {
@@ -251,4 +295,187 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
         startActivity(i)
     }
+
+
+
+    /* In-App update */
+    private lateinit var updateListener: InstallStateUpdatedListener
+
+    private fun checkInAppUpdate() {
+        val appUpdateManager = AppUpdateManagerFactory.create(baseContext)
+        val appUpdateInfo = appUpdateManager.appUpdateInfo
+        appUpdateInfo.addOnSuccessListener {
+            handleUpdate(appUpdateManager, appUpdateInfo)
+        }
+    }
+
+    private fun handleUpdate(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        if (APP_UPDATE_TYPE_SUPPORTED == AppUpdateType.IMMEDIATE) {
+            handleImmediateUpdate(manager, info)
+        } else if (APP_UPDATE_TYPE_SUPPORTED == AppUpdateType.FLEXIBLE) {
+            handleFlexibleUpdate(manager, info)
+        }
+    }
+
+    private fun handleImmediateUpdate(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        if ((info.result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ||
+                    info.result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+            info.result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+            manager.startUpdateFlowForResult(info.result, AppUpdateType.IMMEDIATE, this, REQUEST_UPDATE)
+        }
+    }
+
+    private fun handleFlexibleUpdate(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        if ((info.result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ||
+                    info.result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+            info.result.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+            binding.layoutUpdate.show()
+            setUpdateAction(manager, info)
+        }
+    }
+
+    private fun setUpdateAction(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        binding.layoutUpdate.btn_update.setOnClickListener {
+            updateListener = InstallStateUpdatedListener {
+                binding.layoutUpdate.btn_update.show(false)
+                binding.layoutUpdate.status.show()
+                when (it.installStatus()) {
+                    InstallStatus.FAILED, InstallStatus.UNKNOWN -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_failed)
+                        binding.layoutUpdate.btn_update.visibility = View.VISIBLE
+                    }
+                    InstallStatus.PENDING -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_pending)
+                    }
+                    InstallStatus.CANCELED -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_canceled)
+                    }
+                    InstallStatus.DOWNLOADING -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_downloading)
+                    }
+                    InstallStatus.DOWNLOADED -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_installing)
+                        launchRestart(manager)
+                    }
+                    InstallStatus.INSTALLING -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_installing)
+                    }
+                    InstallStatus.INSTALLED -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_installed)
+                        manager.unregisterListener(updateListener)
+                    }
+                    else -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_restart)
+                    }
+                }
+            }
+            manager.registerListener(updateListener)
+            manager.startUpdateFlowForResult(info.result, AppUpdateType.FLEXIBLE, this, REQUEST_UPDATE)
+        }
+    }
+
+    private fun launchRestart(manager: AppUpdateManager) {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.update_title))
+            .setMessage(getString(R.string.update_message))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.action_restart)) { _, _ ->
+                manager.completeUpdate()
+            }
+            .create().show()
+    }
+
+    // testing in app update
+    private fun testingInAppUpdate() {
+        val appUpdateManager = FakeAppUpdateManager(baseContext)
+        appUpdateManager.setUpdateAvailable(13)
+
+        val appUpdateInfo = appUpdateManager.appUpdateInfo
+        appUpdateInfo.addOnSuccessListener {
+            handleTestingUpdate(appUpdateManager, appUpdateInfo)
+        }
+    }
+
+    private fun handleTestingUpdate(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        if (APP_UPDATE_TYPE_SUPPORTED == AppUpdateType.IMMEDIATE) {
+            handleTestingImmediateUpdate(manager, info)
+        } else if (APP_UPDATE_TYPE_SUPPORTED == AppUpdateType.FLEXIBLE) {
+            handleTestingFlexibleUpdate(manager, info)
+        }
+    }
+
+    private fun handleTestingImmediateUpdate(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        if ((info.result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ||
+                    info.result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+            info.result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+            manager.startUpdateFlowForResult(info.result, AppUpdateType.IMMEDIATE, this, REQUEST_UPDATE)
+        }
+
+        val fakeAppUpdate = manager as FakeAppUpdateManager
+        if (fakeAppUpdate.isImmediateFlowVisible) {
+            fakeAppUpdate.userAcceptsUpdate()
+            fakeAppUpdate.downloadStarts()
+            fakeAppUpdate.downloadCompletes()
+            launchRestart(manager)
+        }
+    }
+
+    private fun handleTestingFlexibleUpdate(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        if ((info.result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ||
+                    info.result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
+            info.result.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE)) {
+            binding.layoutUpdate.show()
+            setTestingUpdateAction(manager, info)
+        }
+    }
+
+    private fun setTestingUpdateAction(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
+        binding.layoutUpdate.btn_update.setOnClickListener {
+            updateListener = InstallStateUpdatedListener {
+                binding.layoutUpdate.btn_update.show(false)
+                binding.layoutUpdate.status.show()
+                when (it.installStatus()) {
+                    InstallStatus.FAILED, InstallStatus.UNKNOWN -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_failed)
+                        binding.layoutUpdate.btn_update.show()
+                    }
+                    InstallStatus.PENDING -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_pending)
+                    }
+                    InstallStatus.CANCELED -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_canceled)
+                    }
+                    InstallStatus.DOWNLOADING -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_downloading)
+                    }
+                    InstallStatus.DOWNLOADED -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_downloaded)
+                        launchRestart(manager)
+                    }
+                    InstallStatus.INSTALLING -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_installing)
+                    }
+                    InstallStatus.INSTALLED -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_installed)
+                        manager.unregisterListener(updateListener)
+                    }
+                    else -> {
+                        binding.layoutUpdate.status.text = getString(R.string.info_restart)
+                    }
+                }
+            }
+            manager.registerListener(updateListener)
+            manager.startUpdateFlowForResult(info.result, AppUpdateType.FLEXIBLE, this, REQUEST_UPDATE)
+
+            val fakeAppUpdate = manager as FakeAppUpdateManager
+            if (fakeAppUpdate.isConfirmationDialogVisible) {
+                fakeAppUpdate.userAcceptsUpdate()
+                fakeAppUpdate.downloadStarts()
+                fakeAppUpdate.downloadCompletes()
+                fakeAppUpdate.completeUpdate()
+                fakeAppUpdate.installCompletes()
+            }
+        }
+    }
+    /* End In-App update */
 }
