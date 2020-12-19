@@ -119,23 +119,23 @@ class QuizViewModel(
         }
     }
 
-    fun previewData() {
-        setLoading(true)
-        if(user != null && user!!.user_id > 0) {
-            viewModelScope.launch {
-                try {
-                    if(user?.life!! > 0) {
-                        val res = quizRepository.getPreview(user!!.user_id)
-                        setQuizData(res)
-                    } else {
-                        setSuccess("showOffers","quizStatus")
-                    }
-                } catch (e: Exception) {
-                    setError("quizdata:${e.message}",ALERT)
-                }
-            }
-        }
-    }
+//    fun previewData() {
+//        setLoading(true)
+//        if(user != null && user!!.user_id > 0) {
+//            viewModelScope.launch {
+//                try {
+//                    if(user?.life!! > 0) {
+//                        val res = quizRepository.getPreview(user!!.user_id)
+//                        setQuizData(res)
+//                    } else {
+//                        setSuccess("showOffers","quizStatus")
+//                    }
+//                } catch (e: Exception) {
+//                    setError("quizdata:${e.message}",ALERT)
+//                }
+//            }
+//        }
+//    }
 
     fun quizData() {
         setLoading(true)
@@ -143,8 +143,13 @@ class QuizViewModel(
             viewModelScope.launch {
                 try {
                     if(user?.life!! > 0) {
-                        val res = quizRepository.getQuiz(user!!.user_id)
-                        setQuizData(res)
+                        if(!user?.is_admin!!) {
+                            val res = quizRepository.getQuiz(user!!.user_id)
+                            setQuizData(res)
+                        } else {
+                            val res = quizRepository.getPreview(user!!.user_id)
+                            setQuizData(res)
+                        }
                     } else {
                         setSuccess("showOffers","quizStatus")
                     }
@@ -528,7 +533,9 @@ class QuizViewModel(
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
             isPopupOpen = true
-            saveData()
+            if(!user?.is_admin!!) {
+                saveData()
+            }
             setSuccess("displayFinish","quizStatus")
         }
     }
@@ -704,6 +711,7 @@ class QuizViewModel(
 
     fun flipQuestion() {
         if (fset.size > 2) {
+            val qno = currentq.qno
             // check is segment is easy medium or hard
             currentq = when (currentq.qdifficulty_level) {
                 1 -> {
@@ -716,6 +724,7 @@ class QuizViewModel(
                     fset[2]
                 }
             }
+            currentq.qno = qno
         }
         tag("fset: $currentq")
         setSuccess("setQuestion", "quizStatus")
