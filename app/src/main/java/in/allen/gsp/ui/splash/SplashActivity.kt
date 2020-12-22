@@ -38,6 +38,7 @@ private const val GOOGLE_SIGN_IN : Int = 9001
 
 class SplashActivity : AppCompatActivity(), KodeinAware {
 
+    private lateinit var googleSignInClient: GoogleSignInClient
     private val TAG = SplashActivity::class.java.name
     private lateinit var binding: ActivitySplashBinding
     private lateinit var viewModel: SplashViewModel
@@ -84,6 +85,9 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
         isReferred()
 
+        googleSignInClient = initGoogle()
+        initFB()
+
         observeSuccess()
         observeLoading()
         observeError()
@@ -126,29 +130,42 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         return GoogleSignIn.getClient(this, gso)
     }
 
+    private fun actionGoogle() {
+        if(::googleSignInClient.isInitialized) {
+            startActivityForResult(
+                googleSignInClient.signInIntent,
+                GOOGLE_SIGN_IN
+            )
+        }
+    }
+
     /* fb login */
     private fun initFB() {
-        tag("initFB")
         callbackManager = CallbackManager.Factory.create()
-        tag("initFB callbackManager $callbackManager")
-        LoginManager.getInstance().registerCallback(callbackManager,
-            object : FacebookCallback<LoginResult> {
-                override fun onSuccess(loginResult: LoginResult) {
-                    tag("initFB onSuccess")
-                    viewModel.firebaseAuthWithFB(loginResult.accessToken)
-                }
+    }
 
-                override fun onCancel() {
-                    tag("initFB onCancel")
-                    viewModel.setError("FB Login cancel", TAG)
-                }
+    private fun actionFB() {
+        if(::callbackManager.isInitialized) {
+            LoginManager.getInstance().registerCallback(callbackManager,
+                object : FacebookCallback<LoginResult> {
+                    override fun onSuccess(loginResult: LoginResult) {
+                        tag("initFB onSuccess")
+                        viewModel.firebaseAuthWithFB(loginResult.accessToken)
+                    }
 
-                override fun onError(exception: FacebookException) {
-                    tag("initFB onError ${exception.message}")
-                    viewModel.setError("FB Error ${exception.message}", TAG)
-                }
-            })
-        LoginManager.getInstance().logInWithReadPermissions(this, listOf("email", "public_profile"))
+                    override fun onCancel() {
+                        tag("initFB onCancel")
+                        viewModel.setError("FB Login cancel", TAG)
+                    }
+
+                    override fun onError(exception: FacebookException) {
+                        tag("initFB onError ${exception.message}")
+                        viewModel.setError("FB Error ${exception.message}", TAG)
+                    }
+                })
+            LoginManager.getInstance()
+                .logInWithReadPermissions(this, listOf("email", "public_profile"))
+        }
     }
 
     private fun isReferred() {
@@ -249,14 +266,10 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
     fun btnActionSplash(view: View) {
         when (view.id) {
             R.id.btnFB -> {
-                initFB()
+                actionFB()
             }
             R.id.btnGG -> {
-                val googleSignInClient = initGoogle()
-                startActivityForResult(
-                    googleSignInClient.signInIntent,
-                    GOOGLE_SIGN_IN
-                )
+                actionGoogle()
             }
         }
     }

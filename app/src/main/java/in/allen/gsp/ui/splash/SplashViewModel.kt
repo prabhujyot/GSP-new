@@ -69,6 +69,7 @@ class SplashViewModel(
     }
 
     fun firebaseAuthWithGoogle(idToken: String) {
+        setLoading(true)
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
@@ -83,6 +84,7 @@ class SplashViewModel(
 
     fun firebaseAuthWithFB(token: AccessToken) {
         tag("firebaseAuthWithFB: $token")
+        setLoading(true)
         val credential = FacebookAuthProvider.getCredential(token.token)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
@@ -109,7 +111,6 @@ class SplashViewModel(
             val providerData = firebaseUser?.providerId
 
             viewModelScope.launch {
-                setLoading(true)
                 try {
                     val params = HashMap<String, String>()
                     params["name"] = firebaseUser?.displayName!!

@@ -25,10 +25,7 @@ import android.util.TypedValue
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
@@ -238,7 +235,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             if (it != null) {
                 when (it.message) {
                     "user" -> {
-//                        viewModel.previewData()
                         viewModel.quizData()
                     }
 
@@ -313,8 +309,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                             lifecycleScope.launch {
                                 delay(viewModel.TIME_DELAY)
-                                tag("preview")
-//                                viewModel.previewData()
                                 viewModel.quizData()
                             }
                         }
@@ -967,8 +961,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private fun displayAttachment(currentQ: Question) {
         tag("displayAttachment: ${currentQ.qno}")
         binding.layoutAttachment.progressTimer.show(false)
-        binding.layoutAttachment.image.show(false)
-        binding.layoutAttachment.video.show(false)
+
+        val image = binding.layoutAttachment.layoutAttachment.findViewById<ImageView>(R.id.image)
+        val video = binding.layoutAttachment.layoutAttachment.findViewById<VideoView>(R.id.video)
+
+        image.show(false)
+        video.show(false)
 
         var url = currentQ.qattach.trim()
         mp = MediaPlayer()
@@ -981,12 +979,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     mp.release()
                 }
                 "video" -> {
-                    binding.layoutAttachment.video.stopPlayback()
+                    video.stopPlayback()
                 }
             }
 
-            if(binding.layoutAttachment.video.visibility == View.VISIBLE) {
-                binding.layoutAttachment.video.stopPlayback()
+            if(video.visibility == View.VISIBLE) {
+                video.stopPlayback()
             }
             if (attachmentSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 attachmentSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -1032,24 +1030,24 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         e.printStackTrace()
                     }
 
-                    binding.layoutAttachment.image.loadImage(
+                    image.loadImage(
                         "${BuildConfig.BASE_URL}gsp-admin/uploads/audio-quiz.jpg", false, true
                     )
-                    binding.layoutAttachment.image.show()
+                    image.show()
                 }
                 "video" -> {
-                    binding.layoutAttachment.video.setVideoPath(url)
-                    binding.layoutAttachment.video.show()
-                    binding.layoutAttachment.video.start()
-                    binding.layoutAttachment.video.setOnCompletionListener {
+                    video.setVideoPath(url)
+                    video.show()
+                    video.start()
+                    video.setOnCompletionListener {
                         binding.layoutAttachment.btnClose.performClick()
                     }
                 }
                 else -> {
-                    binding.layoutAttachment.image.loadImage(
-                        url, false, true
+                    image.loadImage(
+                        url,false, true
                     )
-                    binding.layoutAttachment.image.show()
+                    image.show()
 
                     binding.layoutAttachment.progressTimer.show()
                     binding.layoutAttachment.progressTimer.max = viewModel.TIME_ATTACHMENT.toInt()
@@ -1136,7 +1134,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                 lifecycleScope.launch {
                     delay(viewModel.TIME_DELAY)
-//                    viewModel.previewData()
                     viewModel.quizData()
                 }
             }
