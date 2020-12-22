@@ -1,5 +1,6 @@
 package `in`.allen.gsp.ui.profile
 
+import `in`.allen.gsp.IntroActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.RewardRepository
@@ -7,6 +8,7 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityProfileBinding
 import `in`.allen.gsp.databinding.ItemScratchcardBinding
 import `in`.allen.gsp.databinding.ItemTopicProgressBinding
+import `in`.allen.gsp.ui.splash.SplashActivity
 import `in`.allen.gsp.utils.*
 import android.content.Context
 import android.content.Intent
@@ -25,6 +27,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import dev.skymansandy.scratchcardlayout.listener.ScratchListener
 import dev.skymansandy.scratchcardlayout.ui.ScratchCardLayout
 import kotlinx.android.synthetic.main.toolbar.*
@@ -93,6 +96,15 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         val id = item.itemId
         if(id == R.id.menu_edit) {
             startActivity(Intent(this, ProfileEditActivity::class.java))
+        }
+        if(id == R.id.menu_logout) {
+            val auth = FirebaseAuth.getInstance()
+            auth.signOut()
+            Intent(this, SplashActivity::class.java)
+                .also { it1 ->
+                    it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(it1)
+                }
         }
         if(id == R.id.menu_share) {
             val share = Intent(Intent.ACTION_SEND)

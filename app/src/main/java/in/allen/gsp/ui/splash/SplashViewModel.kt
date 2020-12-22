@@ -82,10 +82,12 @@ class SplashViewModel(
     }
 
     fun firebaseAuthWithFB(token: AccessToken) {
+        tag("firebaseAuthWithFB: $token")
         val credential = FacebookAuthProvider.getCredential(token.token)
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    tag("firebaseAuthWithFB success: ${auth.currentUser}")
                     val firebaseUser = auth.currentUser
                     authToServer(firebaseUser)
                 } else {

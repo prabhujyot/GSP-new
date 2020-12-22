@@ -75,9 +75,9 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
         binding.viewpagerBanner.pageMargin = 16
 
-        if (BuildConfig.DEBUG) {
-            testingInAppUpdate()
-        }
+//        if (BuildConfig.DEBUG) {
+//            testingInAppUpdate()
+//        }
 
 //        checkInAppUpdate()
 

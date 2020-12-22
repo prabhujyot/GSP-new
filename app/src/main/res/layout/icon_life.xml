@@ -14,15 +14,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/life"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/margin4"
         android:text="5"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textStyle="bold"
         android:textColor="@color/white"
+        app:autoSizeMaxTextSize="28sp"
+        app:autoSizeMinTextSize="10sp"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="@id/lifeIcon"
         app:layout_constraintEnd_toEndOf="@id/lifeIcon"
         app:layout_constraintStart_toStartOf="@id/lifeIcon"

@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
+import kotlinx.coroutines.flow.callbackFlow
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -44,6 +45,8 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
     override val kodein by kodein()
     private val repository: UserRepository by instance()
     private val preferences: AppPreferences by instance()
+
+    private lateinit var callbackManager: CallbackManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +80,8 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             colorList
         )
 
+        printKeyHash()
+
         isReferred()
 
         observeSuccess()
@@ -104,6 +109,11 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                 }
             }
         }
+
+        // Pass the activity result back to the Facebook SDK
+        if(::callbackManager.isInitialized) {
+            callbackManager.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     /* google login */
@@ -118,18 +128,23 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
     /* fb login */
     private fun initFB() {
-        val callbackManager = CallbackManager.Factory.create()
+        tag("initFB")
+        callbackManager = CallbackManager.Factory.create()
+        tag("initFB callbackManager $callbackManager")
         LoginManager.getInstance().registerCallback(callbackManager,
             object : FacebookCallback<LoginResult> {
                 override fun onSuccess(loginResult: LoginResult) {
+                    tag("initFB onSuccess")
                     viewModel.firebaseAuthWithFB(loginResult.accessToken)
                 }
 
                 override fun onCancel() {
+                    tag("initFB onCancel")
                     viewModel.setError("FB Login cancel", TAG)
                 }
 
                 override fun onError(exception: FacebookException) {
+                    tag("initFB onError ${exception.message}")
                     viewModel.setError("FB Error ${exception.message}", TAG)
                 }
             })

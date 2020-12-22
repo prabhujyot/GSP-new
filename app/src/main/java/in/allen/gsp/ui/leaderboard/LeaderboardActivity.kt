@@ -99,7 +99,11 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
                                     binding.tinyProgressBar.show(false)
                                     if(list.size > 4) {
                                         val listTop = list.subList(0,3)
-                                        val listOther = list.subList(3,100)
+                                        var listOther: List<Leaderboard> = if(list.size < 100) {
+                                            list.subList(3, list.size)
+                                        } else {
+                                            list.subList(3, 100)
+                                        }
 
                                         // rank 1
                                         binding.rankFirstName.text = listTop[0].name
