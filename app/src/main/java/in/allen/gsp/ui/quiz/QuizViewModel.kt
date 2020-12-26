@@ -573,6 +573,7 @@ class QuizViewModel(
                     params["level"] = "3"
                 }
 
+                tag(params)
                 quizRepository.saveQuiz(params)
             }
         }

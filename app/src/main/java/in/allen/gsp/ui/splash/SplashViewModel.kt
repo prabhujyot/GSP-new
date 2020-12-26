@@ -5,15 +5,14 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Encryption
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.tag
+import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.facebook.AccessToken
-import com.google.firebase.auth.FacebookAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
+import com.facebook.GraphRequest
+import com.google.firebase.auth.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -23,6 +22,8 @@ class SplashViewModel(
     private val repository: UserRepository
 ): ViewModel() {
 
+    lateinit var fbAccessToken: AccessToken
+    private var currentUser: FirebaseUser?
     val ALERT = "alert"
     val SNACKBAR = "snackbar"
     val TAG = "tag"
@@ -32,6 +33,8 @@ class SplashViewModel(
     private val _loading = MutableLiveData<Resource.Loading<Any>>()
     private val _success = MutableLiveData<Resource.Success<Any>>()
     private val _error = MutableLiveData<Resource.Error<String>>()
+
+    private var provider = ""
 
     fun getLoading(): LiveData<Resource.Loading<Any>> {
         return _loading
@@ -60,58 +63,57 @@ class SplashViewModel(
     // check firebase uid
     private val auth = FirebaseAuth.getInstance()
     var referredById = ""
-    //dql67IOsRhKvLOQu3u5qSN:APA91bG34dn2dT4Sc-0sDKrZ1HG9GV1qmw5yZSULtm3X9UwjVVvns5ag42D6X08SqiWGriUEaCjja62OZDRXLu799JOdFvv6lLO2OIlMuS1Ka51x88PdZb1N1Pfkgk69MK-oAI0dHrfq
     var firebaseToken = ""
 
     init {
-        val currentUser = auth.currentUser
+        currentUser = auth.currentUser
+        tag("firebaseAuthWithFB init: authUser: $currentUser")
         authUser(currentUser)
     }
 
     fun firebaseAuthWithGoogle(idToken: String) {
+        provider = "google"
         setLoading(true)
         val credential = GoogleAuthProvider.getCredential(idToken, null)
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val firebaseUser = auth.currentUser
-                    authToServer(firebaseUser)
-                } else {
-                    setError("signInWithCredential:failure ${task.exception}", TAG)
-                }
-            }
+        signInFirebaseAccount(credential)
     }
 
     fun firebaseAuthWithFB(token: AccessToken) {
-        tag("firebaseAuthWithFB: $token")
+        provider = "facebook"
+        tag("firebaseAuthWithFB: $token authUser: $currentUser")
         setLoading(true)
         val credential = FacebookAuthProvider.getCredential(token.token)
+        signInFirebaseAccount(credential)
+    }
+
+    private fun fbGraphRequest(token: AccessToken) {
+        val graphRequest = GraphRequest.newMeRequest(
+            token
+        ) { _, response ->
+            tag("FB GraphResponse $response")
+            val obj = response.jsonObject
+            val params = HashMap<String, String>()
+            params["name"] = obj.getString("name")
+            params["email"] = obj.getString("email")
+            params["avatar"] = obj.getJSONObject("picture").getJSONObject("data").getString("url")
+            authToServer(params)
+        }
+
+        val parameters = Bundle()
+        parameters.putString(
+            "fields",
+            "id, email, first_name, last_name, name, picture, gender, birthday, location"
+        )
+        graphRequest.parameters = parameters
+        graphRequest.executeAsync()
+    }
+
+    private fun signInFirebaseAccount(credential: AuthCredential) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     tag("firebaseAuthWithFB success: ${auth.currentUser}")
                     val firebaseUser = auth.currentUser
-                    authToServer(firebaseUser)
-                } else {
-                    setError("signInWithCredential:failure ${task.exception}", TAG)
-                }
-            }
-    }
-
-    private fun authToServer(firebaseUser: FirebaseUser?) {
-        val isSignedIn = firebaseUser != null
-        tag("authToServer $isSignedIn")
-        if (isSignedIn) {
-            val displayName = firebaseUser?.displayName
-            val email = firebaseUser?.email
-            val emailVerified = firebaseUser?.isEmailVerified
-            val photoURL = firebaseUser?.photoUrl
-            val isAnonymous = firebaseUser?.isAnonymous
-            val uid = firebaseUser?.uid
-            val providerData = firebaseUser?.providerId
-
-            viewModelScope.launch {
-                try {
                     val params = HashMap<String, String>()
                     params["name"] = firebaseUser?.displayName!!
                     params["email"] = firebaseUser.email!!
@@ -119,42 +121,57 @@ class SplashViewModel(
                     params["firebase_uid"] = firebaseUser.uid
                     params["firebase_token"] = firebaseToken
                     params["referred_by_id"] = referredById
-                    val response = repository.login(params)
-                    if (response != null) {
-                        val responseObj = JSONObject(response)
-                        if(responseObj.getInt("status") == 1) {
-                            val data = responseObj.getJSONObject("data")
-                            val user = User(
-                                0,
-                                data.getInt("user_id"),
-                                data.getString("name"),
-                                data.getString("avatar"),
-                                data.getString("email"),
-                                data.getString("mobile"),
-                                data.getString("about"),
-                                data.getString("location"),
-                                data.getString("referral_id"),
-                                data.getString("firebase_token"),
-                                data.getString("firebase_uid"),
-                                data.getString("played_qid"),
-                                data.getInt("high_score"),
-                                data.getInt("xp"),
-                                data.getString("create_date"),
-                                data.getString("session_token"),
-                                data.getInt("coins"),
-                                data.getInt("redeemed_otp_status"),
-                                data.getBoolean("is_admin"),
-                                data.getString("config_data")
-                            )
-                            repository.setDBUser(user)
-                            setSuccess(user, "user")
-                        } else {
-                            setError(responseObj.getString("message"), TAG)
-                        }
+                    authToServer(params)
+                } else {
+                    if(task.exception is FirebaseAuthUserCollisionException
+                        && provider.equals("facebook",true)) {
+                        fbGraphRequest(fbAccessToken)
+                    } else {
+                        setError("signInWithCredential:failure ${task.exception}", TAG)
                     }
-                } catch (e: Exception) {
-                    setError(e.message.toString(), TAG)
                 }
+            }
+    }
+
+    private fun authToServer(params: HashMap<String, String>) {
+        tag("authToServer $params")
+        viewModelScope.launch {
+            try {
+                val response = repository.login(params)
+                if (response != null) {
+                    val responseObj = JSONObject(response)
+                    if(responseObj.getInt("status") == 1) {
+                        val data = responseObj.getJSONObject("data")
+                        val user = User(
+                            0,
+                            data.getInt("user_id"),
+                            data.getString("name"),
+                            data.getString("avatar"),
+                            data.getString("email"),
+                            data.getString("mobile"),
+                            data.getString("about"),
+                            data.getString("location"),
+                            data.getString("referral_id"),
+                            data.getString("firebase_token"),
+                            data.getString("firebase_uid"),
+                            data.getString("played_qid"),
+                            data.getInt("high_score"),
+                            data.getInt("xp"),
+                            data.getString("create_date"),
+                            data.getString("session_token"),
+                            data.getInt("coins"),
+                            data.getInt("redeemed_otp_status"),
+                            data.getBoolean("is_admin"),
+                            data.getString("config_data")
+                        )
+                        repository.setDBUser(user)
+                        setSuccess(user, "user")
+                    } else {
+                        setError(responseObj.getString("message"), TAG)
+                    }
+                }
+            } catch (e: Exception) {
+                setError(e.message.toString(), TAG)
             }
         }
     }
@@ -167,6 +184,14 @@ class SplashViewModel(
         val isSignedIn = firebaseUser != null
         // Status text
         if (isSignedIn) {
+            val params = HashMap<String, String>()
+            params["name"] = firebaseUser?.displayName!!
+            params["email"] = firebaseUser.email!!
+            params["avatar"] = firebaseUser.photoUrl.toString()
+            params["firebase_uid"] = firebaseUser.uid
+            params["firebase_token"] = firebaseToken
+            params["referred_by_id"] = referredById
+
             // check if firebase uid match with db user
             viewModelScope.launch {
                 val dbUser = repository.getDBUser()
@@ -187,7 +212,7 @@ class SplashViewModel(
                             val sysTime = System.currentTimeMillis() / 1000L
                             val expireTime = obj.getLong("expire_on")
                             if (sysTime > expireTime) {
-                                authToServer(firebaseUser)
+                                authToServer(params)
                             } else {
                                 viewModelScope.launch {
                                     delay(2 * 1000)
@@ -203,7 +228,7 @@ class SplashViewModel(
                         setError("", "")
                     }
                 } else {
-                    authToServer(firebaseUser)
+                    authToServer(params)
                 }
             }
         } else {

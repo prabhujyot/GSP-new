@@ -8,7 +8,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 android {
     signingConfigs {
         config {
-            storeFile file('D:\\Android\\StudioProjects\\GSP\\readme\\GSP.jks')
+            storeFile file('readme\\GSP.jks')
             storePassword 'test@app'
             keyAlias 'test@app'
             keyPassword 'test@app'

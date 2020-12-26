@@ -149,7 +149,9 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             LoginManager.getInstance().registerCallback(callbackManager,
                 object : FacebookCallback<LoginResult> {
                     override fun onSuccess(loginResult: LoginResult) {
-                        tag("initFB onSuccess")
+                        tag("initFB onSuccess loginResult.accessToken ${loginResult.accessToken}")
+                        viewModel.fbAccessToken = loginResult.accessToken
+                        tag("initFB onSuccess loginResult.accessToken ${viewModel.fbAccessToken}")
                         viewModel.firebaseAuthWithFB(loginResult.accessToken)
                     }
 
