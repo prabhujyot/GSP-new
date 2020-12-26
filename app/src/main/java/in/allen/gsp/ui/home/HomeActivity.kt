@@ -14,6 +14,7 @@ import `in`.allen.gsp.ui.quiz.QuizActivity
 import `in`.allen.gsp.ui.reward.RewardActivity
 import `in`.allen.gsp.ui.videos.VideosActivity
 import `in`.allen.gsp.utils.*
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -215,7 +216,8 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                                 deferredList.await().observe(this@HomeActivity, { list ->
                                     binding.viewpagerBanner.adapter = BannerAdapter(
                                         layoutInflater,
-                                        list
+                                        list,
+                                        this@HomeActivity
                                     )
                                 })
                             }
@@ -228,7 +230,8 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
     private class BannerAdapter(
         private val inflater: LayoutInflater,
-        private val list: List<Banner>
+        private val list: List<Banner>,
+        private val context: Context
     ): PagerAdapter() {
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -250,7 +253,19 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             val item = list[position]
             binding.image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item.image}")
             binding.title.text = item.title
-            binding.btnGo.setOnClickListener {  }
+            binding.btnGo.setOnClickListener {
+                val i = Intent()
+                when {
+                    item.bannerType.equals("activity",true) -> {
+                        i.setClassName(context, item.bannerAction)
+                    }
+                    item.bannerType.equals("link",true) -> {
+                        i.setClass(context, WebActivity::class.java)
+                        i.putExtra("url",item.bannerAction)
+                    }
+                }
+                context.startActivity(i)
+            }
 
             container.addView(binding.root)
             return binding.root
