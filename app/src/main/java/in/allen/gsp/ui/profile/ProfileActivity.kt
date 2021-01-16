@@ -37,6 +37,7 @@ import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import java.net.URI
 import kotlin.random.Random
 
 

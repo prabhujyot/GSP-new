@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- disabled -->
+    <item android:state_enabled="false" android:drawable="@drawable/bg_btn_disabled" />
+
+    <!-- pressed -->
+    <item android:state_pressed="true">
+        <shape  android:shape="rectangle">
+            <gradient
+                android:startColor="#2E7D32"
+                android:endColor="#1B5E20"
+                android:angle="270"/>
+
+            <stroke android:color="#558B2F"
+                android:width="1dp"/>
+
+            <!-- The radius makes the corners rounded -->
+            <corners
+                android:radius="20dp"   >
+            </corners>
+        </shape>
+    </item>
+
+    <!-- default -->
+    <item>
+        <shape  android:shape="rectangle">
+            <gradient
+                android:startColor="#2E7D32"
+                android:endColor="#1B5E20"
+                android:angle="270"/>
+
+            <stroke android:color="#558B2F"
+                android:width="1dp"/>
+
+            <!-- The radius makes the corners rounded -->
+            <corners
+                android:radius="20dp"   >
+            </corners>
+        </shape>
+    </item>
+</selector>

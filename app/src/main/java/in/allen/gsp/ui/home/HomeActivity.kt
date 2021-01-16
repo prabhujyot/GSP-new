@@ -42,6 +42,7 @@ import kotlinx.android.synthetic.main.toolbar_home.*
 import kotlinx.android.synthetic.main.update.view.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -255,13 +256,14 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             binding.title.text = item.title
             binding.btnGo.setOnClickListener {
                 val i = Intent()
+                i.setClassName(context, item.action)
+                val obj = JSONObject(item.meta)
                 when {
-                    item.bannerType.equals("activity",true) -> {
-                        i.setClassName(context, item.bannerAction)
+                    obj.has("url") -> {
+                        i.putExtra("url",obj.getString("url"))
                     }
-                    item.bannerType.equals("link",true) -> {
-                        i.setClass(context, WebActivity::class.java)
-                        i.putExtra("url",item.bannerAction)
+                    obj.has("contest_id") -> {
+                        i.putExtra("contest_id",obj.getString("contest_id"))
                     }
                 }
                 context.startActivity(i)

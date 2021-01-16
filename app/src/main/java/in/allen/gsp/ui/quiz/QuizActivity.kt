@@ -68,12 +68,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private lateinit var offersSheetBehavior: BottomSheetBehavior<FrameLayout>
 
     // animations
-    private lateinit var animZoomIn: Animation
+//    private lateinit var animZoomIn: Animation
     private lateinit var animFadeIn: Animation
-    private lateinit var animFadeOut: Animation
+//    private lateinit var animFadeOut: Animation
     private lateinit var animBlink: Animation
-    private lateinit var animMoveLeft: Animation
-    private lateinit var animMoveRight: Animation
+//    private lateinit var animMoveLeft: Animation
+//    private lateinit var animMoveRight: Animation
 
     // Question Table
     private val questionTable = ArrayList<View>()
@@ -470,12 +470,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initAnimations() {
-        animZoomIn = AnimationUtils.loadAnimation(applicationContext, R.anim.zoomin)
+//        animZoomIn = AnimationUtils.loadAnimation(applicationContext, R.anim.zoomin)
         animFadeIn = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein)
-        animFadeOut = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout)
+//        animFadeOut = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout)
         animBlink = AnimationUtils.loadAnimation(applicationContext, R.anim.blink)
-        animMoveLeft = AnimationUtils.loadAnimation(applicationContext, R.anim.move_left)
-        animMoveRight = AnimationUtils.loadAnimation(applicationContext, R.anim.move_right)
+//        animMoveLeft = AnimationUtils.loadAnimation(applicationContext, R.anim.move_left)
+//        animMoveRight = AnimationUtils.loadAnimation(applicationContext, R.anim.move_right)
     }
 
     private fun initQuiz() {
@@ -783,7 +783,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             layoutInflater, R.layout.option_spelling, binding.layoutOption, false
         )
 
-        val shuffled = viewModel.shuffle(currentQ.option[0].adesc)
+        val shuffled = shuffleString(currentQ.option[0].adesc)
         for (element in shuffled) {
             val textView2 = TextView(this)
             val params2 = LinearLayout.LayoutParams(100, 100)

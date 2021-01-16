@@ -6,6 +6,7 @@ import `in`.allen.gsp.data.network.NetworkConnectionInterceptor
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.data.repositories.*
 import `in`.allen.gsp.ui.message.NotificationViewModelFactory
+import `in`.allen.gsp.ui.quiz.ContestViewModelFactory
 import `in`.allen.gsp.ui.quiz.QuizViewModelFactory
 import `in`.allen.gsp.ui.reward.RewardViewModelFactory
 import android.app.Application
@@ -41,6 +42,7 @@ class App: Application(), KodeinAware {
         bind() from provider { NotificationViewModelFactory(instance(),instance()) }
         bind() from singleton { QuizRepository(instance(),instance()) }
         bind() from provider { QuizViewModelFactory(instance(),instance(),instance()) }
+        bind() from provider { ContestViewModelFactory(instance(),instance(),instance()) }
     }
 
     override fun onCreate() {

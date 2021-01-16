@@ -1,4 +1,4 @@
-    package `in`.allen.gsp.utils
+package `in`.allen.gsp.utils
 
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
@@ -38,8 +38,9 @@ import java.security.NoSuchAlgorithmException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.ceil
 
-    fun Context.toast(message: String) {
+fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 }
 
@@ -226,6 +227,13 @@ fun getMediaDuration(path: String?): Long {
     return timeInMillisec
 }
 
+fun stringToMilis(date: String, pattern: String): Long {
+    val sdf = SimpleDateFormat(pattern)
+    val c = Calendar.getInstance()
+    c.time = sdf.parse(date)
+    return c.timeInMillis
+}
+
 fun milisToFormat(milliseconds: Long, format: String): String {
     val sdf = SimpleDateFormat(format)
     val resultdate = Date(milliseconds)
@@ -314,6 +322,29 @@ fun Context.printKeyHash() {
     } catch (e: PackageManager.NameNotFoundException) {
     } catch (e: NoSuchAlgorithmException) {
     }
+}
+
+fun shuffleString(input: String): String {
+    val characters: MutableList<Char> = ArrayList()
+    for (c in input.toCharArray()) {
+        characters.add(c)
+    }
+    val output = StringBuilder(input.length)
+    while (characters.size != 0) {
+        val randPicker = (Math.random() * characters.size).toInt()
+        output.append(characters.removeAt(randPicker))
+    }
+    return output.toString()
+}
+
+fun readingTime(text: String): Long {
+    val wpm = 180 // readable words per minute
+    val wordLength = 5 // standardized number of chars in calculable word
+    val words = text.length / wordLength
+    val wordsTime = words * 60 * 1000 / wpm.toLong()
+    val delay = 1000 // milliseconds before user starts reading
+    val bonus = 1000 // extra time
+    return ceil(delay + wordsTime + bonus.toDouble()).toLong()
 }
 
 fun getReferralLink(referralId: String): String {

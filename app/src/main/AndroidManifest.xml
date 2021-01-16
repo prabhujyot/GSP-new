@@ -15,7 +15,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <service
             android:name=".data.services.LifeService"
             android:enabled="true"
@@ -42,34 +41,48 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
-        <activity android:name=".ui.quiz.ContestActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".ui.message.NotificationActivity"
+        <activity android:name=".ui.quiz.ContestInstructionActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".ui.quiz.QuizActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".WebActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.quiz.ContestActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.message.NotificationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.quiz.QuizActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".WebActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.videos.YTPlayerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensor"
             android:theme="@style/BlackNoTitleBarTheme" />
-        <activity android:name=".ui.videos.VideosActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.leaderboard.LeaderboardActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.reward.RewardActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.profile.ProfileEditActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.profile.ProfileActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.home.HomeActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".IntroActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.splash.SplashActivity"
+        <activity
+            android:name=".ui.videos.VideosActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.leaderboard.LeaderboardActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.reward.RewardActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.profile.ProfileEditActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.home.HomeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".IntroActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.splash.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

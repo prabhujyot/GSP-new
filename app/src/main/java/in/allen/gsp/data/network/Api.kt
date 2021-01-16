@@ -160,4 +160,33 @@ interface Api {
         @Query("page") page: Int,
     ): Response<String>
 
+    // contest status
+    @GET("contest_status")
+    suspend fun contestStatus(
+        @Query("user_id") user_id: Int,
+        @Query("contest_id") contest_id: Int
+    ): Response<String>
+
+    // contest enroll
+    @FormUrlEncoded
+    @POST("contest_enrol")
+    suspend fun contestEnrol(
+        @Field("user_id") user_id: Int,
+        @Field("contest_id") contest_id: Int
+    ): Response<String>
+
+    // get contest data
+    @GET("contest")
+    suspend fun getContest(
+        @Query("user_id") user_id: Int,
+        @Query("contest_id") contest_id: Int
+    ): Response<String>
+
+    // save contest data
+    @FormUrlEncoded
+    @POST("contest")
+    suspend fun postContest(
+        @FieldMap params: Map<String, String>
+    ): Response<String>
+
 }

@@ -109,7 +109,7 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                         viewModel.firebaseAuthWithGoogle(account.idToken!!)
                     }
                 } catch (e: ApiException) {
-                    viewModel.setError("Google sign in failed $e", TAG)
+                    viewModel.setError("Google sign in failed $e", viewModel.TAG)
                 }
             }
         }
@@ -157,12 +157,12 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
                     override fun onCancel() {
                         tag("initFB onCancel")
-                        viewModel.setError("FB Login cancel", TAG)
+                        viewModel.setError("FB Login cancel", viewModel.TAG)
                     }
 
                     override fun onError(exception: FacebookException) {
                         tag("initFB onError ${exception.message}")
-                        viewModel.setError("FB Error ${exception.message}", TAG)
+                        viewModel.setError("FB Error ${exception.message}", viewModel.TAG)
                     }
                 })
             LoginManager.getInstance()

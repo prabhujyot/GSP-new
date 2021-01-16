@@ -4,14 +4,20 @@ import `in`.allen.gsp.data.entities.*
 import `in`.allen.gsp.data.repositories.QuizRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.*
+import android.graphics.Color
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.CountDownTimer
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
@@ -36,6 +42,9 @@ class ContestViewModel(
     val TOAST = "toast"
 
     var user: User?= null
+    var contestId = 0
+    var currentTime = Calendar.getInstance().timeInMillis
+
     var quiz: Quiz? = null
     lateinit var qset: ArrayList<Question>
     lateinit var wset: ArrayList<Question>
@@ -60,17 +69,12 @@ class ContestViewModel(
     private var isPause = false
     var isResumable = true
 
-    var isWild = false
     var isPopupOpen = false
     var isDoubleDip = false
 
     var TIME_DELAY: Long = 1000
-    var TIME_READING: Long = 2000
     val TIME_MOVE_TO_NEXT: Long = 2500
     val TIME_POPUP: Long = 2500
-    var TIME_ATTACHMENT: Long = 15000
-
-    var mp = MediaPlayer()
 
     private val firebaseStorage = FirebaseStorage.getInstance("gs://firebase-gyan-se-pehchan.appspot.com")
     private val storageReference = firebaseStorage.reference
@@ -109,9 +113,6 @@ class ContestViewModel(
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
                 user = dbUser
-                if(userRepository.config("shuffle-value").isNotEmpty()) {
-                    shuffleCoins = userRepository.config("shuffle-value").toInt()
-                }
                 setSuccess(dbUser, "user")
             } else {
                 setError("Not Found", TAG)
@@ -119,42 +120,140 @@ class ContestViewModel(
         }
     }
 
-//    fun previewData() {
-//        setLoading(true)
-//        if(user != null && user!!.user_id > 0) {
-//            viewModelScope.launch {
-//                try {
-//                    if(user?.life!! > 0) {
-//                        val res = quizRepository.getPreview(user!!.user_id)
-//                        setQuizData(res)
-//                    } else {
-//                        setSuccess("showOffers","quizStatus")
-//                    }
-//                } catch (e: Exception) {
-//                    setError("quizdata:${e.message}",ALERT)
-//                }
-//            }
-//        }
-//    }
+    fun contestStatus() {
+        if(user != null && user!!.user_id > 0 && contestId > 0) {
+            viewModelScope.launch {
+                try {
+                    setLoading(true)
+                    val response = quizRepository.contestStatus(user!!.user_id,contestId)
+                    if (response != null) {
+                        val responseObj = JSONObject(response)
+                        if(responseObj.getInt("status") == 1) {
+                            val dataObj = responseObj.getJSONObject("data")
+                            setSuccess(dataObj,"contestStatus")
+                        } else {
+                            setError("contestData:${responseObj.getString("message")}", ALERT)
+                        }
+                    }
+                } catch (e: Exception) {
+                    setError("contestData:${e.message}",ALERT)
+                }
+            }
+        }
+    }
 
+    fun enrolVisibility(contestObj: JSONObject) {
+        val enrolStartTime = stringToMilis(
+            contestObj.getString("enrollment_start_time"),
+            "yyyy-MM-dd HH:mm:ss")
+        val enrolEndTime = stringToMilis(
+            contestObj.getString("enrollment_end_time"),
+            "yyyy-MM-dd HH:mm:ss")
+        if(!contestObj.has("isEnrolled")) {
+            if (currentTime in enrolStartTime..enrolEndTime) {
+                setSuccess(contestObj.getInt("id"),"enableContestEnrollment")
+                val diff = enrolEndTime - currentTime
+                if (diff > 0) {
+                    setSuccess(diff,"startCountdownEnrollment")
+                }
+            }
+        }
+    }
+
+    fun playVisibility(dataObj: JSONObject) {
+        val contestObj = dataObj.getJSONObject("contest")
+        val contestStartTime = stringToMilis(dataObj.getString("start_time"), "yyyy-MM-dd HH:mm:ss")
+        val contestEndTime = stringToMilis(dataObj.getString("end_time"), "yyyy-MM-dd HH:mm:ss")
+        if (currentTime in contestStartTime..contestEndTime) {
+            setSuccess(contestObj,"enableContestPlay")
+        } else {
+            val diff = contestStartTime - currentTime
+            tag("enableContestPlay $diff")
+            if (diff > 0) {
+                val hashmap = HashMap<String,Any>()
+                hashmap["diff"] = diff
+                hashmap["contestObj"] = contestObj
+                setSuccess(hashmap,"startCountdownContest")
+            }
+        }
+    }
+
+    fun enrolContest() {
+        if(user != null && user!!.user_id > 0 && contestId > 0) {
+            viewModelScope.launch {
+                try {
+                    setLoading(true)
+                    val response = quizRepository.contestEnrol(user!!.user_id,contestId)
+                    if (response != null) {
+                        val responseObj = JSONObject(response)
+                        if(responseObj.getInt("status") == 1) {
+                            setError(responseObj.getString("message"),TOAST)
+                            contestStatus()
+                        } else {
+                            setError("contestData:${responseObj.getString("message")}", ALERT)
+                        }
+                    }
+                } catch (e: Exception) {
+                    setError("contestData:${e.message}",ALERT)
+                }
+            }
+        }
+    }
+
+    // enrolment timer
+    private var countdownEnrollment: CountDownTimer?= null
+    fun countdownEnrollmentStart(i: Long) {
+        countdownEnrollment = object : CountDownTimer(i, 10) {
+            override fun onTick(l: Long) {
+                setSuccess(l, "countdownEnrollment")
+            }
+
+            override fun onFinish() {
+                countdownEnrollmentCancel()
+                setSuccess("", "countdownEnrollmentFinish")
+            }
+        }
+        (countdownEnrollment as CountDownTimer).start()
+    }
+
+    fun countdownEnrollmentCancel() {
+        countdownEnrollment?.cancel()
+    }
+
+    // contest timer
+    private var countdownContest: CountDownTimer?= null
+    fun countdownContestStart(i: Long, contestObj: JSONObject) {
+//        val i1 = i.minus(86400000).minus(28800000).minus(480000)
+        countdownContest = object : CountDownTimer(i, 1000) {
+            override fun onTick(l: Long) {
+                setSuccess(l, "countdownContest")
+            }
+
+            override fun onFinish() {
+                countdownContestCancel()
+                setSuccess(contestObj, "countdownContestFinish")
+            }
+        }
+        (countdownContest as CountDownTimer).start()
+    }
+
+    fun countdownContestCancel() {
+        countdownContest?.cancel()
+    }
+
+
+
+    // contest activity
     fun quizData() {
         setLoading(true)
         if(user != null && user!!.user_id > 0) {
             viewModelScope.launch {
                 try {
-                    if(user?.life!! > 0) {
-                        if(!user?.is_admin!!) {
-                            val res = quizRepository.getQuiz(user!!.user_id)
-                            setQuizData(res)
-                        } else {
-                            val res = quizRepository.getPreview(user!!.user_id)
-                            setQuizData(res)
-                        }
-                    } else {
-                        setSuccess("showOffers","quizStatus")
-                    }
+//                    val res = quizRepository.contestGet(user!!.user_id,contestId)
+                    val res = quizRepository.getPreview(user!!.user_id)
+                    setQuizData(res)
                 } catch (e: Exception) {
-                    setError("quizdata:${e.message}",ALERT)
+                    setError("contestData:${e.message}",ALERT)
                 }
             }
         }
@@ -174,7 +273,6 @@ class ContestViewModel(
         isResumable = true
 
         isDoubleDip = false
-        isWild = false
         isPopupOpen = false
         index = 0
         start_time = milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
@@ -198,21 +296,9 @@ class ContestViewModel(
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
             if(index < qset.size.minus(1)) {
-                //check level achievement
-                if(!isWild && (index == 4 || index == 9)) {
-                    setSuccess("displayWild","quizStatus")
-                } else {
-                    // reset current question to qset if current question is wild
-                    if(isWild && index == 4) {
-                        // store wild qset
-                        getWild()
-                    }
-                    isWild = false
-
-                    index++
-                    currentq = qset[index]
-                    setSuccess("setQuestion", "quizStatus")
-                }
+                index++
+                currentq = qset[index]
+                setSuccess("setQuestion", "quizStatus")
             } else {
                 setSuccess("displayFinish", "quizStatus")
             }
@@ -228,7 +314,7 @@ class ContestViewModel(
 
     fun displayAttachment() {
         viewModelScope.launch {
-            delay(TIME_READING)
+            delay(TIME_DELAY)
             if(currentq.qattach.trim().isNotEmpty() && !currentq.qattach.trim().equals("null", true)) {
                 isResumable = false
                 isPopupOpen = true
@@ -297,238 +383,6 @@ class ContestViewModel(
     }
 
 
-    fun setWildQuestion(question: Question) {
-        isWild = true
-        val qno = currentq.qno
-        currentq = question
-        currentq.qno = qno
-        currentq.qTime = 30
-        setSuccess("setQuestion", "quizStatus")
-    }
-
-    fun shuffleWild(coins: Int) {
-        if(user != null && user?.user_id!! > 0) {
-            if(coins <= user?.coins!!) {
-                viewModelScope.launch {
-                    setLoading(true)
-                    lock(true)
-                    try {
-                        val response = quizRepository.getWildQuiz(user?.user_id!!, coins)
-                        setLoading(false)
-                        lock(false)
-                        if (response != null) {
-                            val responseObj = JSONObject(response)
-                            if(responseObj.getInt("status") == 1) {
-                                val dataObj = responseObj.getJSONObject("data")
-                                var arr = dataObj.getJSONArray("qset")
-                                if(arr.length() > 0) {
-                                    wset.clear()
-                                    for(i in 0 until arr.length()) {
-                                        val item = arr.get(i) as JSONObject
-
-                                        // setting options
-                                        val optionsArr: JSONArray = item.getJSONArray("options")
-                                        val options: MutableList<Option> = ArrayList()
-                                        for (j in 0 until optionsArr.length()) {
-                                            val obj2 = optionsArr[j] as JSONObject
-                                            val option = Option(
-                                                obj2.getInt("aid"),
-                                                obj2.getInt("aqid"),
-                                                obj2.getString("adesc"),
-                                                obj2.getString("adesc_hindi"),
-                                                "",
-                                                obj2.getInt("acorrect")
-                                            )
-                                            options.add(option)
-                                        }
-
-                                        val qset = Question(
-                                            item.getInt("qid"),
-                                            item.getString("qdesc"),
-                                            item.getString("qdesc_hindi"),
-                                            item.getString("qtype"),
-                                            item.getString("qcat"),
-                                            item.getString("qattach"),
-                                            item.getString("qsummary"),
-                                            item.getInt("qdifficulty_level"),
-                                            item.getString("qformat"),
-                                            item.getString("qfile"),
-                                            1,
-                                            options
-                                        )
-                                        wset.add(qset)
-                                    }
-                                }
-
-                                // attachment
-                                if(!dataObj.getString("attachment").equals("false",true)) {
-                                    arr = dataObj.getJSONArray("attachment")
-                                    if(arr.length() > 0) {
-                                        for(i in 0 until arr.length()) {
-                                            val item = arr.get(i) as JSONObject
-                                            val attachment = Attachment(
-                                                item.getInt("qid"),
-                                                item.getString("type"),
-                                                item.getString("data"),
-                                                item.getString("filename")
-                                            )
-                                            attachmentList.add(attachment)
-                                        }
-                                    }
-                                }
-                                user?.coins = dataObj.getInt("coins")
-                                userRepository.setDBUser(user!!)
-                                setSuccess(wset,"shuffleWild")
-                            } else {
-                                setError(responseObj.getString("message"), ALERT)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        setLoading(false)
-                        lock(false)
-                        setError("${e.message}", ALERT)
-                    }
-                }
-            } else {
-                setError("$coins GSP Coins required to shuffle", ALERT)
-            }
-        }
-    }
-
-    fun offerPurchase(offer: String, coins: Int) {
-        if(user != null && user?.user_id!! > 0) {
-            if(coins <= user?.coins!!) {
-                viewModelScope.launch {
-                    setLoading(true)
-                    lock(true)
-                    try {
-                        val response = quizRepository.purchaseOffer(user?.user_id!!, coins)
-                        setLoading(false)
-//                        lock(false)
-                        if (response != null) {
-                            val responseObj = JSONObject(response)
-                            if(responseObj.getInt("status") == 1) {
-                                val dataObj = responseObj.getJSONObject("data")
-                                when {
-                                    offer.equals("1",true) -> {
-                                        user?.life = user?.life!!.plus(1)
-                                    }
-                                    offer.equals("5",true) -> {
-                                        user?.life = user?.life!!.plus(5)
-                                    }
-                                    offer.equals("1h",true) -> {
-                                        user?.life = user?.life!!.plus(5)
-                                    }
-                                }
-
-                                val maxChance = userRepository.config("max-game-chance")
-                                var maxLife = 5
-                                if(maxChance.isNotEmpty() && !maxChance.equals("0",true)) {
-                                    maxLife = maxChance.toInt()
-                                }
-                                if(user?.life!! > maxLife) {
-                                    user?.life = maxLife
-                                }
-                                user?.update_at = System.currentTimeMillis()
-
-                                user?.coins = dataObj.getInt("coins")
-                                userRepository.setDBUser(user!!)
-                                setSuccess(offer,"offerPurchase")
-                            } else {
-                                setError(responseObj.getString("message"), ALERT)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        setLoading(false)
-                        lock(false)
-                        setError("${e.message}", ALERT)
-                    }
-                }
-            } else {
-                setError("$coins GSP Coins required", ALERT)
-            }
-        }
-    }
-
-    private fun getWild() {
-        if(user != null && user?.user_id!! > 0) {
-            viewModelScope.launch {
-                try {
-                    val response = quizRepository.getWildQuiz(user?.user_id!!, 0)
-                    if (response != null) {
-                        val responseObj = JSONObject(response)
-                        if(responseObj.getInt("status") == 1) {
-                            val dataObj = responseObj.getJSONObject("data")
-                            var arr = dataObj.getJSONArray("qset")
-                            if(arr.length() > 0) {
-                                wset.clear()
-                                for(i in 0 until arr.length()) {
-                                    val item = arr.get(i) as JSONObject
-
-                                    // setting options
-                                    val optionsArr: JSONArray = item.getJSONArray("options")
-                                    val options: MutableList<Option> = ArrayList()
-                                    for (j in 0 until optionsArr.length()) {
-                                        val obj2 = optionsArr[j] as JSONObject
-                                        val option = Option(
-                                            obj2.getInt("aid"),
-                                            obj2.getInt("aqid"),
-                                            obj2.getString("adesc"),
-                                            obj2.getString("adesc_hindi"),
-                                            "",
-                                            obj2.getInt("acorrect")
-                                        )
-                                        options.add(option)
-                                    }
-
-                                    val qset = Question(
-                                        item.getInt("qid"),
-                                        item.getString("qdesc"),
-                                        item.getString("qdesc_hindi"),
-                                        item.getString("qtype"),
-                                        item.getString("qcat"),
-                                        item.getString("qattach"),
-                                        item.getString("qsummary"),
-                                        item.getInt("qdifficulty_level"),
-                                        item.getString("qformat"),
-                                        item.getString("qfile"),
-                                        1,
-                                        options
-                                    )
-                                    wset.add(qset)
-                                }
-                            }
-
-                            // attachment
-                            if(!dataObj.getString("attachment").equals("false",true)) {
-                                arr = dataObj.getJSONArray("attachment")
-                                if(arr.length() > 0) {
-                                    for(i in 0 until arr.length()) {
-                                        val item = arr.get(i) as JSONObject
-                                        val attachment = Attachment(
-                                            item.getInt("qid"),
-                                            item.getString("type"),
-                                            item.getString("data"),
-                                            item.getString("filename")
-                                        )
-                                        attachmentList.add(attachment)
-                                    }
-                                }
-                            }
-                            user?.coins = dataObj.getInt("coins")
-                            userRepository.setDBUser(user!!)
-                        } else {
-                            setError(responseObj.getString("message"), TAG)
-                        }
-                    }
-                } catch (e: Exception) {
-                    setError("${e.message}", TAG)
-                }
-            }
-        }
-    }
-
-
     fun finishQuiz() {
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
@@ -543,42 +397,36 @@ class ContestViewModel(
     private fun saveData() {
         if(user != null && user?.user_id!! > 0) {
             viewModelScope.launch {
-                // update user data
-                if (user?.life!! > 0 && System.currentTimeMillis() > preferences.timestampLife) {
-                    user?.life = user?.life!!.minus(1)
-                    user?.update_at = System.currentTimeMillis()
-                    userRepository.setDBUser(user!!)
-                }
-
                 val params = HashMap<String, String>()
+                params["contest_id"] = contestId.toString()
                 params["start_time"] = start_time
                 params["end_time"] =
                     milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
                 params["stats_data"] = Gson().toJson(statsData)
                 params["life_lines"] = Gson().toJson(lifeline)
                 params["score"] = score.values.sum().toString()
-                params["xp"] = xp.values.sum().toString()
+                params["points"] = xp.values.sum().toString()
                 params["user_id"] = user?.user_id!!.toString()
 
-                val usr = userRepository.getDBUser()
-                params["played_qid"] = usr?.played_qid!!
-
                 if (currentq.qno in 1..5) {
-                    params["level"] = "1"
+                    params["achieved_level"] = "1"
                 }
                 if (currentq.qno in 6..10) {
-                    params["level"] = "2"
+                    params["achieved_level"] = "2"
                 }
                 if (currentq.qno in 11..15) {
-                    params["level"] = "3"
+                    params["achieved_level"] = "3"
                 }
 
-                quizRepository.saveQuiz(params)
+                params["achieved_questions"] = statsData.size.toString()
+
+                quizRepository.contestPost(params)
             }
         }
     }
 
     fun lock(status: Boolean) {
+        tag("lock $status")
         lock = status
         setSuccess(status,"lock")
     }
@@ -747,29 +595,6 @@ class ContestViewModel(
                 "saveFile"
             )
         }
-    }
-
-    fun readingTime(text: String): Long {
-        val wpm = 180 // readable words per minute
-        val wordLength = 5 // standardized number of chars in calculable word
-        val words = text.length / wordLength
-        val wordsTime = words * 60 * 1000 / wpm.toLong()
-        val delay = 1000 // milliseconds before user starts reading
-        val bonus = 1000 // extra time
-        return ceil(delay + wordsTime + bonus.toDouble()).toLong()
-    }
-
-    fun shuffle(input: String): String {
-        val characters: MutableList<Char> = ArrayList()
-        for (c in input.toCharArray()) {
-            characters.add(c)
-        }
-        val output = StringBuilder(input.length)
-        while (characters.size != 0) {
-            val randPicker = (Math.random() * characters.size).toInt()
-            output.append(characters.removeAt(randPicker))
-        }
-        return output.toString()
     }
 
 }

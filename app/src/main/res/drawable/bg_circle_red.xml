@@ -8,11 +8,11 @@
         <shape android:shape="oval">
             <!-- view background color -->
             <gradient
-                android:startColor="#efa310"
-                android:endColor="#f83329"
+                android:startColor="#C62828"
+                android:endColor="#B71C1C"
                 android:angle="270"/>
 
-            <stroke android:color="#efa310"
+            <stroke android:color="#D32F2F"
                 android:width="3dp"/>
         </shape>
     </item>
@@ -22,11 +22,11 @@
         <shape android:shape="oval">
             <!-- view background color -->
             <gradient
-                android:startColor="#efa310"
-                android:endColor="#f83329"
+                android:startColor="#C62828"
+                android:endColor="#B71C1C"
                 android:angle="270"/>
 
-            <stroke android:color="#efa310"
+            <stroke android:color="#D32F2F"
                 android:width="3dp"/>
         </shape>
     </item>

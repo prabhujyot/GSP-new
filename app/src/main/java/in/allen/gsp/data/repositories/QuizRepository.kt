@@ -8,6 +8,7 @@ import `in`.allen.gsp.data.entities.Quiz
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.utils.Coroutines
+import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -56,6 +57,42 @@ class QuizRepository(
     suspend fun purchaseOffer(user_id: Int, value: Int): String? {
         return apiRequest {
             api.getOffer(user_id, value)
+        }
+    }
+
+    suspend fun contestStatus(user_id: Int, contestId: Int): String? {
+        return apiRequest {
+            api.contestStatus(user_id, contestId)
+        }
+    }
+
+    suspend fun contestEnrol(user_id: Int, contestId: Int): String? {
+        return apiRequest {
+            api.contestEnrol(user_id,contestId)
+        }
+    }
+
+    suspend fun contestPost(params: HashMap<String, String>): String? {
+        tag("contestPost: $params")
+        return apiRequest {
+            api.postContest(params)
+        }
+    }
+
+    suspend fun contestGet(user_id: Int,contest_id: Int): Quiz {
+        return withContext(Dispatchers.IO) {
+            val response = apiRequest {
+                api.getContest(user_id,contest_id)
+            }
+
+            response?.let {
+                createData(0,it)
+            }
+
+            delay(300)
+
+            // from database
+            selectDBQuiz()
         }
     }
 

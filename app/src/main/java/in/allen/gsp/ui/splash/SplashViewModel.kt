@@ -72,6 +72,7 @@ class SplashViewModel(
     }
 
     fun firebaseAuthWithGoogle(idToken: String) {
+        tag("firebaseAuthWithGoogle")
         provider = "google"
         setLoading(true)
         val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -109,6 +110,7 @@ class SplashViewModel(
     }
 
     private fun signInFirebaseAccount(credential: AuthCredential) {
+        tag("signInWithCredential")
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -127,7 +129,7 @@ class SplashViewModel(
                         && provider.equals("facebook",true)) {
                         fbGraphRequest(fbAccessToken)
                     } else {
-                        setError("signInWithCredential:failure ${task.exception}", TAG)
+                        setError("signInWithCredential:failure ${task.exception}", SNACKBAR)
                     }
                 }
             }
@@ -167,11 +169,11 @@ class SplashViewModel(
                         repository.setDBUser(user)
                         setSuccess(user, "user")
                     } else {
-                        setError(responseObj.getString("message"), TAG)
+                        setError(responseObj.getString("message"), SNACKBAR)
                     }
                 }
             } catch (e: Exception) {
-                setError(e.message.toString(), TAG)
+                setError(e.message.toString(), SNACKBAR)
             }
         }
     }
@@ -220,7 +222,7 @@ class SplashViewModel(
                                 }
                             }
                         } catch (e: Exception) {
-                            setError("authUser: ${e.message}", TAG)
+                            setError("authUser: ${e.message}", SNACKBAR)
                         }
                     } else {
                         // logout old user and ask login

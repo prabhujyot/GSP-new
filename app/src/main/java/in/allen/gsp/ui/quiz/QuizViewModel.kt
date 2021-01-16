@@ -750,27 +750,4 @@ class QuizViewModel(
         }
     }
 
-    fun readingTime(text: String): Long {
-        val wpm = 180 // readable words per minute
-        val wordLength = 5 // standardized number of chars in calculable word
-        val words = text.length / wordLength
-        val wordsTime = words * 60 * 1000 / wpm.toLong()
-        val delay = 1000 // milliseconds before user starts reading
-        val bonus = 1000 // extra time
-        return ceil(delay + wordsTime + bonus.toDouble()).toLong()
-    }
-
-    fun shuffle(input: String): String {
-        val characters: MutableList<Char> = ArrayList()
-        for (c in input.toCharArray()) {
-            characters.add(c)
-        }
-        val output = StringBuilder(input.length)
-        while (characters.size != 0) {
-            val randPicker = (Math.random() * characters.size).toInt()
-            output.append(characters.removeAt(randPicker))
-        }
-        return output.toString()
-    }
-
 }
