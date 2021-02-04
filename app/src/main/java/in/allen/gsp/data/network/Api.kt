@@ -153,11 +153,19 @@ interface Api {
         @FieldMap params: Map<String, String>
     ): Response<String>
 
-    // scratchcards
+    // get scratchcards
     @GET("scratchcard")
     suspend fun getScratchcards(
         @Query("user_id") user_id: Int,
         @Query("page") page: Int,
+    ): Response<String>
+
+    // set scratchcard
+    @FormUrlEncoded
+    @POST("scratchcard")
+    suspend fun setScratchcards(
+        @Field("user_id") user_id: Int,
+        @Field("achieved_level") page: Int,
     ): Response<String>
 
     // contest status
@@ -187,6 +195,18 @@ interface Api {
     @POST("contest")
     suspend fun postContest(
         @FieldMap params: Map<String, String>
+    ): Response<String>
+
+    // get channels list
+    @GET("channels")
+    suspend fun getChannels(
+        @Query("user_id") user_id: Int
+    ): Response<String>
+
+    // get videos
+    @GET("videos")
+    suspend fun getVideos(
+        @Query("channel_id") channel_id: String
     ): Response<String>
 
 }

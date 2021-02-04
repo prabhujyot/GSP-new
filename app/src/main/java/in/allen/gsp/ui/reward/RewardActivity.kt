@@ -121,7 +121,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             share.putExtra(
                 Intent.EXTRA_TEXT,
                 "Hey, I can’t stop playing this game. I believe you’d like it as well." +
-                        " Use my referral link to download this game 'Gyan Se Pehchan'" +
+                        " Use my referral link to download 'Gyan Se Pehchan' app" +
                         " and get coin benefits when you join and play! \n" + Uri.parse(
                     viewModel.user?.referral_id?.let { getReferralLink(it) }))
             startActivity(Intent.createChooser(share, "Share with"))

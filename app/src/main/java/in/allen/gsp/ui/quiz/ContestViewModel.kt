@@ -1,39 +1,32 @@
 package `in`.allen.gsp.ui.quiz
 
-import `in`.allen.gsp.data.entities.*
+import `in`.allen.gsp.data.entities.Attachment
+import `in`.allen.gsp.data.entities.Question
+import `in`.allen.gsp.data.entities.Quiz
+import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.QuizRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.*
-import android.graphics.Color
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.CountDownTimer
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
 import com.google.gson.Gson
-import com.google.gson.JsonObject
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
-import kotlin.math.ceil
 
 
 class ContestViewModel(
     private val userRepository: UserRepository,
-    private val quizRepository: QuizRepository,
-    private val preferences: AppPreferences
+    private val quizRepository: QuizRepository
 ): ViewModel() {
 
     val ALERT = "alert"
@@ -56,12 +49,12 @@ class ContestViewModel(
 
     var index = 0
     var lang = "eng"
-    var shuffleCoins = 1
 
     val lifeline = HashMap<String, Boolean>()
     val score = HashMap<Int, Long>()
     val xp = HashMap<Int, Long>()
     val statsData = ArrayList<HashMap<String, Int>>()
+    private val questionSet = ArrayList<Int>()
 
     private var multiplier: Long = 1
     private var timerRemainingTime:Long = 0
@@ -249,8 +242,8 @@ class ContestViewModel(
         if(user != null && user!!.user_id > 0) {
             viewModelScope.launch {
                 try {
-//                    val res = quizRepository.contestGet(user!!.user_id,contestId)
-                    val res = quizRepository.getPreview(user!!.user_id)
+                    val res = quizRepository.contestGet(user!!.user_id,contestId)
+//                    val res = quizRepository.getPreview(user!!.user_id)
                     setQuizData(res)
                 } catch (e: Exception) {
                     setError("contestData:${e.message}",ALERT)
@@ -279,13 +272,17 @@ class ContestViewModel(
 
         multiplierTimerCancel()
         questionTimerCancel()
-        attachmentTimerCancel()
 
         quiz = quizData
         qset = quizRepository.getQset(this.quiz!!)
         wset = quizRepository.getWset(this.quiz!!)
         fset = quizRepository.getFset(this.quiz!!)
         attachmentList = quizRepository.getAttachmentList(this.quiz!!)
+
+        questionSet.clear()
+        for(q in qset) {
+            questionSet.add(q.qid)
+        }
 
         // save attachment
         setSuccess("downloadAttachment", "downloadAttachment")
@@ -407,6 +404,7 @@ class ContestViewModel(
                 params["score"] = score.values.sum().toString()
                 params["points"] = xp.values.sum().toString()
                 params["user_id"] = user?.user_id!!.toString()
+                params["question_set"] = Gson().toJson(questionSet)
 
                 if (currentq.qno in 1..5) {
                     params["achieved_level"] = "1"
@@ -475,31 +473,6 @@ class ContestViewModel(
 
     fun questionTimerCancel() {
         questionTimer?.cancel()
-    }
-
-
-    // attachment timer
-    private var attachmentTimer: CountDownTimer?= null
-    fun attachmentTimerStart(i: Long) {
-        attachmentTimer = object : CountDownTimer(i, 10) {
-            override fun onTick(l: Long) {
-                setSuccess(l,"attachmentTimer")
-            }
-
-            override fun onFinish() {
-                attachmentTimerCancel()
-                closeAttachment()
-            }
-        }
-        (attachmentTimer as CountDownTimer).start()
-    }
-
-    fun attachmentTimerCancel() {
-        attachmentTimer?.cancel()
-    }
-
-    private fun closeAttachment() {
-        setSuccess("closeAttachment","quizStatus")
     }
 
 

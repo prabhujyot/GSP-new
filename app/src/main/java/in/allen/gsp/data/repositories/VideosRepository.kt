@@ -2,6 +2,7 @@ package `in`.allen.gsp.data.repositories
 
 import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.entities.Video
+import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.utils.AppPreferences
@@ -14,7 +15,8 @@ import org.json.JSONObject
 
 
 class VideosRepository(
-    private val api: YTApi,
+    private val ytApi: YTApi,
+    private val api: Api,
     private val db: AppDatabase,
     private val preferences: AppPreferences
 ): SafeApiRequest() {
@@ -28,33 +30,42 @@ class VideosRepository(
     }
 
     suspend fun getVideos(
-        params: Map<String, String>,
+        channelId:String,
         fetchInterval: Int
     ): LiveData<List<Video>> {
         return withContext(Dispatchers.IO) {
-            fetchVideos(params,fetchInterval)
-            db.getVideoDao().getList(params["playlistId"] ?: error(""))
+            fetchVideos(channelId,fetchInterval)
+            db.getVideoDao().getList(channelId)
         }
     }
 
-    suspend fun fetchVideos(
-        params:Map<String, String>,
+    private suspend fun fetchVideos(
+        channelId:String,
         fetchInterval: Int
     ) {
-        if(isFetchNeeded(fetchInterval,params["playlistId"] ?: error(""))) {
+        if(isFetchNeeded(channelId,fetchInterval)) {
             try {
                 val response = apiRequest {
-                    api.playlist(params)
+                    api.getVideos(channelId)
                 }
-                videos.postValue(response?.let { createData(it,fetchInterval) })
+                videos.postValue(response?.let {
+                    createData(it,fetchInterval,channelId)
+                })
             } catch (e: Exception) {}
         }
     }
 
-    private fun isFetchNeeded(fetchInterval: Int, playlist: String): Boolean {
-        var savedAt = preferences.timestampPlaylist1
-        if(playlist.equals("PLQ2YKhBryYByhl0Zh-gluJ0uHpq3frZWy",true)) {
-            savedAt = preferences.timestampPlaylist2
+    private fun isFetchNeeded(channelId: String,fetchInterval: Int): Boolean {
+        val savedAt: Long = when {
+            channelId.equals("UCL3FND-1oDhcru5AMpLGDiQ",true) -> {
+                preferences.timestampChannel2
+            }
+            channelId.equals("UC5kS6RDXzNdftVReekcRJCA",true) -> {
+                preferences.timestampChannel3
+            }
+            else -> {
+                preferences.timestampChannel1
+            }
         }
         val diff: Long = System.currentTimeMillis() - savedAt
         return diff > fetchInterval
@@ -66,52 +77,67 @@ class VideosRepository(
         }
     }
 
-    private fun createData(data: String, fetchInterval: Int): List<Video> {
+    private fun createData(data: String, fetchInterval: Int,channelId: String): List<Video> {
         val list = mutableListOf<Video>()
         val response = JSONObject(data)
-        if(!response.has("error")) {
-            val arr = response.getJSONArray("items")
-            var listId = ""
+
+        if(response.getInt("status") == 1) {
+            val arr = response.getJSONArray("data")
             if(arr.length() > 0) {
                 for(i in 0 until arr.length()) {
                     val item = arr.get(i) as JSONObject
-
-                    var thumbnails = ""
-                    if(item.getJSONObject("snippet").getJSONObject("thumbnails").has("medium")) {
-                        thumbnails = item.getJSONObject("snippet").getJSONObject("thumbnails").getJSONObject("medium").getString("url")
-                    }
                     val video = Video(
-                        item.getJSONObject("snippet").getJSONObject("resourceId").getString("videoId"),
-                        item.getJSONObject("snippet").getString("title"),
-                        item.getJSONObject("snippet").getString("channelTitle"),
-                        item.getJSONObject("snippet").getString("playlistId"),
-                        item.getJSONObject("snippet").getString("publishedAt"),
-                        item.getJSONObject("snippet").getString("description"),
-                        thumbnails
+                        item.getString("videoId"),
+                        item.getString("title"),
+                        item.getString("channelTitle"),
+                        item.getString("channelId"),
+                        item.getString("publishedAt"),
+                        item.getString("description"),
+                        item.getString("thumb")
                     )
                     list.add(video)
-                    listId = item.getJSONObject("snippet").getString("playlistId")
+                }
+
+                val timestamp = System.currentTimeMillis().plus(fetchInterval)
+                when {
+                    channelId.equals("UCL3FND-1oDhcru5AMpLGDiQ",true) -> {
+                        preferences.timestampChannel2 = timestamp
+                    }
+                    channelId.equals("UC5kS6RDXzNdftVReekcRJCA",true) -> {
+                        preferences.timestampChannel3 = timestamp
+                    }
+                    else -> {
+                        preferences.timestampChannel1 = timestamp
+                    }
                 }
             }
-            val timestamp = System.currentTimeMillis().plus(fetchInterval)
-            if(listId.equals("PLQ2YKhBryYByhl0Zh-gluJ0uHpq3frZWy",true)) {
-                preferences.timestampPlaylist2 = timestamp
-            } else {
-                preferences.timestampPlaylist1 = timestamp
-            }
         }
+
         return list
     }
 
     suspend fun getVideoDetails(params: Map<String, String>): String? {
         return apiRequest {
-            api.video(params)
+            ytApi.video(params)
         }
     }
 
     suspend fun getComments(params: Map<String, String>): String? {
         return apiRequest {
-            api.comments(params)
+            ytApi.comments(params)
+        }
+    }
+
+
+    suspend fun getPlaylists(params: Map<String, String>): String? {
+        return apiRequest {
+            ytApi.playlists(params)
+        }
+    }
+
+    suspend fun getChannelList(user_id: Int): String? {
+        return apiRequest {
+            api.getChannels(user_id)
         }
     }
 }

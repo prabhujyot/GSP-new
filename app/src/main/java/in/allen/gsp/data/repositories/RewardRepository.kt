@@ -32,9 +32,15 @@ class RewardRepository(
         }
     }
 
-    suspend fun scratchcards(userId: Int, page: Int): String? {
+    suspend fun getScratchcards(userId: Int, page: Int): String? {
         return apiRequest {
             api.getScratchcards(userId,page)
+        }
+    }
+
+    suspend fun setScratchcard(userId: Int, level: Int): String? {
+        return apiRequest {
+            api.setScratchcards(userId,level)
         }
     }
 

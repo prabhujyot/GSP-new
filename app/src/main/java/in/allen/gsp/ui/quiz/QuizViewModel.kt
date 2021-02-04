@@ -2,9 +2,9 @@ package `in`.allen.gsp.ui.quiz
 
 import `in`.allen.gsp.data.entities.*
 import `in`.allen.gsp.data.repositories.QuizRepository
+import `in`.allen.gsp.data.repositories.RewardRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.*
-import android.media.MediaPlayer
 import android.os.CountDownTimer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,12 +21,12 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
-import kotlin.math.ceil
 
 
 class QuizViewModel(
     private val userRepository: UserRepository,
     private val quizRepository: QuizRepository,
+    private val rewardRepository: RewardRepository,
     private val preferences: AppPreferences
 ): ViewModel() {
 
@@ -53,6 +53,7 @@ class QuizViewModel(
     val score = HashMap<Int, Long>()
     val xp = HashMap<Int, Long>()
     val statsData = ArrayList<HashMap<String, Int>>()
+    private val questionSet = ArrayList<Int>()
 
     private var multiplier: Long = 1
     private var timerRemainingTime:Long = 0
@@ -68,9 +69,6 @@ class QuizViewModel(
     var TIME_READING: Long = 2000
     val TIME_MOVE_TO_NEXT: Long = 2500
     val TIME_POPUP: Long = 2500
-    var TIME_ATTACHMENT: Long = 15000
-
-    var mp = MediaPlayer()
 
     private val firebaseStorage = FirebaseStorage.getInstance("gs://firebase-gyan-se-pehchan.appspot.com")
     private val storageReference = firebaseStorage.reference
@@ -119,24 +117,6 @@ class QuizViewModel(
         }
     }
 
-//    fun previewData() {
-//        setLoading(true)
-//        if(user != null && user!!.user_id > 0) {
-//            viewModelScope.launch {
-//                try {
-//                    if(user?.life!! > 0) {
-//                        val res = quizRepository.getPreview(user!!.user_id)
-//                        setQuizData(res)
-//                    } else {
-//                        setSuccess("showOffers","quizStatus")
-//                    }
-//                } catch (e: Exception) {
-//                    setError("quizdata:${e.message}",ALERT)
-//                }
-//            }
-//        }
-//    }
-
     fun quizData() {
         setLoading(true)
         if(user != null && user!!.user_id > 0) {
@@ -161,7 +141,7 @@ class QuizViewModel(
     }
 
     private fun setQuizData(quizData: Quiz) {
-        tag("setQuizData");
+        tag("$TAG, setQuizData");
         score.clear()
         xp.clear()
         lifeline.clear()
@@ -176,18 +156,23 @@ class QuizViewModel(
         isDoubleDip = false
         isWild = false
         isPopupOpen = false
+
         index = 0
         start_time = milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss")
 
         multiplierTimerCancel()
         questionTimerCancel()
-        attachmentTimerCancel()
 
         quiz = quizData
         qset = quizRepository.getQset(this.quiz!!)
         wset = quizRepository.getWset(this.quiz!!)
         fset = quizRepository.getFset(this.quiz!!)
         attachmentList = quizRepository.getAttachmentList(this.quiz!!)
+
+        questionSet.clear()
+        for(q in qset) {
+            questionSet.add(q.qid)
+        }
 
         // save attachment
         setSuccess("downloadAttachment", "downloadAttachment")
@@ -280,11 +265,7 @@ class QuizViewModel(
         }
 
         // set to quiz data
-        user?.played_qid = user?.played_qid!!.plus("${currentq.qid},")
-        Coroutines.io {
-            tag("${currentq.qid} addingqids ${user?.played_qid}")
-            user?.let { userRepository.setDBUser(it) }
-        }
+        appendPlayedQid()
 
         xp[currentq.qno] = currentq.qTime.minus(duration).toLong()
         val cscore: Long = currentq.qTime.minus(duration)
@@ -296,6 +277,13 @@ class QuizViewModel(
         setSuccess(score.values.sum(),"calculateScore")
     }
 
+    fun appendPlayedQid() {
+        user?.played_qid = user?.played_qid!!.plus("${currentq.qid},")
+        Coroutines.io {
+            tag("$TAG, ${currentq.qid} addingqids ${user?.played_qid}")
+            user?.let { userRepository.setDBUser(it) }
+        }
+    }
 
     fun setWildQuestion(question: Question) {
         isWild = true
@@ -559,6 +547,7 @@ class QuizViewModel(
                 params["score"] = score.values.sum().toString()
                 params["xp"] = xp.values.sum().toString()
                 params["user_id"] = user?.user_id!!.toString()
+                params["question_set"] = Gson().toJson(questionSet)
 
                 val usr = userRepository.getDBUser()
                 params["played_qid"] = usr?.played_qid!!
@@ -573,8 +562,13 @@ class QuizViewModel(
                     params["level"] = "3"
                 }
 
-                tag(params)
+                tag("$TAG, $params")
                 quizRepository.saveQuiz(params)
+
+                // reward scratchcard
+                if(currentq.qno == 15) {
+                    rewardRepository.setScratchcard(user?.user_id!!,3)
+                }
             }
         }
     }
@@ -612,6 +606,7 @@ class QuizViewModel(
     // Question Timer
     private var questionTimer: CountDownTimer?= null
     private fun questionTimerStart(i: Long) {
+        tag("$TAG, questionTimerStart")
         questionTimer = object : CountDownTimer(i, 10) {
             override fun onTick(l: Long) {
                 timerRemainingTime = l
@@ -619,45 +614,25 @@ class QuizViewModel(
             }
 
             override fun onFinish() {
+                setSuccess("timeUp","quizStatus")
                 questionTimerCancel()
                 finishQuiz()
             }
         }
         (questionTimer as CountDownTimer).start()
+        viewModelScope.launch {
+            tag("$TAG, questionTimerStart delay")
+            delay(200)
+            setSuccess("timeStart","quizStatus")
+        }
     }
 
     fun questionTimerCancel() {
         questionTimer?.cancel()
     }
 
-
-    // attachment timer
-    private var attachmentTimer: CountDownTimer?= null
-    fun attachmentTimerStart(i: Long) {
-        attachmentTimer = object : CountDownTimer(i, 10) {
-            override fun onTick(l: Long) {
-                setSuccess(l,"attachmentTimer")
-            }
-
-            override fun onFinish() {
-                attachmentTimerCancel()
-                closeAttachment()
-            }
-        }
-        (attachmentTimer as CountDownTimer).start()
-    }
-
-    fun attachmentTimerCancel() {
-        attachmentTimer?.cancel()
-    }
-
-    private fun closeAttachment() {
-        setSuccess("closeAttachment","quizStatus")
-    }
-
-
     fun onBackPressed() {
-        tag("$TAG onBackPressed: $lock")
+        tag("$TAG, onBackPressed: $lock")
         if(!lock) {
             if (timerRemainingTime > 500) {
                 isPopupOpen = true
@@ -677,6 +652,7 @@ class QuizViewModel(
     }
 
     fun onResume() {
+        tag("$TAG, onResume, isPause: $isPause, isResumable: $isResumable, isPopupOpen: $isPopupOpen")
         // execute only when activity got resumed from pause
         if(isPause) {
             isPause = false
@@ -727,7 +703,7 @@ class QuizViewModel(
             }
             currentq.qno = qno
         }
-        tag("fset: $currentq")
+        tag("$TAG, fset: $currentq")
         setSuccess("setQuestion", "quizStatus")
     }
 

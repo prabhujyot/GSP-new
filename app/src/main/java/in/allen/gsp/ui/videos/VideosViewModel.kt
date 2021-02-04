@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class VideosViewModel(
     private val userRepository: UserRepository,
@@ -49,12 +50,45 @@ class VideosViewModel(
         _success.value = Resource.Success(data, filter)
     }
 
-    fun videoList(params: HashMap<String,String>) {
+    init {
+        userData()
+    }
+
+    fun userData() {
+        viewModelScope.launch {
+            val dbUser = userRepository.getDBUser()
+            if (dbUser != null) {
+                setSuccess(dbUser,"user")
+            }
+        }
+    }
+
+    fun channelList(user_id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getChannelList(user_id)
+                if (response != null) {
+                    val responseObj = JSONObject(response)
+                    if(responseObj.getInt("status") == 1) {
+                        val dataArr = responseObj.getJSONArray("data")
+                        setSuccess(dataArr,"channelList")
+                    } else {
+                        setError("${responseObj.getString("message")}", ALERT)
+                    }
+                }
+            } catch (e: Exception) {
+                setError("${e.message}",ALERT)
+            }
+        }
+    }
+
+
+    fun videoList(channelId:String) {
         viewModelScope.launch {
             val minutes= userRepository.config("fetch-interval")
             val fetchInterval = minutes.toInt().times(60).times(1000)
             val response by lazyDeferred {
-                repository.getVideos(params,fetchInterval)
+                repository.getVideos(channelId,fetchInterval)
             }
             setSuccess(response,"videoList")
         }

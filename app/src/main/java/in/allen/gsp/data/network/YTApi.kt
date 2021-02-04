@@ -31,6 +31,18 @@ interface YTApi {
         }
     }
 
+    // channels
+    @GET("channels")
+    suspend fun channels(
+        @QueryMap params:Map<String, String>
+    ): Response<String>
+
+    // channel playlist
+    @GET("playlists")
+    suspend fun playlists(
+        @QueryMap params:Map<String, String>
+    ): Response<String>
+
     // playlist
     @GET("playlistItems")
     suspend fun playlist(

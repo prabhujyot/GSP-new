@@ -36,20 +36,28 @@ class AppPreferences(context: Context) {
             editor.putBoolean("appMute", value).commit()
         }
 
-    var timestampPlaylist1: Long
+    var timestampChannel1: Long
         get() {
-            return  sharedPreferences.getLong("timestampPlaylist1", 0)
+            return  sharedPreferences.getLong("timestampChannel1", 0)
         }
         set(value) {
-            editor.putLong("timestampPlaylist1", value).commit()
+            editor.putLong("timestampChannel1", value).commit()
         }
 
-    var timestampPlaylist2: Long
+    var timestampChannel2: Long
         get() {
-            return  sharedPreferences.getLong("timestampPlaylist2", 0)
+            return  sharedPreferences.getLong("timestampChannel2", 0)
         }
         set(value) {
-            editor.putLong("timestampPlaylist2", value).commit()
+            editor.putLong("timestampChannel2", value).commit()
+        }
+
+    var timestampChannel3: Long
+        get() {
+            return  sharedPreferences.getLong("timestampChannel3", 0)
+        }
+        set(value) {
+            editor.putLong("timestampChannel3", value).commit()
         }
 
     var timestampLeaderboard: Long
@@ -67,4 +75,5 @@ class AppPreferences(context: Context) {
         set(value) {
             editor.putLong("timestampLife", value).commit()
         }
+
 }

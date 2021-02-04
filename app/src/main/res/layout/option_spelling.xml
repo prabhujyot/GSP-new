@@ -5,7 +5,9 @@
     <!-- Spellings -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/margin24"
+        android:layout_marginEnd="@dimen/margin24">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideSpellingsH"

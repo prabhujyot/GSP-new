@@ -178,7 +178,7 @@
                     app:layout_constraintTop_toBottomOf="@id/guidelineMiddle"
                     app:layout_constraintWidth_min="100dp" />
 
-                <androidx.viewpager.widget.ViewPager
+                <com.asksira.loopingviewpager.LoopingViewPager
                     android:id="@+id/viewpager_banner"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -187,11 +187,14 @@
                     android:clipToPadding="false"
                     android:paddingLeft="@dimen/margin16"
                     android:paddingRight="@dimen/margin16"
-                    app:layout_constraintBottom_toTopOf="@id/guidelineBottom"
-                    app:layout_constraintHeight_max="80dp"
+                    app:layout_constraintBottom_toTopOf="@id/layoutAction"
+                    app:layout_constraintHeight_max="180dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/btnPlay"
-                    app:layout_constraintVertical_bias="1.0" />
+                    app:layout_constraintVertical_bias="1.0"
+                    app:isInfinite="true"
+                    app:autoScroll="true"
+                    app:scrollInterval="5000"/>
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guidelineBottom"

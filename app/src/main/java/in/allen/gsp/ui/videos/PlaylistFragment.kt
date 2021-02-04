@@ -36,12 +36,14 @@ class PlaylistFragment : Fragment(), KodeinAware {
     private val userRepository: UserRepository by instance()
     private val videosRepository: VideosRepository by instance()
 
-    private lateinit var playlistId: String
+    private lateinit var channelId: String
+
+    private lateinit var parentActivity: VideosActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            playlistId = it.getString("playlistId").toString()
+            channelId = it.getString("channelId").toString()
         }
     }
 
@@ -49,6 +51,7 @@ class PlaylistFragment : Fragment(), KodeinAware {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        parentActivity = activity as VideosActivity
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_playlist,container,false)
         return binding.root
     }
@@ -58,13 +61,7 @@ class PlaylistFragment : Fragment(), KodeinAware {
         viewModel = VideosViewModel(userRepository,videosRepository)
 
         observeSuccess()
-
-        val hashMap = HashMap<String,String>()
-        hashMap["part"] = "snippet"
-        hashMap["maxResults"] = "50"
-        hashMap["playlistId"] = playlistId
-        hashMap["key"] = "AIzaSyDbpMioiHvdMHmA41UETZy6sCO1txortVc"
-        viewModel.videoList(hashMap)
+        viewModel.videoList(channelId)
     }
 
     private fun observeSuccess() {
@@ -94,10 +91,10 @@ class PlaylistFragment : Fragment(), KodeinAware {
 
     companion object {
         @JvmStatic
-        fun newInstance(playlistId: String) =
+        fun newInstance(channelId: String) =
             PlaylistFragment().apply {
                 arguments = Bundle().apply {
-                    putString("playlistId", playlistId)
+                    putString("channelId", channelId)
                 }
             }
     }

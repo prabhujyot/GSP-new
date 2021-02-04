@@ -1,6 +1,5 @@
 package `in`.allen.gsp.ui.profile
 
-import `in`.allen.gsp.IntroActivity
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.RewardRepository
@@ -13,6 +12,7 @@ import `in`.allen.gsp.utils.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.view.animation.Animation
@@ -37,7 +37,6 @@ import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
-import java.net.URI
 import kotlin.random.Random
 
 
@@ -113,6 +112,12 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
             share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val file = screenShot(binding.statistics, "screenshot.jpg")
             share.putExtra(
+                Intent.EXTRA_TEXT,
+                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
+                        " Use my referral link to download 'Gyan Se Pehchan' app" +
+                        " and get coin benefits when you join and play! \n" + Uri.parse(
+                    viewModel.user?.referral_id?.let { getReferralLink(it) }))
+            share.putExtra(
                 Intent.EXTRA_STREAM, FileProvider.getUriForFile(
                     this,
                     applicationContext.packageName + ".provider",
@@ -143,6 +148,7 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         viewModel.getError().observe(this, {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
+                binding.rootLayout.hideProgress()
                 when (it.message) {
                     "alert" -> {
                         it.data?.let { it1 -> alertDialog("Error", it1) {} }

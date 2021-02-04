@@ -13,6 +13,6 @@ class ContestViewModelFactory(
     private val preferences: AppPreferences
 ) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return ContestViewModel(userRepository,quizRepository,preferences) as T
+        return ContestViewModel(userRepository, quizRepository) as T
     }
 }

@@ -8,7 +8,7 @@ data class Video (
     @PrimaryKey(autoGenerate = false) val videoId: String,
     val title: String,
     val channelTitle: String,
-    val playlistId: String,
+    val channelId: String,
     val publishedAt: String,
     val description: String,
     val thumb: String

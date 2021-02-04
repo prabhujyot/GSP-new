@@ -37,9 +37,9 @@ class IntroActivity : AppCompatActivity() {
     private class IntroAdapter(private val inflater: LayoutInflater): PagerAdapter() {
 
         var images = intArrayOf(R.drawable.group, R.drawable.gifts, R.drawable.coins)
-        private var titles = arrayOf("A platform gives to you\na brainy recognition",
-            "Lets play\n& win exciting prizes",
-            "Earn coins and\nconvert into cash"
+        private var titles = arrayOf("A Platform That Gives Recognition\nto your Knowledge",
+            "Play | Earn | Redeem",
+            "Let's Play\n& Win Exciting Prizes",
         )
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {

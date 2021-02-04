@@ -5,7 +5,7 @@
 
     <string name="app_name">Gyan Se Pehchan</string>
     <string name="lblGSP">GSP</string>
-    <string name="lblPresents">Presence</string>
+    <string name="lblPresents">Presents</string>
     <string name="lblPoweredBy">Powered by</string>
     <string name="txtPoweredBy">www.klipinterest.com</string>
     <string name="lblAllen">ALLEN</string>
@@ -16,12 +16,9 @@
     <string name="lblEarnCoins">Earn Coins</string>
     <string name="lblNotification">Notification</string>
     <string name="lblMoreContests">More Contests</string>
-    <string name="lblSetting">Setting</string>
     <string name="lblLeaderboard">Leaderboard</string>
     <string name="lblVideos">Videos</string>
     <string name="lblBack">Back</string>
-    <string name="lblWonGames">Won Games</string>
-    <string name="lblTotalCoins">Total Coins</string>
     <string name="lblAvatar">Avatar</string>
     <string name="lblWin">Win</string>
     <string name="lblLose">Lose</string>
@@ -52,33 +49,20 @@
     <string name="lblCheckin">Check In</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="lblTopPlayers">Top Players</string>
-    <string name="lblUsername">Username</string>
     <string name="one">1</string>
     <string name="two">2</string>
     <string name="three">3</string>
-    <string name="lblPrizes">Prizes</string>
-    <string name="title_activity_settings">SettingsActivity</string>
 
     <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
     <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
 
     <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="lblComment">Comment</string>
     <string name="lblScore">Score</string>
     <string name="lblLevel2">Level 2</string>
     <string name="lblLevel1">Level 1</string>
     <string name="lblLevel3">Level 3</string>
-    <string name="lblQuizPoints">Quiz Points</string>
     <string name="lblShuffle">Shuffle</string>
     <string name="lblQuit">Quit</string>
     <string name="lblTrue">True</string>
@@ -86,7 +70,6 @@
     <string name="lblExit">Exit</string>
     <string name="lblRestart">Play Again</string>
     <string name="lblLogout">Logout</string>
-    <string name="lblTotalGames">Total Games</string>
     <string name="lblVerify">Verify</string>
     <string name="submit">Submit</string>
     <string name="prompt_code">Enter OTP</string>
@@ -98,16 +81,12 @@
     <string name="dialogMessage">Dialog Message</string>
     <string name="lblClose">Close</string>
     <string name="lblOk">Ok</string>
-    <string name="lblTranslate">Translate</string>
-    <string name="lblQuestionTable">Q. Table</string>
     <string name="txt0">0</string>
     <string name="lblRewards">Rewards</string>
-    <string name="full">Full</string>
     <string name="infinity">&#8734;</string>
     <string name="lblTotalQuiz">Total Quiz</string>
     <string name="lblTotalXP">Total XP</string>
     <string name="default_notification_channel_id">GSP_Notification_Channel</string>
-    <string name="info_processing">Processing</string>
     <string name="action_update">Update</string>
     <string name="info_failed">Failed</string>
     <string name="info_pending">Pending</string>
@@ -125,4 +104,5 @@
     <string name="toast_cancelled">Canceled</string>
     <string name="toast_failed">Failed</string>
     <string name="info_downloaded">Downloaded</string>
+    <string name="skip">Skip</string>
 </resources>

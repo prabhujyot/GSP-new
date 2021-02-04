@@ -131,6 +131,7 @@ class QuizRepository(
     }
 
     suspend fun saveQuiz(params: HashMap<String, String>): String? {
+        tag("saveQuiz: $params")
         return apiRequest {
             api.postQuiz(params)
         }

@@ -24,7 +24,7 @@ class ProfileViewModel(
     val TAG = "tag"
     val TOAST = "toast"
 
-    private var user: User?= null
+    var user: User?= null
     var flagScratchcard = false
 
     // interaction with activity
@@ -107,7 +107,7 @@ class ProfileViewModel(
                             val data = responseObj.getString("data")
                             setSuccess(data,"updateProfile")
                         } else {
-                            setError(responseObj.getString("message"),TAG)
+                            setError(responseObj.getString("message"),SNACKBAR)
                         }
                     }
                 } catch (e: Exception) {
@@ -133,7 +133,7 @@ class ProfileViewModel(
                             val data = responseObj.getString("message")
                             setSuccess(data,"verifyMobile")
                         } else {
-                            setError(responseObj.getString("message"),TAG)
+                            setError(responseObj.getString("message"),SNACKBAR)
                         }
                     }
                 } catch (e: Exception) {
@@ -159,7 +159,7 @@ class ProfileViewModel(
                             val data = responseObj.getString("data")
                             setSuccess(data, "getOTP")
                         } else {
-                            setError(responseObj.getString("message"),TAG)
+                            setError(responseObj.getString("message"),SNACKBAR)
                         }
                     }
                 } catch (e: Exception) {
@@ -173,7 +173,7 @@ class ProfileViewModel(
         if(user != null && user?.user_id!! > 0) {
             viewModelScope.launch {
                 try {
-                    val response = rewardRepository.scratchcards(user?.user_id!!, page)
+                    val response = rewardRepository.getScratchcards(user?.user_id!!, page)
                     if (response != null) {
                         val responseObj = JSONObject(response)
                         if (responseObj.getInt("status") == 1) {

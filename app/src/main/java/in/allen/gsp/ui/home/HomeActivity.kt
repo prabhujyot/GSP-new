@@ -6,7 +6,6 @@ import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.BannerRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityHomeBinding
-import `in`.allen.gsp.databinding.ItemBannerBinding
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
 import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.ui.profile.ProfileActivity
@@ -20,12 +19,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.viewpager.widget.PagerAdapter
+import com.asksira.loopingviewpager.LoopingPagerAdapter
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -46,6 +46,7 @@ import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
@@ -63,6 +64,10 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     private val bannerRepository: BannerRepository by instance()
     private val preferences: AppPreferences by instance()
 
+    private lateinit var app: App
+
+    private var autoscroll = "true"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
@@ -73,6 +78,8 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             onBackPressed()
         }
 
+        app = application as App
+
         binding.rootLayout.setOnClickListener { hideSystemUI() }
 
         binding.viewpagerBanner.pageMargin = 16
@@ -81,17 +88,21 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 //            testingInAppUpdate()
 //        }
 
-//        checkInAppUpdate()
+        checkInAppUpdate()
 
         observeLoading()
         observeError()
         observeSuccess()
         viewModel.userData()
 
+        lifecycleScope.launch {
+            autoscroll = userRepository.config("banner-scroll")
+        }
+
         userRepository.userLife.observe(this, {
-            if(it != null) {
+            if (it != null) {
                 binding.iconLife.life.text = "${it["life"]}"
-                if(System.currentTimeMillis() < preferences.timestampLife) {
+                if (System.currentTimeMillis() < preferences.timestampLife) {
                     binding.iconLife.life.text = getString(R.string.infinity)
                     it["life"] = 0
                 }
@@ -115,9 +126,32 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         })
     }
 
+    override fun onPause() {
+        super.onPause()
+        binding.viewpagerBanner.pauseAutoScroll()
+        if(::app.isInitialized) {
+            app.getmServ()?.pause()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if(::app.isInitialized) {
+            app.unbindMusicService()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         hideSystemUI()
+        if(!autoscroll.equals("true",true)) {
+            binding.viewpagerBanner.pauseAutoScroll()
+        } else {
+            binding.viewpagerBanner.resumeAutoScroll()
+        }
+//        if(::app.isInitialized) {
+//            app.getmServ()?.playMusic("round", true)
+//        }
     }
 
     override fun onBackPressed() {
@@ -197,7 +231,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                                 TimeUnit.MILLISECONDS.toSeconds(it.data) - TimeUnit.MINUTES.toSeconds(
                                     TimeUnit.MILLISECONDS.toMinutes(it.data)
                                 )
-                            val hms = String.format("%02d:%02d",m,s)
+                            val hms = String.format("%02d:%02d", m, s)
                             binding.lifeTimer.text = "$hms"
                         }
                     }
@@ -216,10 +250,18 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                             lifecycleScope.launch {
                                 deferredList.await().observe(this@HomeActivity, { list ->
                                     binding.viewpagerBanner.adapter = BannerAdapter(
-                                        layoutInflater,
+                                        this@HomeActivity,
                                         list,
-                                        this@HomeActivity
+                                        true
                                     )
+
+                                    tag("autoscroll: $autoscroll")
+                                    if(!autoscroll.equals("true",true)) {
+                                        binding.viewpagerBanner.pauseAutoScroll()
+                                    } else {
+                                        binding.viewpagerBanner.resumeAutoScroll()
+                                    }
+//                                    autoscroll(true)
                                 })
                             }
                         }
@@ -229,52 +271,104 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         })
     }
 
-    private class BannerAdapter(
-        private val inflater: LayoutInflater,
-        private val list: List<Banner>,
-        private val context: Context
-    ): PagerAdapter() {
+//    private class BannerAdapter(
+//        private val inflater: LayoutInflater,
+//        private val list: List<Banner>,
+//        private val context: Context
+//    ): PagerAdapter() {
+//
+//        override fun isViewFromObject(view: View, `object`: Any): Boolean {
+//            return view === `object`
+//        }
+//
+//        override fun getCount(): Int {
+//            return list.size
+//        }
+//
+//        override fun instantiateItem(container: ViewGroup, position: Int): Any {
+//            val binding: ItemBannerBinding = DataBindingUtil.inflate(
+//                inflater,
+//                R.layout.item_banner,
+//                container,
+//                false
+//            )
+//
+//            val item = list[position]
+//            binding.image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item.image}")
+//            binding.image.setOnClickListener {
+//                if(item.action.trim().length > 10) {
+//                    val i = Intent()
+//                    i.setClassName(context, item.action)
+//                    if(item.meta.trim().length > 4) {
+//                        val obj = JSONObject(item.meta)
+//                        when {
+//                            obj.has("url") -> {
+//                                i.putExtra("url", obj.getString("url"))
+//                            }
+//                            obj.has("contest_id") -> {
+//                                i.putExtra("contest_id", obj.getString("contest_id"))
+//                            }
+//                        }
+//                    }
+//                    context.startActivity(i)
+//                }
+//            }
+//
+//            container.addView(binding.root)
+//            return binding.root
+//        }
+//
+//        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+//            container.removeView(`object` as View)
+//        }
+//    }
 
-        override fun isViewFromObject(view: View, `object`: Any): Boolean {
-            return view === `object`
+    class BannerAdapter(
+        context: Context,
+        itemList: List<Banner>,
+        isInfinite: Boolean
+    ) : LoopingPagerAdapter<Banner>(context, itemList, isInfinite) {
+
+        //This method will be triggered if the item View has not been inflated before.
+        override fun inflateView(
+            viewType: Int,
+            container: ViewGroup,
+            listPosition: Int
+        ): View {
+            return LayoutInflater.from(context).inflate(R.layout.item_banner, container, false)
         }
 
-        override fun getCount(): Int {
-            return list.size
-        }
+        //Bind your data with your item View here.
+        //Below is just an example in the demo app.
+        //You can assume convertView will not be null here.
+        //You may also consider using a ViewHolder pattern.
+        override fun bindView(
+            convertView: View,
+            listPosition: Int,
+            viewType: Int
+        ) {
 
-        override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val binding: ItemBannerBinding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.item_banner,
-                container,
-                false
-            )
-
-            val item = list[position]
-            binding.image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item.image}")
-            binding.title.text = item.title
-            binding.btnGo.setOnClickListener {
-                val i = Intent()
-                i.setClassName(context, item.action)
-                val obj = JSONObject(item.meta)
-                when {
-                    obj.has("url") -> {
-                        i.putExtra("url",obj.getString("url"))
+            val item = itemList?.get(listPosition)
+            val image = convertView.findViewById<ImageView>(R.id.image)
+            image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item?.image}")
+            image.setOnClickListener {
+                if(item?.action?.trim()!!.length > 10) {
+                    val i = Intent()
+                    i.setClassName(context, item.action)
+                    if(item.meta.trim().length > 4) {
+                        val obj = JSONObject(item.meta)
+                        when {
+                            obj.has("url") -> {
+                                i.putExtra("url", obj.getString("url"))
+                            }
+                            obj.has("contest_id") -> {
+                                i.putExtra("contest_id", obj.getString("contest_id"))
+                            }
+                        }
                     }
-                    obj.has("contest_id") -> {
-                        i.putExtra("contest_id",obj.getString("contest_id"))
-                    }
+                    context.startActivity(i)
                 }
-                context.startActivity(i)
             }
-
-            container.addView(binding.root)
-            return binding.root
-        }
-
-        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-            container.removeView(`object` as View)
         }
     }
 
@@ -338,7 +432,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         if ((info.result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ||
                     info.result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
             info.result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-            manager.startUpdateFlowForResult(info.result, AppUpdateType.IMMEDIATE, this, REQUEST_UPDATE)
+            manager.startUpdateFlowForResult(
+                info.result,
+                AppUpdateType.IMMEDIATE,
+                this,
+                REQUEST_UPDATE
+            )
         }
     }
 
@@ -387,7 +486,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                 }
             }
             manager.registerListener(updateListener)
-            manager.startUpdateFlowForResult(info.result, AppUpdateType.FLEXIBLE, this, REQUEST_UPDATE)
+            manager.startUpdateFlowForResult(
+                info.result,
+                AppUpdateType.FLEXIBLE,
+                this,
+                REQUEST_UPDATE
+            )
         }
     }
 
@@ -425,7 +529,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         if ((info.result.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE ||
                     info.result.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) &&
             info.result.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
-            manager.startUpdateFlowForResult(info.result, AppUpdateType.IMMEDIATE, this, REQUEST_UPDATE)
+            manager.startUpdateFlowForResult(
+                info.result,
+                AppUpdateType.IMMEDIATE,
+                this,
+                REQUEST_UPDATE
+            )
         }
 
         val fakeAppUpdate = manager as FakeAppUpdateManager
@@ -482,7 +591,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                 }
             }
             manager.registerListener(updateListener)
-            manager.startUpdateFlowForResult(info.result, AppUpdateType.FLEXIBLE, this, REQUEST_UPDATE)
+            manager.startUpdateFlowForResult(
+                info.result,
+                AppUpdateType.FLEXIBLE,
+                this,
+                REQUEST_UPDATE
+            )
 
             val fakeAppUpdate = manager as FakeAppUpdateManager
             if (fakeAppUpdate.isConfirmationDialogVisible) {
@@ -495,4 +609,22 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
     }
     /* End In-App update */
+
+//    private fun autoscroll(scroll:Boolean) {
+//        tag("autoscroll $scroll")
+//        Timer().schedule(object : TimerTask() {
+//            // task to be scheduled
+//            override fun run() {
+//                val adt = binding.viewpagerBanner.adapter as BannerAdapter
+//                tag("autoscroll adt.count: ${adt.count}")
+//                var currentPage = binding.viewpagerBanner.currentItem
+//                if(currentPage == adt.count) {
+//                    currentPage = 0
+//                }
+//                binding.viewpagerBanner.currentItem = currentPage++
+//                currentPage++
+//                tag("autoscroll currentPage: $currentPage")
+//            }
+//        }, 3500, 3500)
+//    }
 }

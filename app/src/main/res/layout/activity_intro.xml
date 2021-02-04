@@ -18,13 +18,13 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="@dimen/margin24"
-        android:layout_marginBottom="@dimen/margin24"
+        android:layout_marginTop="@dimen/margin24"
         android:adjustViewBounds="true"
         android:background="@android:color/transparent"
-        android:contentDescription="@string/app_name"
+        android:contentDescription="@string/skip"
         android:scaleType="center"
         android:src="@drawable/arrow_next"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:onClick="btnActionIntro"/>
 

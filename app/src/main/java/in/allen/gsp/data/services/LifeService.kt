@@ -124,7 +124,7 @@ class LifeService : Service(), KodeinAware {
     }
 
     private fun taskRegular(user: User,interval: Int,maxLife: Int): TimerTask {
-        var remainingMilis = 0L
+        var remainingMilis: Long
         val intervalMilis = interval.times(60).times(1000)
         return object : TimerTask() {
             override fun run() {

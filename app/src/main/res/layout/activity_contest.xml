@@ -32,13 +32,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/guidelineAttachment"/>
 
-<!--            <include layout="@layout/toolbar"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                android:layout_marginTop="@dimen/margin24"/>-->
-
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineAttachment"
                 android:layout_width="wrap_content"
@@ -74,6 +67,46 @@
                 app:layout_constraintTop_toBottomOf="@id/guidelineAttachment" />
 
 
+            <!-- Question -->
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/question"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="The Jatropha curcas."
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
+                app:layout_constraintEnd_toEndOf="@id/textScore"
+                app:layout_constraintStart_toStartOf="@id/qno"
+                app:layout_constraintTop_toBottomOf="@id/btnTranslate" />
+
+            <LinearLayout
+                android:id="@+id/layoutOption"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/margin8"
+                android:layout_marginBottom="@dimen/margin8"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@id/qno"
+                app:layout_constraintEnd_toEndOf="@id/textScore"
+                app:layout_constraintStart_toStartOf="@id/qno"
+                app:layout_constraintTop_toBottomOf="@id/guidelineQuestion">
+                <include
+                    android:id="@+id/layoutOptionInclude"
+                    layout="@layout/option_linear"/>
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineQuestion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.43" />
+
+
+            <!-- score -->
             <TextView
                 android:id="@+id/qno"
                 android:layout_width="wrap_content"
@@ -111,6 +144,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/qno" />
 
+
+            <!-- lifelines -->
             <ImageButton
                 android:id="@+id/btnDoubleDip"
                 android:layout_width="40dp"
@@ -206,43 +241,6 @@
                 app:layout_constraintTop_toTopOf="@id/progressTimer"
                 android:onClick="btnActionContest"/>
 
-            <!-- Question -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/question"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:gravity="center"
-                android:text="The Jatropha curcas."
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
-                app:layout_constraintEnd_toEndOf="@id/textScore"
-                app:layout_constraintStart_toStartOf="@id/qno"
-                app:layout_constraintTop_toBottomOf="@id/btnTranslate" />
-
-            <LinearLayout
-                android:id="@+id/layoutOption"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="@dimen/margin8"
-                android:layout_marginBottom="@dimen/margin8"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@id/qno"
-                app:layout_constraintEnd_toEndOf="@id/textScore"
-                app:layout_constraintStart_toStartOf="@id/qno"
-                app:layout_constraintTop_toBottomOf="@id/guidelineQuestion">
-                <include
-                    android:id="@+id/layoutOptionInclude"
-                    layout="@layout/option_linear"/>
-            </LinearLayout>
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guidelineQuestion"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.43" />
 
             <FrameLayout
                 android:id="@+id/lock"

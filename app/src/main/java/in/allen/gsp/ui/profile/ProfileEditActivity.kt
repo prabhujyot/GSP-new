@@ -73,6 +73,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         viewModel.getError().observe(this, {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
+                binding.rootLayout.hideProgress()
                 when (it.message) {
                     "alert" -> {
                         it.data?.let { it1 -> alertDialog("Error", it1) {} }
@@ -131,6 +132,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                             otpSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                         }
 
+                        binding.rootLayout.otp.setText("")
                         binding.verificationStatus.text = "Not Verified"
                         viewModel.countdownStart(5 * 60 * 1000)
                     }
@@ -147,6 +149,9 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
 
                         binding.btnVerify.isEnabled = true
                         binding.btnVerify.text = "Verify"
+                    }
+                    "updateProfile" -> {
+                        viewModel.setError("Profile updated",viewModel.SNACKBAR)
                     }
                 }
             }

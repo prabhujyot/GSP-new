@@ -3,7 +3,6 @@ package `in`.allen.gsp.ui.quiz
 import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.Question
-import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.databinding.ActivityQuizBinding
 import `in`.allen.gsp.databinding.OptionLinearBinding
@@ -22,21 +21,21 @@ import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.*
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.icon_life.view.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.kodein.di.KodeinAware
@@ -63,41 +62,34 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     // bottomsheets
     private lateinit var categorySheetBehavior: BottomSheetBehavior<FrameLayout>
-    private lateinit var attachmentSheetBehavior: BottomSheetBehavior<FrameLayout>
     private lateinit var finishSheetBehavior: BottomSheetBehavior<FrameLayout>
     private lateinit var offersSheetBehavior: BottomSheetBehavior<FrameLayout>
 
     // animations
-//    private lateinit var animZoomIn: Animation
     private lateinit var animFadeIn: Animation
-//    private lateinit var animFadeOut: Animation
     private lateinit var animBlink: Animation
-//    private lateinit var animMoveLeft: Animation
-//    private lateinit var animMoveRight: Animation
 
     // Question Table
     private val questionTable = ArrayList<View>()
 
     private lateinit var mp: MediaPlayer
 
-    private val userRepository: UserRepository by instance()
     private val preferences: AppPreferences by instance()
+    private lateinit var app: App
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // hide statusbar
+        this.window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_quiz)
         viewModel = ViewModelProvider(this, factory).get(QuizViewModel::class.java)
 
-        setSupportActionBar(myToolbar)
-        btnBack.setOnClickListener {
-            onBackPressed()
-        }
-
-        val bg = ResourcesCompat.getDrawable(resources, R.drawable.bg_play_o, null)
-        if (bg != null) {
-            bg.alpha = 20
-            binding.bgLayout.setImageDrawable(bg)
-        }
+        app = application as App
 
         initBottomSheets()
         initAnimations()
@@ -108,81 +100,20 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         viewModel.userData()
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val lifeMenu = menu?.findItem(R.id.menu_life)
-        val itemRoot = lifeMenu?.actionView
-        val lp = ConstraintLayout.LayoutParams(50,50)
-        itemRoot?.layoutParams = lp
-
-        itemRoot?.life?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        itemRoot?.life?.setTypeface(itemRoot.life?.typeface, Typeface.BOLD)
-
-        userRepository.userLife.observe(this, {
-            if(it != null) {
-                viewModel.user?.life = it["life"]!!.toInt()
-                itemRoot?.life?.text = "${it["life"]}"
-                binding.layoutOffers.layoutLife.life.text = "${it["life"]}"
-
-                if(System.currentTimeMillis() < preferences.timestampLife) {
-                    itemRoot?.life?.text = getString(R.string.infinity)
-                    binding.layoutOffers.layoutLife.life.text = getString(R.string.infinity)
-                    it["life"] = 0
-                }
-
-                if (it["life"]!!.toInt() == 5) {
-                    binding.layoutOffers.lifeTimer.text = "Full"
-                } else {
-                    it["remaining"]?.let { it1 ->
-                        val m =
-                            TimeUnit.MILLISECONDS.toMinutes(it1) - TimeUnit.HOURS.toMinutes(
-                                TimeUnit.MILLISECONDS.toHours(it1)
-                            )
-                        val s =
-                            TimeUnit.MILLISECONDS.toSeconds(it1) - TimeUnit.MINUTES.toSeconds(
-                                TimeUnit.MILLISECONDS.toMinutes(it1)
-                            )
-                        val hms = String.format("%02d:%02d", m, s)
-                        binding.layoutOffers.lifeTimer.text = "$hms"
-                    }
-                }
-            }
-        })
-
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.play, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        if(id == R.id.menu_translate) {
-            if(viewModel.lang.equals("eng", true)) {
-                viewModel.lang = "hindi"
-            } else {
-                viewModel.lang = "eng"
-            }
-
-            switchLanguage(viewModel.currentq)
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
     override fun onBackPressed() {
         viewModel.onBackPressed()
     }
 
     override fun onPause() {
         viewModel.onPause()
+        if(::app.isInitialized) {
+            app.getmServ()?.pause()
+        }
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        hideSystemUI()
         viewModel.onResume()
     }
 
@@ -231,7 +162,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, { it ->
+        viewModel.getSuccess().observe(this, {
             if (it != null) {
                 when (it.message) {
                     "user" -> {
@@ -269,12 +200,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     "multiplierTimer" -> {
                         if (it.data is Long) {
                             binding.progressMultiplier.progress = it.data.toInt()
-                        }
-                    }
-
-                    "attachmentTimer" -> {
-                        if (it.data is Long) {
-                            binding.layoutAttachment.progressTimer.progress = it.data.toInt()
                         }
                     }
 
@@ -336,9 +261,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             if(it.data.equals("displayWild",true)) {
                                 displayWild()
                             }
-                            if (it.data.equals("closeAttachment", true)) {
-                                binding.layoutAttachment.btnClose.performClick()
-                            }
                             if (it.data.equals("displayOption", true)) {
                                 displayOption(viewModel.currentq)
                             }
@@ -371,6 +293,30 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                 } catch (e: Exception) {}
                                 finish()
                             }
+                            if(it.data.equals("timeStart",true)) {
+                                tag("timeStart ${::app.isInitialized}")
+                                if(::app.isInitialized) {
+                                    when {
+                                        viewModel.currentq.qtype.equals("image",true) -> {
+                                            app.getmServ()?.playMusic("image", true)
+                                        }
+                                        viewModel.currentq.qdifficulty_level == 2 -> {
+                                            app.getmServ()?.playMusic("think_8", true)
+                                        }
+                                        viewModel.currentq.qdifficulty_level == 3 -> {
+                                            app.getmServ()?.playMusic("think_9", true)
+                                        }
+                                        else -> {
+                                            app.getmServ()?.playMusic("timer_2", true)
+                                        }
+                                    }
+                                }
+                            }
+                            if (it.data.equals("timeUp",true)) {
+                                if(::app.isInitialized) {
+                                    app.getmServ()?.playMusic("times_up_2",false)
+                                }
+                            }
                         }
                     }
 
@@ -384,6 +330,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     "performLifeline" -> {
                         if (it.data is String) {
                             if (it.data.equals("fifty_fifty", true)) {
+                                if(::app.isInitialized) {
+                                    app.getmServ()?.playMusic("fifty",false)
+                                }
+
                                 val temp = ArrayList<Any>()
                                 if (bindingSingleChoice.optionA.tag != 1) {
                                     temp.add(bindingSingleChoice.optionA)
@@ -453,16 +403,23 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             R.id.btnQuit -> {
                 viewModel.validateLifeline("quit")
             }
+            R.id.btnTranslate -> {
+                if(viewModel.lang.equals("eng", true)) {
+                    viewModel.lang = "hindi"
+                } else {
+                    viewModel.lang = "eng"
+                }
+
+                switchLanguage(viewModel.currentq)
+            }
         }
     }
 
     private fun initBottomSheets() {
         categorySheetBehavior = BottomSheetBehavior.from(binding.layoutCategory.bottomSheetCategory)
-        attachmentSheetBehavior = BottomSheetBehavior.from(binding.layoutAttachment.bottomSheetAttachment)
         finishSheetBehavior = BottomSheetBehavior.from(binding.layoutFinish.bottomSheetFinish)
         offersSheetBehavior = BottomSheetBehavior.from(binding.layoutOffers.bottomSheetOffers)
         categorySheetBehavior.isDraggable = false
-        attachmentSheetBehavior.isDraggable = false
         finishSheetBehavior.isDraggable = false
         offersSheetBehavior.isDraggable = false
 
@@ -470,12 +427,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initAnimations() {
-//        animZoomIn = AnimationUtils.loadAnimation(applicationContext, R.anim.zoomin)
         animFadeIn = AnimationUtils.loadAnimation(applicationContext, R.anim.fadein)
-//        animFadeOut = AnimationUtils.loadAnimation(applicationContext, R.anim.fadeout)
         animBlink = AnimationUtils.loadAnimation(applicationContext, R.anim.blink)
-//        animMoveLeft = AnimationUtils.loadAnimation(applicationContext, R.anim.move_left)
-//        animMoveRight = AnimationUtils.loadAnimation(applicationContext, R.anim.move_right)
     }
 
     private fun initQuiz() {
@@ -503,6 +456,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initQusetionTable() {
+        binding.slidingDrawer.close()
         // question table
         binding.level1.show(false)
         binding.level2.show(false)
@@ -573,6 +527,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private fun setQuestion(currentQ: Question) {
         tag("$TAG setQuestion ${currentQ.qno} ${viewModel.index}")
+        binding.slidingDrawer.close()
         viewModel.lock(true)
 
         viewModel.questionTimerCancel()
@@ -590,6 +545,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.layoutOption.visibility = View.INVISIBLE
 
         switchLanguage(currentQ)
+
+        // reset attachment view
+        resetAttachmantBackground()
     }
 
     private fun switchLanguage(currentQ: Question) {
@@ -684,6 +642,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun clickOption(view: View) {
+        if(::app.isInitialized) {
+            app.getmServ()?.pause()
+        }
+
         viewModel.stopTimer()
 
         view.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_btn_blue, null)
@@ -692,9 +654,13 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         lifecycleScope.launch {
             delay(viewModel.TIME_DELAY)
             if(view.tag == 1) {
+                if(::app.isInitialized) {
+                    app.getmServ()?.playMusic("correct",false)
+                }
+
                 view.background = ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.bg_btn_orange,
+                    R.drawable.bg_btn_green,
                     null
                 )
 
@@ -719,9 +685,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     view.setTextColor(ResourcesCompat.getColor(resources, R.color.disable, null))
                     onResume()
                 } else {
+                    if(::app.isInitialized) {
+                        app.getmServ()?.playMusic("incorrect",false)
+                    }
+
+                    viewModel.appendPlayedQid()
+
                     view.background = ResourcesCompat.getDrawable(
                         resources,
-                        R.drawable.bg_btn_black,
+                        R.drawable.bg_btn_red,
                         null
                     )
                     viewModel.finishQuiz()
@@ -834,7 +806,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             textView.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
             textView.background = ResourcesCompat.getDrawable(
                 resources,
-                R.drawable.bg_circle_black,
+                R.drawable.bg_circle_red,
                 null
             )
             textView.tag = true
@@ -867,6 +839,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 tag("spelling: $spelling length: ${spelling.length}, ${shuffled.length} :: ${spelling.length == shuffled.length}")
                 // check answer
                 if(spelling.length == shuffled.length) {
+                    if(::app.isInitialized) {
+                        app.getmServ()?.pause()
+                    }
+
                     // lock
                     viewModel.lock(true)
                     //stop progessbar
@@ -876,10 +852,14 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     lifecycleScope.launch {
                         delay(viewModel.TIME_DELAY)
                         if(spelling.equals(currentQ.option[0].adesc,true)) {
+                            if(::app.isInitialized) {
+                                app.getmServ()?.playMusic("correct",false)
+                            }
+
                             for (k in 0 until bindingSpelling.spelLayout.childCount) {
                                 (bindingSpelling.spelLayout.getChildAt(k) as TextView).background = ResourcesCompat.getDrawable(
                                     resources,
-                                    R.drawable.bg_circle_orange,
+                                    R.drawable.bg_circle_green,
                                     null
                                 )
                             }
@@ -894,10 +874,16 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                 viewModel.calculateScore(duration)
                             }
                         } else {
+                            if(::app.isInitialized) {
+                                app.getmServ()?.playMusic("incorrect",false)
+                            }
+
+                            viewModel.appendPlayedQid()
+
                             for (k in 0 until bindingSpelling.spelLayout.childCount) {
                                 (bindingSpelling.spelLayout.getChildAt(k) as TextView).background = ResourcesCompat.getDrawable(
                                     resources,
-                                    R.drawable.bg_circle_black,
+                                    R.drawable.bg_circle_red,
                                     null
                                 )
                             }
@@ -920,8 +906,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             stateLifeline(binding.btnDoubleDip, false)
             stateLifeline(binding.btnFlip, false)
         }
-
-//        binding.question.startAnimation(animFadeIn)
 
         // highlight table
         for(v in questionTable) {
@@ -957,111 +941,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         viewModel.startTimer()
     }
 
-
-    private fun displayAttachment(currentQ: Question) {
-        tag("displayAttachment: ${currentQ.qno}")
-        binding.layoutAttachment.progressTimer.show(false)
-
-        val image = binding.layoutAttachment.layoutAttachment.findViewById<ImageView>(R.id.image)
-        val video = binding.layoutAttachment.layoutAttachment.findViewById<VideoView>(R.id.video)
-
-        image.show(false)
-        video.show(false)
-
-        var url = currentQ.qattach.trim()
-        mp = MediaPlayer()
-        binding.layoutAttachment.btnClose.setOnClickListener {
-            when(currentQ.qtype) {
-                "audio" -> {
-                    if (mp.isPlaying) {
-                        mp.stop()
-                    }
-                    mp.release()
-                }
-                "video" -> {
-                    video.stopPlayback()
-                }
-            }
-
-            if(video.visibility == View.VISIBLE) {
-                video.stopPlayback()
-            }
-            if (attachmentSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                attachmentSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
-
-            viewModel.attachmentTimerCancel()
-            viewModel.displayOption()
-        }
-
-        binding.layoutAttachment.question.text = currentQ.qdesc
-        if(viewModel.lang.equals("hindi",true)) {
-            binding.layoutAttachment.question.text = currentQ.qdesc_hindi
-        }
-
-        val localFile = File(getExternalFilesDir("quiz"), currentQ.qid.toString())
-        if(localFile.exists()) {
-            url = localFile.path
-        }
-
-        if(url.isNotEmpty() && !url.equals("null", true)) {
-            tag("$TAG url: $url")
-            when(currentQ.qtype) {
-                "audio" -> {
-                    try {
-                        // Set the media player audio stream type
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            mp.setAudioAttributes(
-                                AudioAttributes.Builder()
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
-                            )
-                        } else {
-                            mp.setAudioStreamType(AudioManager.STREAM_MUSIC)
-                        }
-                        mp.setDataSource(url)
-                        mp.prepare()
-                        if(!mp.isPlaying) {
-                            mp.start()
-                        }
-                        mp.setOnCompletionListener {
-                            binding.layoutAttachment.btnClose.performClick()
-                        }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-
-                    image.loadImage(
-                        "${BuildConfig.BASE_URL}gsp-admin/uploads/audio-quiz.jpg", false, true
-                    )
-                    image.show()
-                }
-                "video" -> {
-                    video.setVideoPath(url)
-                    video.show()
-                    video.start()
-                    video.setOnCompletionListener {
-                        binding.layoutAttachment.btnClose.performClick()
-                    }
-                }
-                else -> {
-                    image.loadImage(
-                        url,false, true
-                    )
-                    image.show()
-
-                    binding.layoutAttachment.progressTimer.show()
-                    binding.layoutAttachment.progressTimer.max = viewModel.TIME_ATTACHMENT.toInt()
-                    binding.layoutAttachment.progressTimer.progress = viewModel.TIME_ATTACHMENT.toInt()
-                    viewModel.attachmentTimerStart(viewModel.TIME_ATTACHMENT)
-                }
-            }
-
-            if (attachmentSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                attachmentSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                hideSystemUI()
-            }
-        }
-    }
 
     private fun displayWild() {
         binding.layoutCategory.shuffleCost.text = "Shuffle at ${viewModel.shuffleCoins} coins."
@@ -1112,7 +991,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         if (categorySheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
             categorySheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            hideSystemUI()
         }
     }
 
@@ -1126,6 +1004,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun displayFinish() {
+        if(::app.isInitialized) {
+            app.getmServ()?.playMusic("quit",false)
+        }
+
         startService()
 
         binding.layoutFinish.btnPlay.setOnClickListener {
@@ -1159,7 +1041,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         if (finishSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
             finishSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            hideSystemUI()
         }
     }
 
@@ -1183,7 +1064,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         if (offersSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
             offersSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-            hideSystemUI()
         }
     }
 
@@ -1219,6 +1099,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun displayLifeline(type: String) {
+        if(::app.isInitialized) {
+            app.getmServ()?.playMusic("lifeline",false)
+        }
+
         val dialogBuilder = AlertDialog.Builder(this)
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.dialog_lifeline, null)
@@ -1267,9 +1151,122 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 viewModel.setSuccess(type, "performLifeline")
             }
         }
-
-        hideSystemUI()
     }
+
+
+    private fun displayAttachment(currentQ: Question) {
+        tag("displayAttachment: ${currentQ.qno}")
+
+        val image = binding.layoutAttachment.findViewById<ImageView>(R.id.image)
+        val video = binding.layoutAttachment.findViewById<VideoView>(R.id.video)
+        val close = binding.layoutAttachment.findViewById<ImageButton>(R.id.btnClose)
+        close.setOnClickListener {
+            attachmentComplete(currentQ.qtype)
+        }
+
+        image.show(false)
+        video.show(false)
+
+        var url = currentQ.qattach.trim()
+        mp = MediaPlayer()
+
+        val localFile = File(getExternalFilesDir("quiz"), currentQ.qid.toString())
+        if(localFile.exists()) {
+            url = localFile.path
+        }
+
+        if(url.isNotEmpty() && !url.equals("null", true)) {
+            tag("$TAG url: $url")
+            when(currentQ.qtype) {
+                "audio" -> {
+                    try {
+                        // Set the media player audio stream type
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            mp.setAudioAttributes(
+                                AudioAttributes.Builder()
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
+                            )
+                        } else {
+                            mp.setAudioStreamType(AudioManager.STREAM_MUSIC)
+                        }
+                        mp.setDataSource(url)
+                        mp.prepare()
+                        if(!mp.isPlaying) {
+                            mp.start()
+                        }
+                        mp.setOnCompletionListener {
+                            attachmentComplete("audio")
+                        }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+
+                    image.loadImage(
+                        "${BuildConfig.BASE_URL}gsp-admin/uploads/audio-quiz.jpg", false, true
+                    )
+                    image.show()
+                    close.show()
+                }
+                "video" -> {
+                    video.setVideoPath(url)
+                    video.show()
+                    close.show()
+                    video.start()
+                    video.setOnCompletionListener {
+                        attachmentComplete("video")
+                    }
+                }
+                else -> {
+                    image.loadImage(
+                        url,false, true
+                    )
+                    image.show()
+                    lifecycleScope.launch {
+                        delay(viewModel.TIME_POPUP)
+                        attachmentComplete("image")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun attachmentComplete(attachmentType: String) {
+        tag("attachmentComplete: $attachmentType")
+        val video = binding.layoutAttachment.findViewById<VideoView>(R.id.video)
+
+        when(attachmentType) {
+            "audio" -> {
+                if (mp.isPlaying) {
+                    mp.stop()
+                }
+                mp.release()
+                resetAttachmantBackground()
+            }
+            "video" -> {
+                if(video.visibility == View.VISIBLE) {
+                    video.stopPlayback()
+                }
+                resetAttachmantBackground()
+            }
+        }
+
+        viewModel.displayOption()
+    }
+
+    private fun resetAttachmantBackground() {
+        val image = binding.layoutAttachment.findViewById<ImageView>(R.id.image)
+        val close = binding.layoutAttachment.findViewById<ImageButton>(R.id.btnClose)
+        val video = binding.layoutAttachment.findViewById<VideoView>(R.id.video)
+
+        close.show(false)
+        video.show(false)
+        image.show()
+
+        if(image.visibility == View.VISIBLE) {
+            image.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.bg_play_o,null))
+        }
+    }
+
 
     private fun downloadFile(sourceFileName: String, destinationFileName: String) {
         val localFile = File(getExternalFilesDir("quiz"), destinationFileName)

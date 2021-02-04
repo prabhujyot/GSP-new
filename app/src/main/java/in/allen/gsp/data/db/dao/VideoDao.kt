@@ -13,7 +13,7 @@ interface VideoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun setList(videos: List<Video>)
 
-    @Query("Select * from video where playlistId = :playlistId")
-    fun getList(playlistId: String): LiveData<List<Video>>
+    @Query("Select * from video where channelId = :channelId")
+    fun getList(channelId: String): LiveData<List<Video>>
 
 }
