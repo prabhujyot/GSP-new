@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -24,21 +25,27 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.dynamiclinks.DynamicLink
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
-import com.google.firebase.messaging.FirebaseMessaging
+import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.math.RoundingMode
+import java.net.URL
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.ceil
+
 
 fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_LONG).show()
@@ -87,7 +94,10 @@ fun Activity.confirmDialog(
     alertDialog.setCanceledOnTouchOutside(false)
     alertDialog.setCancelable(false)
 
-    alertDialog.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+    alertDialog.window?.setFlags(
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+    )
     alertDialog.show()
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
         alertDialog.window?.setDecorFitsSystemWindows(false)
@@ -129,7 +139,10 @@ fun Activity.alertDialog(title: String, message: String, alertAction: () -> Unit
     alertDialog.setCanceledOnTouchOutside(false)
     alertDialog.setCancelable(false)
 
-    alertDialog.window?.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE)
+    alertDialog.window?.setFlags(
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+    )
     alertDialog.show()
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
         alertDialog.window?.setDecorFitsSystemWindows(false)
@@ -157,22 +170,33 @@ fun Activity.showSystemUI() {
     }
 }
 
-fun Activity.hideSystemUI() {
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-        window.setDecorFitsSystemWindows(false)
-    } else {
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                // Set the content to appear under the system bars so that the
-                // content doesn't resize when the system bars hide and show.
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                // Hide the nav bar and status bar
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN)
-    }
+//fun Activity.hideSystemUI() {
+//    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+//        window.setDecorFitsSystemWindows(false)
+//    } else {
+//        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//                // Set the content to appear under the system bars so that the
+//                // content doesn't resize when the system bars hide and show.
+//                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                // Hide the nav bar and status bar
+//                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+//    }
+//}
+
+fun Activity.hideStatusBar() {
+    // hide statusbar
+    window.setFlags(
+        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        WindowManager.LayoutParams.FLAG_FULLSCREEN
+    )
 }
 
+fun Context.densityFactor(): Float {
+    return resources.displayMetrics.density
+}
 
 fun tag(data: Any) {
     Log.e("GSP", "$data")
@@ -198,17 +222,20 @@ fun ImageView.loadImage(url: String, circular: Boolean = false, centerInside: Bo
     if(circular) {
         Glide.with(this)
             .load(url)
+            .transition(DrawableTransitionOptions.withCrossFade(1000))
             .circleCrop()
             .into(this)
     } else {
         if(centerInside) {
             Glide.with(this)
                 .load(url)
+                .transition(DrawableTransitionOptions.withCrossFade(1000))
                 .centerInside()
                 .into(this)
         } else {
             Glide.with(this)
                 .load(url)
+                .transition(DrawableTransitionOptions.withCrossFade(1000))
                 .centerCrop()
                 .into(this)
         }
@@ -243,7 +270,7 @@ fun milisToFormat(milliseconds: Long, format: String): String {
 fun timeInAgo(dateTime: String?, format: String): String {
     val ago: String
     val sdf = SimpleDateFormat(format)
-    //sdf.timeZone = TimeZone.getTimeZone("GMT")
+    sdf.timeZone = TimeZone.getTimeZone("GMT+05:30")
 
     val time = sdf.parse(dateTime).time
     val now = System.currentTimeMillis()
@@ -251,7 +278,7 @@ fun timeInAgo(dateTime: String?, format: String): String {
     return ago
 }
 
-fun formatNumber(pattern: String,num: Number): String? {
+fun formatNumber(pattern: String, num: Number): String? {
     val df = DecimalFormat(pattern)
     df.roundingMode = RoundingMode.CEILING
     return df.format(num)
@@ -296,6 +323,21 @@ fun Context.screenShot(view: View, fileName: String): File {
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
     stream.flush()
     stream.close()
+    return file
+}
+
+fun Context.saveStream(body: ResponseBody, fileName: String): File {
+    val input: InputStream = body.byteStream()
+    val file = File(getExternalFilesDir(null), fileName)
+    val stream = FileOutputStream(file)
+    stream.use { output ->
+        val buffer = ByteArray(4 * 1024) // or other buffer size
+        var read: Int
+        while (input.read(buffer).also { read = it } != -1) {
+            output.write(buffer, 0, read)
+        }
+        output.flush()
+    }
     return file
 }
 
@@ -358,9 +400,28 @@ fun getReferralLink(referralId: String): String {
     return dynamicLink.uri.toString()
 }
 
-fun subscribeFirebaseTopic(topic: String) {
-    FirebaseMessaging.getInstance().subscribeToTopic(topic).addOnCompleteListener {
-        val msg = it.isSuccessful
-        tag("$topic Subscription: $msg")
+fun Context.share(image: String, message: String) {
+    val file = File(getExternalFilesDir(null), image)
+    val share = Intent(Intent.ACTION_SEND)
+    share.type = "image/*"
+    share.putExtra(
+        Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+            this,
+            applicationContext.packageName + ".provider",
+            file
+        )
+    )
+    share.putExtra(Intent.EXTRA_TEXT, message)
+    startActivity(Intent.createChooser(share, "Share with"))
+}
+
+fun urlToBitmap(url: String): Bitmap? {
+    var bmp: Bitmap? = null
+    try {
+        val url = URL(url)
+        bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+    } catch (e: IOException) {
+        tag(e)
     }
+    return bmp
 }

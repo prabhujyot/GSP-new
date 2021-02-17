@@ -1,7 +1,7 @@
 package `in`.allen.gsp
 
 import `in`.allen.gsp.ui.home.HomeActivity
-import `in`.allen.gsp.utils.hideSystemUI
+import `in`.allen.gsp.utils.hideStatusBar
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +11,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.PagerAdapter
+import androidx.viewpager.widget.ViewPager
 import com.gohn.parallaxviewpager.ParallaxViewPager
+import kotlinx.android.synthetic.main.activity_intro.*
 
 class IntroActivity : AppCompatActivity() {
 
@@ -20,6 +22,9 @@ class IntroActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         setContentView(R.layout.activity_intro)
 
         parallaxViewPager = findViewById(R.id.parallaxViewPager)
@@ -27,11 +32,24 @@ class IntroActivity : AppCompatActivity() {
 //        pager.addMovementToView(R.id.description, 0.2f) // Move Little
         parallaxViewPager.addMovementToView(R.id.image, 0.8f) // Move Much
         parallaxViewPager.adapter = IntroAdapter(layoutInflater)
-    }
 
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
+        parallaxViewPager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {}
+
+            override fun onPageSelected(position: Int) {
+                if(position == 2) {
+                    btnNext.text = "Done"
+                } else {
+                    btnNext.text = "Next"
+                }
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {}
+        })
     }
 
     private class IntroAdapter(private val inflater: LayoutInflater): PagerAdapter() {

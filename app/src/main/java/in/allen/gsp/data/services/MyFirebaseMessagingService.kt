@@ -5,10 +5,7 @@ import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.ui.message.NotificationActivity
-import `in`.allen.gsp.utils.AppPreferences
-import `in`.allen.gsp.utils.Coroutines
-import `in`.allen.gsp.utils.milisToFormat
-import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.*
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -53,12 +50,16 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
         tag("$TAG From: ${remoteMessage.from}")
 
         // Check if message contains a data payload.
-        if (remoteMessage.data.isNotEmpty()) {
-            tag("$TAG Message data payload: ${remoteMessage.data}")
-
-            val key = remoteMessage.data["key"]
-            if(key.equals("gsp_notification",true)) {
-                sendNotification(remoteMessage.data["title"]!!,remoteMessage.data["body"]!!)
+        remoteMessage.data.let {
+            tag("$TAG Message data payload: $it")
+            if(it["title"] != null && it["body"] != null) {
+                sendNotification(
+                    it["title"]!!,
+                    it["body"]!!,
+                    it["sub_text"]!!,
+                    it["large_icon"]!!,
+                    it["big_image"]!!
+                )
             }
         }
 
@@ -96,7 +97,13 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
      *
      * @param messageBody FCM message body received.
      */
-    private fun sendNotification(messageTitle: String, messageBody: String) {
+    private fun sendNotification(
+        messageTitle: String,
+        messageBody: String,
+        subText: String = "",
+        largeIcon: String = "",
+        bigImage: String = ""
+    ) {
         tag("sendNotification")
         var notificationId = 0
         Coroutines.io {
@@ -116,38 +123,56 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
                     milisToFormat(Calendar.getInstance().timeInMillis, "yyyy-MM-dd HH:mm:ss"),
                     0)
                 messageRepository.setItem(message)
+                messageRepository.getUnreadCount(user.user_id)
                 tag("message saved")
             }
 
-            val intent = Intent(this, NotificationActivity::class.java)
-            intent.putExtra("title",messageTitle)
-            intent.putExtra("body",messageBody)
-            intent.putExtra("notificationId",notificationId)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            val pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT)
+            if(preferences.appNotification) {
+                val intent = Intent(this, NotificationActivity::class.java)
+                intent.putExtra("title", messageTitle)
+                intent.putExtra("body", messageBody)
+                intent.putExtra("notificationId", notificationId)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                val pendingIntent = PendingIntent.getActivity(
+                    this, 0 /* Request code */, intent,
+                    PendingIntent.FLAG_ONE_SHOT
+                )
 
-            val channelId = getString(R.string.default_notification_channel_id)
-            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(messageTitle)
-                .setContentText(messageBody)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent)
+                val channelId = getString(R.string.default_notification_channel_id)
+                val defaultSoundUri =
+                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
+                if(largeIcon.isNotEmpty()) {
+                    notificationBuilder.setLargeIcon(urlToBitmap(largeIcon))
+                }
+                notificationBuilder.setContentTitle(messageTitle)
+                notificationBuilder.setContentText(messageBody)
+                if(subText.isNotEmpty()) {
+                    notificationBuilder.setContentText(subText)
+                }
+                notificationBuilder.setAutoCancel(true)
+                notificationBuilder.setSound(defaultSoundUri)
+                notificationBuilder.setContentIntent(pendingIntent)
 
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                if(bigImage.isNotEmpty()) {
+                    notificationBuilder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(urlToBitmap(bigImage)))
+                }
+                val notificationManager =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-            // Since android Oreo notification channel is needed.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(channelId,
-                    "GSP Notification Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT)
-                notificationManager.createNotificationChannel(channel)
+                // Since android Oreo notification channel is needed.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(
+                        channelId,
+                        "GSP Notification Channel",
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
+                    notificationManager.createNotificationChannel(channel)
+                }
+
+                notificationManager.notify(notificationId, notificationBuilder.build())
             }
-
-            notificationManager.notify(notificationId, notificationBuilder.build())
         }
     }
 

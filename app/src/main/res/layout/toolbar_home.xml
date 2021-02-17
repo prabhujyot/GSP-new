@@ -12,25 +12,61 @@
         <ImageView
             android:id="@+id/allen"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:contentDescription="@string/lblAllen"
             android:scaleType="centerInside"
             android:src="@drawable/allen"
+            app:tint="@color/allenBlue"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/btnClose"
             app:layout_constraintBottom_toBottomOf="@id/btnClose"
-            app:layout_constraintHeight_max="42dp"/>
+            app:layout_constraintHeight_max="36dp"/>
+
+        <ImageButton
+            android:id="@+id/menuNotification"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/solid_blue_radius"
+            android:contentDescription="@string/lblNotification"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_notification"
+            android:tint="@color/white"
+            app:layout_constraintEnd_toStartOf="@id/btnClose"
+            app:layout_constraintTop_toTopOf="@id/btnClose"
+            android:layout_marginEnd="@dimen/margin8"/>
+
+        <TextView
+            android:id="@+id/msgCounter"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:adjustViewBounds="true"
+            app:layout_constraintStart_toStartOf="@id/menuNotification"
+            app:layout_constraintBottom_toBottomOf="@id/menuNotification"
+            android:layout_marginStart="@dimen/margin20"
+            android:layout_marginBottom="@dimen/margin20"
+            android:background="@drawable/bg_circle_black"
+            android:text="!"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:textSize="8sp"
+            android:gravity="center"
+            android:visibility="gone"/>
+
         <ImageButton
             android:id="@+id/btnClose"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:padding="@dimen/margin16"
+            android:background="@drawable/solid_grey_radius"
+            android:contentDescription="@string/lblClose"
+            android:scaleType="centerInside"
             android:src="@drawable/ic_close"
-            app:layout_constraintEnd_toEndOf="parent"
             android:tint="@color/white"
-            android:contentDescription="@string/lblClose" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginEnd="@dimen/margin16"
+            android:layout_marginTop="@dimen/margin8"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.appcompat.widget.Toolbar>

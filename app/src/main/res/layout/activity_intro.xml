@@ -13,20 +13,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <ImageButton
+<!--    <ImageButton-->
+<!--        android:id="@+id/btnNext"-->
+<!--        android:layout_width="36dp"-->
+<!--        android:layout_height="36dp"-->
+<!--        android:layout_marginEnd="@dimen/margin24"-->
+<!--        android:layout_marginTop="@dimen/margin24"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:background="@android:color/transparent"-->
+<!--        android:contentDescription="@string/skip"-->
+<!--        android:scaleType="center"-->
+<!--        android:src="@drawable/arrow_next"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:onClick="btnActionIntro"/>-->
+
+    <TextView
         android:id="@+id/btnNext"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin24"
-        android:layout_marginTop="@dimen/margin24"
-        android:adjustViewBounds="true"
-        android:background="@android:color/transparent"
+        android:layout_marginTop="@dimen/margin32"
         android:contentDescription="@string/skip"
-        android:scaleType="center"
-        android:src="@drawable/arrow_next"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:onClick="btnActionIntro"/>
+        android:onClick="btnActionIntro"
+        android:text="Next"
+        android:textColor="@color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textStyle=""/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

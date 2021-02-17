@@ -1,19 +1,25 @@
 package `in`.allen.gsp.ui.home
 
 import `in`.allen.gsp.data.repositories.BannerRepository
+import `in`.allen.gsp.data.repositories.LeaderboardRepository
+import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Resource
 import `in`.allen.gsp.utils.lazyDeferred
+import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 class HomeViewModel(
     private val userRepository: UserRepository,
-    private val bannerRepository: BannerRepository
+    private val bannerRepository: BannerRepository,
+    private val leaderboardRepository: LeaderboardRepository,
+    private val messageRepository: MessageRepository
 ): ViewModel() {
 
     val ALERT = "alert"
@@ -54,6 +60,7 @@ class HomeViewModel(
         viewModelScope.launch {
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
+                messageRepository.getUnreadCount(dbUser.user_id)
                 setSuccess(dbUser,"user")
             } else {
                 setError("Not found",SNACKBAR)
@@ -66,6 +73,25 @@ class HomeViewModel(
             bannerRepository.getList(user_id)
         }
         setSuccess(response,"banner")
+    }
+
+    fun tileData() {
+        viewModelScope.launch {
+            delay(1000)
+            val response = bannerRepository.getTileList()
+            setSuccess(response,"tiles")
+        }
+    }
+
+    fun leaderboard() {
+        viewModelScope.launch {
+            val minutes= userRepository.config("fetch-interval")
+            val fetchInterval = minutes.toInt().times(60).times(1000)
+            val response by lazyDeferred {
+                leaderboardRepository.getList(fetchInterval)
+            }
+            setSuccess(response,"leaderboard")
+        }
     }
 
 }

@@ -14,6 +14,7 @@ import androidx.room.RoomDatabase
         Message::class,
         Video::class,
         Banner::class,
+        Tile::class,
         Contest::class,
         Quiz::class
     ],
@@ -27,6 +28,7 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun getMessageDao(): MessageDao
     abstract fun getVideoDao(): VideoDao
     abstract fun getBannerDao(): BannerDao
+    abstract fun getTileDao(): TileDao
     abstract fun getQuizDao(): QuizDao
     abstract fun getContestDao(): ContestDao
 

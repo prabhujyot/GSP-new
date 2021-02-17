@@ -1,0 +1,35 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="App Settings">
+        <SwitchPreferenceCompat
+            app:key="appMute"
+            app:title="@string/appMute"/>
+
+        <SwitchPreferenceCompat
+            app:key="appNotification"
+            app:title="@string/lblNotification"
+            app:defaultValue="true"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="General">
+        <Preference
+            android:key="appHelp"
+            android:title="@string/lblHelp" >
+            <intent android:targetPackage="in.allen.gsp"
+                android:targetClass="in.allen.gsp.WebActivity">
+                <extra android:name="url" android:value="https://www.klipinterest.com/gsp-admin/index.php/site/page/app-instructions" />
+            </intent>
+        </Preference>
+
+        <Preference
+            android:key="appPrivacyPolicy"
+            android:title="@string/lblPrivacyPolicy" >
+            <intent android:targetPackage="in.allen.gsp"
+                android:targetClass="in.allen.gsp.WebActivity">
+                <extra android:name="url" android:value="https://www.klipinterest.com/gsp-admin/index.php/site/page/privacy-policy" />
+            </intent>
+        </Preference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -28,6 +28,9 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_contest_instruction)
         viewModel = ViewModelProvider(this, factory).get(ContestViewModel::class.java)
 
@@ -45,11 +48,6 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
         observeError()
         observeSuccess()
         viewModel.userData()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     fun actionContestInstruction(view: View) {}

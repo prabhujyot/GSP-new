@@ -35,6 +35,8 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile_edit)
         viewModel = ProfileViewModel(repository,rewardRepository)
 
@@ -52,11 +54,6 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         observeError()
         observeSuccess()
         viewModel.userData()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     private fun observeLoading() {

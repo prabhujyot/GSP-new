@@ -7,7 +7,9 @@ import `in`.allen.gsp.databinding.ItemNotificationBinding
 import `in`.allen.gsp.utils.*
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,11 +68,6 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         observeSuccess()
     }
 
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
-    }
-
     override fun onBackPressed() {
         if(::messageSheetBehavior.isInitialized &&
             messageSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -123,15 +120,27 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
                                 nomore = true
                             }
                         }
+
+                        if(list.isNotEmpty()) {
+                            binding.noData.show(false)
+                        }
                     }
                     "open" -> {
-                        val msg = it.data as Message
-                        binding.rootLayout.bottomSheetMessage.webView.loadData(
-                            msg.msg,
-                            "text/html; charset=UTF-8",
-                            null)
-                        if(messageSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                            messageSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                        if(it.data is HashMap<*,*>) {
+                            val msg = it.data["item"] as Message
+                            val position = it.data["position"] as Int
+                            binding.rootLayout.bottomSheetMessage.webView.loadData(
+                                msg.msg,
+                                "text/html; charset=UTF-8",
+                                null)
+                            if(messageSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                                messageSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                            }
+
+                            if (::recyclerAdapter.isInitialized) {
+                                list[position].status = 1
+                                recyclerAdapter.notifyItemChanged(position)
+                            }
                         }
                     }
                 }
@@ -162,8 +171,8 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         binding.rootLayout.isClickable = false
     }
 
-    fun openSheet(notificationId: Int) {
-        viewModel.openMessage(notificationId)
+    fun openSheet(notificationId: Int, position: Int) {
+        viewModel.openMessage(notificationId,position)
     }
 
     private fun reset() {
@@ -219,11 +228,12 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-            holder.bind(items[position])
+            val item = items[position]
+            holder.bind(item,position)
             if(position == 0) {
-                holder.separator.show(false)
+                holder.binding.separator.show(false)
             } else {
-                holder.separator.show()
+                holder.binding.separator.show()
             }
         }
 
@@ -235,25 +245,38 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
             val binding: ItemNotificationBinding,
             val activity: NotificationActivity
         ) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(data: Message) {
+            fun bind(data: Message, position: Int) {
                 tag("bind: $data")
+
                 if(data.status == 0) {
                     binding.time.typeface = Typeface.DEFAULT_BOLD
                     binding.title.typeface = Typeface.DEFAULT_BOLD
                     binding.time.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.white, null))
                     binding.title.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.white, null))
                     binding.msg.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.white, null))
+                } else {
+                    binding.time.typeface = Typeface.DEFAULT
+                    binding.title.typeface = Typeface.DEFAULT
+                    binding.time.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.grey, null))
+                    binding.title.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.grey, null))
+                    binding.msg.setTextColor(ResourcesCompat.getColor(activity.resources, R.color.grey, null))
                 }
+
                 binding.message = data
-                binding.time.text = timeInAgo(data.date,"yyyy-MM-dd hh:mm:ss")
+                binding.time.text = timeInAgo(data.date,"yyyy-MM-dd HH:mm:ss")
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    binding.msg.text = Html.fromHtml(data.msg, Html.FROM_HTML_MODE_COMPACT)
+                } else {
+                    binding.msg.text = Html.fromHtml(data.msg)
+                }
 
                 binding.item.setOnClickListener {
-                    activity.openSheet(data.id)
+                    activity.openSheet(data.id,position)
                 }
 
                 binding.executePendingBindings()
             }
-            val separator: View = binding.separator
         }
     }
 

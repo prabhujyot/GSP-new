@@ -2,10 +2,13 @@ package `in`.allen.gsp.ui.home
 
 import `in`.allen.gsp.*
 import `in`.allen.gsp.data.entities.Banner
+import `in`.allen.gsp.data.entities.Leaderboard
+import `in`.allen.gsp.data.entities.Tile
 import `in`.allen.gsp.data.entities.User
-import `in`.allen.gsp.data.repositories.BannerRepository
+import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.databinding.ActivityHomeBinding
+import `in`.allen.gsp.databinding.ItemTileBinding
 import `in`.allen.gsp.ui.leaderboard.LeaderboardActivity
 import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.ui.profile.ProfileActivity
@@ -15,17 +18,22 @@ import `in`.allen.gsp.ui.videos.VideosActivity
 import `in`.allen.gsp.utils.*
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.asksira.loopingviewpager.LoopingPagerAdapter
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -60,8 +68,9 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     private lateinit var viewModel: HomeViewModel
 
     override val kodein by kodein()
+    private val factory:HomeViewModelFactory by instance()
     private val userRepository: UserRepository by instance()
-    private val bannerRepository: BannerRepository by instance()
+    private val messageRepository: MessageRepository by instance()
     private val preferences: AppPreferences by instance()
 
     private lateinit var app: App
@@ -70,19 +79,24 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = HomeViewModel(userRepository, bannerRepository)
+        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
 
         setSupportActionBar(myToolbar)
         btnClose.setOnClickListener {
             onBackPressed()
         }
 
-        app = application as App
+        menuNotification.setOnClickListener {
+            val i = Intent()
+            i.setClass(this@HomeActivity, NotificationActivity::class.java)
+            startActivity(i)
+        }
 
-        binding.rootLayout.setOnClickListener { hideSystemUI() }
+        binding.viewpagerBanner.pageMargin = 8
 
-        binding.viewpagerBanner.pageMargin = 16
 
 //        if (BuildConfig.DEBUG) {
 //            testingInAppUpdate()
@@ -124,6 +138,18 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                 }
             }
         })
+
+        messageRepository.unreadMsg.observe(this, {
+            msgCounter.show(false)
+            if (it > 0) {
+                if (it < 10) {
+                    msgCounter.text = it.toString()
+                } else {
+                    msgCounter.text = "9+"
+                }
+                msgCounter.show()
+            }
+        })
     }
 
     override fun onPause() {
@@ -143,15 +169,11 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
     override fun onResume() {
         super.onResume()
-        hideSystemUI()
         if(!autoscroll.equals("true",true)) {
             binding.viewpagerBanner.pauseAutoScroll()
         } else {
             binding.viewpagerBanner.resumeAutoScroll()
         }
-//        if(::app.isInitialized) {
-//            app.getmServ()?.playMusic("round", true)
-//        }
     }
 
     override fun onBackPressed() {
@@ -239,9 +261,10 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                     "user" -> {
                         val user = it.data as User
                         if (user.avatar.isNotBlank()) {
-                            binding.btnProfileTop.loadImage(user.avatar, true)
+                            binding.fabProfile.loadImage(user.avatar,true,true)
                         }
                         viewModel.bannerData(user.user_id)
+                        viewModel.leaderboard()
                     }
 
                     "banner" -> {
@@ -255,13 +278,37 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                                         true
                                     )
 
+                                    viewModel.tileData()
+
                                     tag("autoscroll: $autoscroll")
                                     if(!autoscroll.equals("true",true)) {
                                         binding.viewpagerBanner.pauseAutoScroll()
                                     } else {
                                         binding.viewpagerBanner.resumeAutoScroll()
                                     }
-//                                    autoscroll(true)
+                                })
+                            }
+                        }
+                    }
+
+                    "tiles" -> {
+                        tag("$TAG, tiles")
+                        if (it.data is List<*>) {
+                            val list = it.data as List<Tile>
+                            if(list.isNotEmpty()) {
+                                setTiles(list)
+                            }
+                        }
+                    }
+
+                    "leaderboard" -> {
+                        if(it.data is Deferred<*>) {
+                            val deferredList = it.data as Deferred<LiveData<List<Leaderboard>>>
+                            lifecycleScope.launch {
+                                deferredList.await().observe(this@HomeActivity, { list->
+                                    if(list.size > 4) {
+                                        setLeaderboard(list)
+                                    }
                                 })
                             }
                         }
@@ -271,57 +318,6 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         })
     }
 
-//    private class BannerAdapter(
-//        private val inflater: LayoutInflater,
-//        private val list: List<Banner>,
-//        private val context: Context
-//    ): PagerAdapter() {
-//
-//        override fun isViewFromObject(view: View, `object`: Any): Boolean {
-//            return view === `object`
-//        }
-//
-//        override fun getCount(): Int {
-//            return list.size
-//        }
-//
-//        override fun instantiateItem(container: ViewGroup, position: Int): Any {
-//            val binding: ItemBannerBinding = DataBindingUtil.inflate(
-//                inflater,
-//                R.layout.item_banner,
-//                container,
-//                false
-//            )
-//
-//            val item = list[position]
-//            binding.image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item.image}")
-//            binding.image.setOnClickListener {
-//                if(item.action.trim().length > 10) {
-//                    val i = Intent()
-//                    i.setClassName(context, item.action)
-//                    if(item.meta.trim().length > 4) {
-//                        val obj = JSONObject(item.meta)
-//                        when {
-//                            obj.has("url") -> {
-//                                i.putExtra("url", obj.getString("url"))
-//                            }
-//                            obj.has("contest_id") -> {
-//                                i.putExtra("contest_id", obj.getString("contest_id"))
-//                            }
-//                        }
-//                    }
-//                    context.startActivity(i)
-//                }
-//            }
-//
-//            container.addView(binding.root)
-//            return binding.root
-//        }
-//
-//        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-//            container.removeView(`object` as View)
-//        }
-//    }
 
     class BannerAdapter(
         context: Context,
@@ -372,16 +368,58 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    private fun setLeaderboard(list: List<Leaderboard>) {
+        val listTop = list.subList(0,3)
+
+        // rank 1
+        binding.layoutRanks.findViewById<TextView>(R.id.rank_first_name).text = listTop[0].name
+        binding.layoutRanks.findViewById<TextView>(R.id.rank_first_score).text = "S. ${listTop[0].score}"
+        listTop[0].avatar.let { it1 -> binding.layoutRanks.findViewById<FloatingActionButton>(R.id.rank_first_avatar).loadImage(it1,true) }
+
+        // rank 2
+        binding.layoutRanks.findViewById<TextView>(R.id.rank_second_name).text = listTop[1].name
+        binding.layoutRanks.findViewById<TextView>(R.id.rank_second_score).text = "S. ${listTop[1].score}"
+        listTop[1].avatar.let { it1 -> binding.layoutRanks.findViewById<FloatingActionButton>(R.id.rank_second_avatar).loadImage(it1,true) }
+
+        // rank 3
+        binding.layoutRanks.findViewById<TextView>(R.id.rank_third_name).text = listTop[2].name
+        binding.layoutRanks.findViewById<TextView>(R.id.rank_third_score).text = "S. ${listTop[2].score}"
+        listTop[2].avatar.let { it1 -> binding.layoutRanks.findViewById<FloatingActionButton>(R.id.rank_third_avatar).loadImage(it1,true) }
+
+        binding.layoutRanks.show()
+    }
+
+    private fun setTiles(list: List<Tile>) {
+        tag("$TAG, setTiles : ${list.size}")
+        binding.hScrollContainer.removeAllViews()
+        for (item in list) {
+            val bindingTiles: ItemTileBinding = DataBindingUtil.inflate(
+                layoutInflater, R.layout.item_tile, binding.hScrollContainer, false
+            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                bindingTiles.title.text = Html.fromHtml(item.text, Html.FROM_HTML_MODE_COMPACT)
+            } else {
+                bindingTiles.title.text = Html.fromHtml(item.text)
+            }
+            bindingTiles.image.loadImage(
+                "${BuildConfig.BASE_URL}gsp-admin/uploads/tiles/${item.image}",
+                false,
+                centerInside = true,
+            )
+            binding.hScrollContainer.addView(bindingTiles.root)
+        }
+    }
+
     fun btnActionHome(view: View) {
         val i = Intent()
         when (view.id) {
-            R.id.btnVideos -> {
+            R.id.layoutVideo -> {
                 i.setClass(this@HomeActivity, VideosActivity::class.java)
             }
-            R.id.btnLeaderboard -> {
+            R.id.layoutLeaderboard -> {
                 i.setClass(this@HomeActivity, LeaderboardActivity::class.java)
             }
-            R.id.btnProfileTop -> {
+            R.id.fabProfile -> {
                 i.setClass(this@HomeActivity, ProfileActivity::class.java)
             }
             R.id.btnPlay -> {
@@ -393,16 +431,13 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             R.id.btnCoins -> {
                 i.setClass(this@HomeActivity, RewardActivity::class.java)
             }
-            R.id.btnNotification -> {
-                i.setClass(this@HomeActivity, NotificationActivity::class.java)
+            R.id.btnSetting -> {
+                i.setClass(this@HomeActivity, SettingsActivity::class.java)
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
                 i.putExtra("url", "${BuildConfig.BASE_URL}category/quiz-time/")
             }
-//            R.id.btnSetting -> {
-//                i.setClass(this@HomeActivity, RewardActivity::class.java)
-//            }
         }
         startActivity(i)
     }
@@ -609,22 +644,4 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         }
     }
     /* End In-App update */
-
-//    private fun autoscroll(scroll:Boolean) {
-//        tag("autoscroll $scroll")
-//        Timer().schedule(object : TimerTask() {
-//            // task to be scheduled
-//            override fun run() {
-//                val adt = binding.viewpagerBanner.adapter as BannerAdapter
-//                tag("autoscroll adt.count: ${adt.count}")
-//                var currentPage = binding.viewpagerBanner.currentItem
-//                if(currentPage == adt.count) {
-//                    currentPage = 0
-//                }
-//                binding.viewpagerBanner.currentItem = currentPage++
-//                currentPage++
-//                tag("autoscroll currentPage: $currentPage")
-//            }
-//        }, 3500, 3500)
-//    }
 }

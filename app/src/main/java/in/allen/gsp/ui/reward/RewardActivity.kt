@@ -20,12 +20,14 @@ import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.downloader.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
 import jp.wasabeef.blurry.Blurry
@@ -38,6 +40,8 @@ import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import java.io.File
+
 
 class RewardActivity : AppCompatActivity(), KodeinAware {
 
@@ -52,6 +56,9 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_reward)
         viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
 
@@ -84,11 +91,6 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         viewModel.userData()
     }
 
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
-    }
-
     override fun onBackPressed() {
         if(::redeemSheetBehavior.isInitialized &&
             redeemSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -116,15 +118,23 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                 }
         }
         if(id == R.id.menu_invite) {
-            val share = Intent(Intent.ACTION_SEND)
-            share.type = "text/plain"
-            share.putExtra(
-                Intent.EXTRA_TEXT,
-                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
-                        " Use my referral link to download 'Gyan Se Pehchan' app" +
-                        " and get coin benefits when you join and play! \n" + Uri.parse(
-                    viewModel.user?.referral_id?.let { getReferralLink(it) }))
-            startActivity(Intent.createChooser(share, "Share with"))
+            viewModel.setLoading(true)
+            val url = BuildConfig.BASE_URL + "gsp-admin/uploads/banners/gsp_refer.png"
+            val path = getExternalFilesDir(null).toString()
+            PRDownloader.download(url, path, "refer.png")
+                .build()
+                .setOnStartOrResumeListener { }
+                .setOnPauseListener { }
+                .setOnCancelListener { }
+                .setOnProgressListener { }
+                .start(object : OnDownloadListener {
+                    override fun onDownloadComplete() {
+                        viewModel.setSuccess("","share")
+                    }
+                    override fun onError(error: com.downloader.Error?) {
+                        viewModel.setLoading(false)
+                    }
+                })
         }
         return super.onOptionsItemSelected(item)
     }
@@ -174,7 +184,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                         binding.totalCoins.text = "${user.coins}"
                         binding.coinValue.text = "Cash: ${user.coins.div(viewModel.coinsValue)} INR"
 
-                        if(!viewModel.dailyReward) {
+                        if (!viewModel.dailyReward) {
                             viewModel.getDailyReward()
                             viewModel.dailyReward = true
                         }
@@ -184,20 +194,33 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                     "getDailyReward" -> {
                         if (it.data is JSONObject) {
                             val obj = it.data
-                            setDailyCheckinViews(obj.getInt("diff"),obj.getInt("today_value"))
+                            setDailyCheckinViews(obj.getInt("diff"), obj.getInt("today_value"))
                         }
                     }
 
                     "setDailyReward" -> {
                         if (it.data is JSONObject) {
                             val obj = it.data
-                            setDailyCheckinViews(obj.getInt("diff"),obj.getInt("today_value"))
+                            setDailyCheckinViews(obj.getInt("diff"), obj.getInt("today_value"))
                         }
                     }
 
                     "redeem" -> {
                         if (it.data is String) {
-                            viewModel.setError(it.data,"snackbar")
+                            viewModel.setError(it.data, "snackbar")
+                        }
+                    }
+
+                    "share" -> {
+                        if (it.data is String) {
+                            share(
+                                "refer.png",
+                                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
+                                        " Use my referral link to download 'Gyan Se Pehchan' app" +
+                                        " and get coin benefits when you join and play! \n" + Uri.parse(
+                                    viewModel.user?.referral_id?.let { it1 -> getReferralLink(it1) }
+                                )
+                            )
                         }
                     }
                 }
@@ -366,25 +389,71 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             val textId = "textDay" + (i+1)
             val lblId = "lblDay" + (i+1)
 
-            val imgView: ImageView = binding.rootLayout.findViewById(resources.getIdentifier(imgId,"id",packageName))
-            val textView: TextView = binding.rootLayout.findViewById(resources.getIdentifier(textId,"id",packageName))
-            val lblView: TextView = binding.rootLayout.findViewById(resources.getIdentifier(lblId,"id",packageName))
+            val imgView: ImageView = binding.rootLayout.findViewById(
+                resources.getIdentifier(
+                    imgId,
+                    "id",
+                    packageName
+                )
+            )
+            val textView: TextView = binding.rootLayout.findViewById(
+                resources.getIdentifier(
+                    textId,
+                    "id",
+                    packageName
+                )
+            )
+            val lblView: TextView = binding.rootLayout.findViewById(
+                resources.getIdentifier(
+                    lblId,
+                    "id",
+                    packageName
+                )
+            )
 
             if (textView.text.toString().toInt() < todayValue) {
-                imgView.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_black,null))
-                lblView.background = ResourcesCompat.getDrawable(resources,R.drawable.ic_check,null)
+                imgView.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.bg_btn_black,
+                        null
+                    )
+                )
+                lblView.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_check,
+                    null
+                )
                 ViewCompat.setBackgroundTintList(
                     lblView,
-                    ColorStateList.valueOf(ResourcesCompat.getColor(resources,R.color.black,null)))
+                    ColorStateList.valueOf(ResourcesCompat.getColor(resources, R.color.black, null))
+                )
                 lblView.text = null
             }
             if (textView.text.toString().toInt() == todayValue) {
                 if (diff == 0) {
-                    imgView.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.bg_btn_black,null))
-                    lblView.background = ResourcesCompat.getDrawable(resources,R.drawable.ic_check,null)
+                    imgView.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.bg_btn_black,
+                            null
+                        )
+                    )
+                    lblView.background = ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.ic_check,
+                        null
+                    )
                     ViewCompat.setBackgroundTintList(
                         lblView,
-                        ColorStateList.valueOf(ResourcesCompat.getColor(resources,R.color.black,null)))
+                        ColorStateList.valueOf(
+                            ResourcesCompat.getColor(
+                                resources,
+                                R.color.black,
+                                null
+                            )
+                        )
+                    )
                     lblView.text = null
                 }
             }

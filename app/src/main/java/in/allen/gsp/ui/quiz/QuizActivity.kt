@@ -18,13 +18,12 @@ import android.graphics.drawable.ColorDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
@@ -35,6 +34,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,11 +81,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // hide statusbar
-        this.window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+        hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_quiz)
         viewModel = ViewModelProvider(this, factory).get(QuizViewModel::class.java)
@@ -135,7 +132,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     "alert" -> {
                         it.data?.let { it1 ->
                             var action = ""
-                            var str = ""
+                            var str = it1
                             if(it1.startsWith("quizdata:")) {
                                 action = "finish"
                                 str = it1.removePrefix("quizdata:")
@@ -162,7 +159,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
+        viewModel.getSuccess().observe(this, { it ->
             if (it != null) {
                 when (it.message) {
                     "user" -> {
@@ -384,6 +381,20 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             }
                         }
                     }
+
+                    "share" -> {
+                        if (it.data is String) {
+                            viewModel.setLoading(false)
+                            share(
+                                "refer.png",
+                                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
+                                        " Use my referral link to download 'Gyan Se Pehchan' app" +
+                                        " and get coin benefits when you join and play! \n" + Uri.parse(
+                                    viewModel.user?.referral_id?.let { it1 -> getReferralLink(it1) }
+                                )
+                            )
+                        }
+                    }
                 }
             }
         })
@@ -404,13 +415,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 viewModel.validateLifeline("quit")
             }
             R.id.btnTranslate -> {
-                if(viewModel.lang.equals("eng", true)) {
-                    viewModel.lang = "hindi"
-                } else {
-                    viewModel.lang = "eng"
-                }
+                if(!viewModel.currentq.qformat.equals("spellings", true)) {
+                    if (viewModel.lang.equals("eng", true)) {
+                        viewModel.lang = "hindi"
+                    } else {
+                        viewModel.lang = "eng"
+                    }
 
-                switchLanguage(viewModel.currentq)
+                    switchLanguage(viewModel.currentq)
+                }
             }
         }
     }
@@ -440,7 +453,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.layoutFinish.progressScore.max = 0
         binding.layoutFinish.progressScore.clearAnimation()
 
-        viewModel.qset.reverse()
         viewModel.currentq = viewModel.qset[viewModel.index]
         viewModel.setSuccess("setQuestion", "quizStatus")
     }
@@ -456,50 +468,33 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initQusetionTable() {
-        binding.slidingDrawer.close()
-        // question table
-        binding.level1.show(false)
-        binding.level2.show(false)
-        binding.level3.show(false)
-
         questionTable.clear()
-        binding.layoutLevel1.removeAllViews()
-        binding.layoutLevel2.removeAllViews()
-        binding.layoutLevel3.removeAllViews()
+        binding.layoutTable.findViewById<LinearLayout>(R.id.layoutLevel1).removeAllViews()
+        binding.layoutTable.findViewById<LinearLayout>(R.id.layoutLevel2).removeAllViews()
+        binding.layoutTable.findViewById<LinearLayout>(R.id.layoutLevel3).removeAllViews()
 
-        viewModel.qset.reverse()
         for(i in viewModel.qset) {
-            tag("$TAG qno: ${i.qno}")
-            val params = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+            val f = 18.times(densityFactor()).toInt()
+            val params = LinearLayout.LayoutParams(f,f)
             val textView = TextView(this)
             textView.layoutParams = params
-            textView.setPadding(16, 2, 16, 2)
-            if (Build.VERSION.SDK_INT < 23) {
-                textView.setTextAppearance(this, R.style.TextAppearance_AppCompat_Small)
-            } else {
-                textView.setTextAppearance(R.style.TextAppearance_AppCompat_Small)
-            }
-            textView.typeface = Typeface.DEFAULT_BOLD
-            textView.text = "Q.: ${i.qno}"
+            textView.gravity = Gravity.CENTER
+            textView.text = "${i.qno}"
+            textView.textSize = 8.0f
             textView.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+            textView.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_circle_black,null)
             textView.tag = i.qno
 
             if (i.qno in 1..5) {
-                binding.layoutLevel1.addView(textView)
-                binding.level1.show()
+                binding.layoutTable.findViewById<LinearLayout>(R.id.layoutLevel1).addView(textView)
             }
 
             if (i.qno in 6..10) {
-                binding.layoutLevel2.addView(textView)
-                binding.level2.show()
+                binding.layoutTable.findViewById<LinearLayout>(R.id.layoutLevel2).addView(textView)
             }
 
             if (i.qno in 11..15) {
-                binding.layoutLevel3.addView(textView)
-                binding.level3.show()
+                binding.layoutTable.findViewById<LinearLayout>(R.id.layoutLevel3).addView(textView)
             }
 
             // create view array
@@ -527,7 +522,6 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private fun setQuestion(currentQ: Question) {
         tag("$TAG setQuestion ${currentQ.qno} ${viewModel.index}")
-        binding.slidingDrawer.close()
         viewModel.lock(true)
 
         viewModel.questionTimerCancel()
@@ -539,8 +533,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.progressMultiplier.max = 10 * 1000
         binding.progressMultiplier.progress = 10 * 1000
 
-        binding.qno.text = "Q.No.: ${currentQ.qno}"
-
+        binding.question.visibility = View.INVISIBLE
         binding.layoutOption.clearAnimation()
         binding.layoutOption.visibility = View.INVISIBLE
 
@@ -654,6 +647,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         lifecycleScope.launch {
             delay(viewModel.TIME_DELAY)
             if(view.tag == 1) {
+                viewModel.isDoubleDip = false
                 if(::app.isInitialized) {
                     app.getmServ()?.playMusic("correct",false)
                 }
@@ -806,7 +800,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             textView.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
             textView.background = ResourcesCompat.getDrawable(
                 resources,
-                R.drawable.bg_circle_red,
+                R.drawable.bg_circle_black,
                 null
             )
             textView.tag = true
@@ -909,7 +903,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         // highlight table
         for(v in questionTable) {
-            v.background = null
+            v.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_circle_black, null)
             (v as TextView).setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
         }
 
@@ -917,7 +911,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             if(v.tag == currentQ.qno) {
                 v.background = ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.bg_btn_yellow,
+                    R.drawable.bg_circle_yellow,
                     null
                 )
                 (v as TextView).setTextColor(
@@ -927,11 +921,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         null
                     )
                 )
-                v.setPadding(16, 2, 16, 2)
                 break
             }
         }
 
+        binding.qno.text = "Q.No.: ${currentQ.qno}"
+        binding.question.visibility = View.VISIBLE
         viewModel.displayAttachment()
     }
 
@@ -1009,6 +1004,26 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         startService()
+
+        binding.layoutFinish.btnShare.setOnClickListener {
+            viewModel.setLoading(true)
+            val url = BuildConfig.BASE_URL + "gsp-admin/uploads/banners/gsp_refer.png"
+            val path = getExternalFilesDir(null).toString()
+            PRDownloader.download(url, path, "refer.png")
+                .build()
+                .setOnStartOrResumeListener { }
+                .setOnPauseListener { }
+                .setOnCancelListener { }
+                .setOnProgressListener { }
+                .start(object : OnDownloadListener {
+                    override fun onDownloadComplete() {
+                        viewModel.setSuccess("","share")
+                    }
+                    override fun onError(error: com.downloader.Error?) {
+                        viewModel.setLoading(false)
+                    }
+                })
+        }
 
         binding.layoutFinish.btnPlay.setOnClickListener {
             if (finishSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {

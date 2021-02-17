@@ -173,6 +173,9 @@ class QuizViewModel(
         for(q in qset) {
             questionSet.add(q.qid)
         }
+        for(f in fset) {
+            questionSet.add(f.qid)
+        }
 
         // save attachment
         setSuccess("downloadAttachment", "downloadAttachment")
@@ -423,17 +426,17 @@ class QuizViewModel(
                                 userRepository.setDBUser(user!!)
                                 setSuccess(offer,"offerPurchase")
                             } else {
-                                setError(responseObj.getString("message"), ALERT)
+                                setError("quizdata:${responseObj.getString("message")}", ALERT)
                             }
                         }
                     } catch (e: Exception) {
                         setLoading(false)
                         lock(false)
-                        setError("${e.message}", ALERT)
+                        setError("quizdata:${e.message}", ALERT)
                     }
                 }
             } else {
-                setError("$coins GSP Coins required", ALERT)
+                setError("quizdata:$coins GSP Coins required", ALERT)
             }
         }
     }

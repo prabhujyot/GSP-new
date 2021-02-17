@@ -1,5 +1,6 @@
 package `in`.allen.gsp.ui.profile
 
+import `in`.allen.gsp.BuildConfig
 import `in`.allen.gsp.R
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.RewardRepository
@@ -26,6 +27,8 @@ import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.downloader.OnDownloadListener
+import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import dev.skymansandy.scratchcardlayout.listener.ScratchListener
@@ -37,6 +40,7 @@ import org.json.JSONObject
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
+import java.io.File
 import kotlin.random.Random
 
 
@@ -65,6 +69,9 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
         viewModel = ProfileViewModel(repository,rewardRepository)
 
@@ -107,31 +114,25 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                 }
         }
         if(id == R.id.menu_share) {
-            val share = Intent(Intent.ACTION_SEND)
-            share.type = "image/jpeg"
-            share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            val file = screenShot(binding.statistics, "screenshot.jpg")
-            share.putExtra(
-                Intent.EXTRA_TEXT,
-                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
-                        " Use my referral link to download 'Gyan Se Pehchan' app" +
-                        " and get coin benefits when you join and play! \n" + Uri.parse(
-                    viewModel.user?.referral_id?.let { getReferralLink(it) }))
-            share.putExtra(
-                Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                    this,
-                    applicationContext.packageName + ".provider",
-                    file
-                )
-            )
-            startActivity(Intent.createChooser(share, "Share Image"))
+            viewModel.setLoading(true)
+            val url = BuildConfig.BASE_URL + "gsp-admin/uploads/banners/gsp_refer.png"
+            val path = getExternalFilesDir(null).toString()
+            PRDownloader.download(url, path, "refer.png")
+                .build()
+                .setOnStartOrResumeListener { }
+                .setOnPauseListener { }
+                .setOnCancelListener { }
+                .setOnProgressListener { }
+                .start(object : OnDownloadListener {
+                    override fun onDownloadComplete() {
+                        viewModel.setSuccess("","share")
+                    }
+                    override fun onError(error: com.downloader.Error?) {
+                        viewModel.setLoading(false)
+                    }
+                })
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     private fun observeLoading() {
@@ -239,6 +240,19 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                             } else {
                                 nomore = true
                             }
+                        }
+                    }
+
+                    "share" -> {
+                        if (it.data is String) {
+                            share(
+                                "refer.png",
+                                "Hey, I can’t stop playing this game. I believe you’d like it as well." +
+                                        " Use my referral link to download 'Gyan Se Pehchan' app" +
+                                        " and get coin benefits when you join and play! \n" + Uri.parse(
+                                    viewModel.user?.referral_id?.let { it1 -> getReferralLink(it1) }
+                                )
+                            )
                         }
                     }
                 }

@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
+import com.google.firebase.messaging.FirebaseMessaging
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.kodein
 import org.kodein.di.generic.instance
@@ -50,6 +51,8 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_splash)
         viewModel = SplashViewModel(repository)
@@ -84,17 +87,20 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
         isReferred()
 
+        // subscribe notification
+        if(!preferences.subscribeNotification) {
+            FirebaseMessaging.getInstance().subscribeToTopic("Notification").addOnCompleteListener {
+                preferences.subscribeNotification = it.isSuccessful
+                tag("Subscription: ${preferences.subscribeNotification}")
+            }
+        }
+
         googleSignInClient = initGoogle()
         initFB()
 
         observeSuccess()
         observeLoading()
         observeError()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

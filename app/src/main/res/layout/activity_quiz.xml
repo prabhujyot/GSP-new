@@ -37,14 +37,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.28" />
+                app:layout_constraintGuide_percent="0.265" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineTranslate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.245" />
+                app:layout_constraintGuide_percent="0.23" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/btnTranslate"
@@ -54,7 +54,9 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="@dimen/margin16"
                 android:src="@drawable/ic_translate"
-                android:onClick="btnActionPlay"/>
+                android:onClick="btnActionPlay"
+                app:fabCustomSize="56dp"
+                app:maxImageSize="24dp"/>
 
             <ProgressBar
                 android:id="@+id/progressMultiplier"
@@ -66,6 +68,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guidelineAttachment" />
 
+            <include
+                android:id="@+id/layoutTable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                layout="@layout/layout_qnos"
+                app:layout_constraintTop_toBottomOf="@id/progressMultiplier"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="@dimen/margin16"
+                android:layout_marginTop="@dimen/margin2"/>
+
 
             <!-- Question -->
             <androidx.appcompat.widget.AppCompatTextView
@@ -76,7 +88,8 @@
                 android:text="The Jatropha curcas."
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="17sp"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
                 app:layout_constraintEnd_toEndOf="@id/textScore"
                 app:layout_constraintStart_toStartOf="@id/qno"
@@ -103,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.43" />
+                app:layout_constraintGuide_percent="0.44" />
 
 
             <!-- score -->
@@ -115,6 +128,7 @@
                 android:text="Q.No.: 0"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/progressTimer" />
 
@@ -126,6 +140,7 @@
                 android:text="@string/lblScore"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="@id/textScore"
                 app:layout_constraintEnd_toStartOf="@id/textScore"
                 app:layout_constraintTop_toTopOf="@id/textScore" />
@@ -204,6 +219,7 @@
                 android:text="90"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textStyle="bold"
+                android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="@id/progressTimer"
                 app:layout_constraintEnd_toEndOf="@id/progressTimer"
                 app:layout_constraintStart_toStartOf="@id/progressTimer"
@@ -253,105 +269,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guidelineTranslate"
                 app:layout_constraintBottom_toBottomOf="parent"/>
-
-
-            <SlidingDrawer
-                android:id="@+id/slidingDrawer"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin80"
-                android:content="@id/layoutPoints"
-                android:handle="@id/btnPane"
-                android:orientation="horizontal"
-                android:rotation="0"
-                android:translationZ="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <LinearLayout
-                    android:id="@+id/layoutPoints"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/left_corner_radius"
-                    android:orientation="vertical"
-                    android:paddingLeft="@dimen/margin24"
-                    android:paddingTop="@dimen/margin16"
-                    android:paddingRight="@dimen/margin24"
-                    android:paddingBottom="@dimen/margin16"
-                    android:gravity="center_vertical">
-
-                    <LinearLayout
-                        android:id="@+id/layoutLevel3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/level3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:background="@drawable/bg_btn_black"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblLevel3"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/layoutLevel2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/level2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:background="@drawable/bg_btn_black"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblLevel2"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:id="@+id/layoutLevel1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"/>
-                    <androidx.appcompat.widget.AppCompatTextView
-                        android:id="@+id/level1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:layout_marginBottom="@dimen/margin8"
-                        android:background="@drawable/bg_btn_black"
-                        android:paddingLeft="@dimen/margin16"
-                        android:paddingTop="@dimen/margin2"
-                        android:paddingRight="@dimen/margin16"
-                        android:paddingBottom="@dimen/margin2"
-                        android:text="@string/lblLevel1"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <ImageButton
-                    android:id="@+id/btnPane"
-                    android:layout_width="18dp"
-                    android:layout_height="72dp"
-                    android:background="@drawable/left_corner_radius"
-                    android:src="@drawable/arrow_previous" />
-            </SlidingDrawer>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

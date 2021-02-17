@@ -76,4 +76,20 @@ class AppPreferences(context: Context) {
             editor.putLong("timestampLife", value).commit()
         }
 
+    var subscribeNotification: Boolean
+        get() {
+            return  sharedPreferences.getBoolean("subscribeNotification", false)
+        }
+        set(value) {
+            editor.putBoolean("subscribeNotification", value).commit()
+        }
+
+    var appNotification: Boolean
+        get() {
+            return  sharedPreferences.getBoolean("appNotification", false)
+        }
+        set(value) {
+            editor.putBoolean("appNotification", value).commit()
+        }
+
 }

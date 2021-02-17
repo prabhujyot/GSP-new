@@ -1,6 +1,7 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.utils.hideSystemUI
+import `in`.allen.gsp.utils.hideStatusBar
+import `in`.allen.gsp.utils.tag
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -16,6 +17,9 @@ class WebActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         setContentView(R.layout.activity_web)
 
         setSupportActionBar(myToolbar)
@@ -37,14 +41,11 @@ class WebActivity : AppCompatActivity() {
 
         intent.getStringExtra("url").let {
             val url = intent.getStringExtra("url")
+            tag("$TAG, $url")
             if (url != null) {
                 webView.loadUrl(url)
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
-    }
 }

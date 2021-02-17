@@ -63,11 +63,7 @@ class ContestActivity : AppCompatActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // hide statusbar
-        this.window.setFlags(
-            WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
+        hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_contest)
         viewModel = ViewModelProvider(this, factory).get(ContestViewModel::class.java)
@@ -558,6 +554,7 @@ class ContestActivity : AppCompatActivity(), KodeinAware {
         lifecycleScope.launch {
             delay(viewModel.TIME_DELAY)
             if(view.tag == 1) {
+                viewModel.isDoubleDip = false
                 view.background = ResourcesCompat.getDrawable(
                     resources,
                     R.drawable.bg_btn_green,

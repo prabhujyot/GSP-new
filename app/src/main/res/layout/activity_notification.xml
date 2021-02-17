@@ -35,6 +35,14 @@
             android:padding="@dimen/margin8"
             tools:listitem="@layout/item_notification"/>
 
+        <TextView
+            android:id="@+id/noData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No message yet."
+            android:layout_gravity="center"
+            android:textColor="@color/white"/>
+
         <!-- Redeem bottom sheet -->
         <include layout="@layout/bottomsheet_message"/>
 

@@ -16,4 +16,7 @@ interface LeaderboardDao {
     @Query("Select * from leaderboard order by rank ASC")
     fun getList(): LiveData<List<Leaderboard>>
 
+    @Query("delete from leaderboard")
+    fun clearList()
+
 }

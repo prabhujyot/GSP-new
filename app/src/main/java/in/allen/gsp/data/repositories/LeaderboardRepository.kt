@@ -53,6 +53,7 @@ class LeaderboardRepository(
 
     private fun setDBList(list: List<Leaderboard>) {
         Coroutines.io {
+            db.getLeaderboardDao().clearList()
             db.getLeaderboardDao().setList(list)
         }
     }

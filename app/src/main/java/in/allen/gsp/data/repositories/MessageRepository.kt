@@ -3,6 +3,7 @@ package `in`.allen.gsp.data.repositories
 import `in`.allen.gsp.data.db.AppDatabase
 import `in`.allen.gsp.data.entities.Message
 import `in`.allen.gsp.data.network.SafeApiRequest
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -10,6 +11,8 @@ import kotlinx.coroutines.withContext
 class MessageRepository(
     private val db: AppDatabase
 ): SafeApiRequest() {
+
+    val unreadMsg = MutableLiveData<Int>()
 
     suspend fun setItem(message: Message) = db.getMessageDao().insert(message)
 
@@ -31,6 +34,12 @@ class MessageRepository(
             hashMap["page"] = page.plus(1)
         }
         return hashMap
+    }
+
+    suspend fun getUnreadCount(user_id: Int) {
+        return withContext(Dispatchers.IO) {
+            unreadMsg.postValue(db.getMessageDao().countUnread(user_id))
+        }
     }
 
 }

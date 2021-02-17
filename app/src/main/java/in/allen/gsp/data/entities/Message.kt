@@ -11,5 +11,5 @@ data class Message (
     val title: String,
     val msg: String,
     @ColumnInfo(name = "create_date") val date: String,
-    val status: Int
+    var status: Int
 )

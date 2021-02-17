@@ -11,12 +11,14 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Deferred
@@ -37,6 +39,9 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_leaderboard)
         viewModel = LeaderboardViewModel(userRepository,repository)
 
@@ -48,11 +53,6 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
         observeLoading()
         observeError()
         observeSuccess()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     private fun observeLoading() {
@@ -106,19 +106,25 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
                                         }
 
                                         // rank 1
-                                        binding.rankFirstName.text = listTop[0].name
-                                        binding.rankFirstScore.text = "Score ${listTop[0].score}"
-                                        listTop[0].avatar.let { it1 -> binding.rankFirstAvatar.loadImage(it1,true) }
+                                        binding.root.findViewById<TextView>(R.id.rank_first_name).text = listTop[0].name
+                                        binding.root.findViewById<TextView>(R.id.rank_first_score).text = "Score ${listTop[0].score}"
+                                        listTop[0].avatar.let {
+                                                it1 -> binding.root.findViewById<FloatingActionButton>(R.id.rank_first_avatar).loadImage(it1,true)
+                                        }
 
                                         // rank 2
-                                        binding.rankSecondName.text = listTop[1].name
-                                        binding.rankSecondScore.text = "Score ${listTop[1].score}"
-                                        listTop[1].avatar.let { it1 -> binding.rankSecondAvatar.loadImage(it1,true) }
+                                        binding.root.findViewById<TextView>(R.id.rank_second_name).text = listTop[1].name
+                                        binding.root.findViewById<TextView>(R.id.rank_second_score).text = "Score ${listTop[1].score}"
+                                        listTop[1].avatar.let {
+                                                it1 -> binding.root.findViewById<FloatingActionButton>(R.id.rank_second_avatar).loadImage(it1,true)
+                                        }
 
                                         // rank 3
-                                        binding.rankThirdName.text = listTop[2].name
-                                        binding.rankThirdScore.text = "Score ${listTop[2].score}"
-                                        listTop[2].avatar.let { it1 -> binding.rankThirdAvatar.loadImage(it1,true) }
+                                        binding.root.findViewById<TextView>(R.id.rank_third_name).text = listTop[2].name
+                                        binding.root.findViewById<TextView>(R.id.rank_third_score).text = "Score ${listTop[2].score}"
+                                        listTop[2].avatar.let {
+                                                it1 -> binding.root.findViewById<FloatingActionButton>(R.id.rank_third_avatar).loadImage(it1,true)
+                                        }
 
                                         val recyclerAdapter = RecyclerViewAdapter(listOther, this@LeaderboardActivity)
                                         binding.recyclerView.apply {

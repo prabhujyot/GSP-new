@@ -5,6 +5,7 @@ import `in`.allen.gsp.data.repositories.MessageRepository
 import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.utils.Coroutines
 import `in`.allen.gsp.utils.Resource
+import `in`.allen.gsp.utils.tag
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -52,7 +53,6 @@ class NotificationViewModel(
     }
 
     var user: User?= null
-    var notificationId = 0
 
     init {
         userData()
@@ -79,13 +79,22 @@ class NotificationViewModel(
         }
     }
 
-    fun openMessage(notificationId: Int) {
+    fun openMessage(notificationId: Int, position: Int) {
+        tag("getUnreadCount 1")
         viewModelScope.launch {
             Coroutines.io {
                 messageRepository.updateItem(notificationId,1)
+                if(user != null && user?.user_id!! > 0) {
+                    tag("getUnreadCount")
+                    messageRepository.getUnreadCount(user?.user_id!!)
+                }
             }
+
             val response = messageRepository.getItem(notificationId)
-            setSuccess(response,"open")
+            val data = HashMap<String,Any>()
+            data["item"] = response
+            data["position"] = position
+            setSuccess(data,"open")
         }
     }
 

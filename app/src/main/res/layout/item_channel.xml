@@ -14,7 +14,6 @@
             android:adjustViewBounds="true"
             android:cropToPadding="false"
             android:scaleType="centerCrop"
-            android:src="@drawable/fireworks"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"

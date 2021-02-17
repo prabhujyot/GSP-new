@@ -26,7 +26,7 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="white">#ffffff</color>
+    <color name="white">#fefefe</color>
     <color name="black">#000000</color>
     <color name="opacBlack">#B3000000</color>
     <color name="grey">#707070</color>
@@ -37,4 +37,5 @@
     <color name="orange">#f83329</color>
     <color name="voilet">#a228d9</color>
     <color name="lightBlue">#10828f</color>
+    <color name="allenBlue">#3c47e9</color>
 </resources>

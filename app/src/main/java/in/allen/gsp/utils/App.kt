@@ -6,6 +6,7 @@ import `in`.allen.gsp.data.network.NetworkConnectionInterceptor
 import `in`.allen.gsp.data.network.YTApi
 import `in`.allen.gsp.data.repositories.*
 import `in`.allen.gsp.data.services.MusicService
+import `in`.allen.gsp.ui.home.HomeViewModelFactory
 import `in`.allen.gsp.ui.message.NotificationViewModelFactory
 import `in`.allen.gsp.ui.quiz.ContestViewModelFactory
 import `in`.allen.gsp.ui.quiz.QuizViewModelFactory
@@ -18,6 +19,7 @@ import android.content.ServiceConnection
 import android.os.Build
 import android.os.IBinder
 import androidx.multidex.MultiDex
+import com.downloader.PRDownloader
 import com.google.android.gms.security.ProviderInstaller
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -45,6 +47,7 @@ class App: Application(), KodeinAware {
         bind() from singleton { VideosRepository(instance(), instance(), instance(), instance()) }
         bind() from singleton { RewardRepository(instance()) }
         bind() from provider { RewardViewModelFactory(instance(), instance()) }
+        bind() from provider { HomeViewModelFactory(instance(), instance(),instance(), instance()) }
         bind() from provider { NotificationViewModelFactory(instance(), instance()) }
         bind() from singleton { QuizRepository(instance(), instance()) }
         bind() from provider { QuizViewModelFactory(instance(), instance(), instance(), instance()) }
@@ -60,6 +63,8 @@ class App: Application(), KodeinAware {
                 ProviderInstaller.installIfNeeded(this)
             } catch (ignored: Exception) {}
         }
+
+        PRDownloader.initialize(applicationContext);
 
         bindMusicService()
     }

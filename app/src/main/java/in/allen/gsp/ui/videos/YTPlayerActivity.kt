@@ -43,6 +43,9 @@ class YTPlayerActivity: YouTubeBaseActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_yt_player)
 
         this.setFinishOnTouchOutside(false)
@@ -87,11 +90,6 @@ class YTPlayerActivity: YouTubeBaseActivity(),
             val error = String.format("Error initializing YouTube player: %s", p1.toString())
             toast(error)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     private fun reset() {

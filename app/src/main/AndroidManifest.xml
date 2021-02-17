@@ -15,6 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"/>
+
         <service
             android:name=".data.services.LifeService"
             android:enabled="true"
@@ -44,8 +49,9 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
-        <activity android:name=".ui.quiz.ContestInstructionActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.quiz.ContestInstructionActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.quiz.ContestActivity"
             android:screenOrientation="portrait" />
@@ -80,7 +86,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.home.HomeActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Material" />
         <activity
             android:name=".IntroActivity"
             android:screenOrientation="portrait" />

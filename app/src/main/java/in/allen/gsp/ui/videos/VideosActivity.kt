@@ -36,6 +36,9 @@ class VideosActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_videos)
         viewModel = VideosViewModel(userRepository, videoRepository)
 
@@ -46,11 +49,6 @@ class VideosActivity : AppCompatActivity(), KodeinAware {
         observeSuccess()
         observeLoading()
         observeError()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUI()
     }
 
     private fun observeLoading() {

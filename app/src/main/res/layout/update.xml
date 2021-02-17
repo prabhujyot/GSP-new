@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/opacBlack">
+    android:background="@color/greyLight">
 
     <TextView
         android:id="@+id/status"
@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="@string/update_available"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:visibility="visible"
         android:layout_marginStart="@dimen/margin8"
         app:layout_constraintStart_toStartOf="parent"
