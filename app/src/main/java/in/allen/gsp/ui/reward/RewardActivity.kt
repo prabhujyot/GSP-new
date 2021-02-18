@@ -182,7 +182,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                     "user" -> {
                         val user = it.data as User
                         binding.totalCoins.text = "${user.coins}"
-                        binding.coinValue.text = "Cash: ${user.coins.div(viewModel.coinsValue)} INR"
+                        binding.coinValue.text = "${user.coins.div(viewModel.coinsValue)} INR"
 
                         if (!viewModel.dailyReward) {
                             viewModel.getDailyReward()

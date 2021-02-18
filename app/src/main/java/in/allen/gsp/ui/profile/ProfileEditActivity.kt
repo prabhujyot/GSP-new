@@ -54,6 +54,8 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         observeError()
         observeSuccess()
         viewModel.userData()
+
+        binding.mobile.requestFocus()
     }
 
     private fun observeLoading() {
@@ -148,6 +150,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                         binding.btnVerify.text = "Verify"
                     }
                     "updateProfile" -> {
+                        binding.rootLayout.otp.requestFocus()
                         viewModel.setError("Profile updated",viewModel.SNACKBAR)
                     }
                 }
@@ -191,6 +194,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                 viewModel.getOTP(mobile)
             }
             R.id.btnSubmit -> {
+                hideKeyboard(view)
                 val otp = binding.rootLayout.otp.text.toString()
                 viewModel.verifyMobile(mobile,otp)
             }
