@@ -2,7 +2,6 @@ package `in`.allen.gsp.data.repositories
 
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
-import `in`.allen.gsp.utils.Coroutines
 
 
 class RewardRepository(

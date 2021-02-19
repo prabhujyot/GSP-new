@@ -2,7 +2,6 @@ package `in`.allen.gsp.data.network
 
 import `in`.allen.gsp.BuildConfig
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit

@@ -12,11 +12,7 @@
     <dimen name="margin2">2dp</dimen>
     <dimen name="margin60">60dp</dimen>
     <dimen name="margin88">88dp</dimen>
-    <dimen name="margin80">80dp</dimen>
     <dimen name="margin3">3dp</dimen>
-    <dimen name="margin63">63dp</dimen>
-    <dimen name="margin52">52dp</dimen>
-    <dimen name="margin42">42dp</dimen>
     <dimen name="margin44">44dp</dimen>
     <dimen name="margin20">20dp</dimen>
 </resources>

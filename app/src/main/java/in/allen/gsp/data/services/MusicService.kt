@@ -37,13 +37,12 @@ class MusicService : Service(), KodeinAware, MediaPlayer.OnErrorListener {
 
     override fun onCreate() {
         super.onCreate()
-
         mediaPlayer = MediaPlayer()
         mediaPlayer!!.setOnErrorListener { _, _, _ -> true }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        return START_STICKY
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onDestroy() {
@@ -84,7 +83,12 @@ class MusicService : Service(), KodeinAware, MediaPlayer.OnErrorListener {
             play(0,loop)
 
             // is user already off the music
-            isMute(appPreferences.appMute)
+            if(appPreferences.appMusic) {
+                isMute(false)
+            } else {
+                isMute(true)
+            }
+
         } else {
             mediaPlayer = MediaPlayer()
             playMusic(key,loop)
@@ -136,7 +140,6 @@ class MusicService : Service(), KodeinAware, MediaPlayer.OnErrorListener {
     private fun isMute(mute: Boolean): Boolean {
         tag("$TAG, isMute: $mute")
         return if (mediaPlayer != null) {
-            appPreferences.appMute = mute
             if (mute) {
                 mediaPlayer!!.setVolume(0f, 0f)
                 true

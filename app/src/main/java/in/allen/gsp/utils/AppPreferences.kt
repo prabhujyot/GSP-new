@@ -28,12 +28,12 @@ class AppPreferences(context: Context) {
             editor.putBoolean("appIntro", value).commit()
         }
 
-    var appMute: Boolean
+    var appMusic: Boolean
         get() {
-            return  sharedPreferences.getBoolean("appMute", false)
+            return  sharedPreferences.getBoolean("appMusic", false)
         }
         set(value) {
-            editor.putBoolean("appMute", value).commit()
+            editor.putBoolean("appMusic", value).commit()
         }
 
     var timestampChannel1: Long

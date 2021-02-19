@@ -53,6 +53,9 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        hideStatusBar()
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_notification)
         viewModel = ViewModelProvider(this, factory).get(NotificationViewModel::class.java)
 

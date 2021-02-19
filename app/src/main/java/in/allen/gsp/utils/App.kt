@@ -47,7 +47,7 @@ class App: Application(), KodeinAware {
         bind() from singleton { VideosRepository(instance(), instance(), instance(), instance()) }
         bind() from singleton { RewardRepository(instance()) }
         bind() from provider { RewardViewModelFactory(instance(), instance()) }
-        bind() from provider { HomeViewModelFactory(instance(), instance(),instance(), instance()) }
+        bind() from provider { HomeViewModelFactory(instance(), instance(), instance(), instance()) }
         bind() from provider { NotificationViewModelFactory(instance(), instance()) }
         bind() from singleton { QuizRepository(instance(), instance()) }
         bind() from provider { QuizViewModelFactory(instance(), instance(), instance(), instance()) }
@@ -90,7 +90,7 @@ class App: Application(), KodeinAware {
         }
     }
 
-    fun bindMusicService() {
+    private fun bindMusicService() {
         if (!mIsBound) {
             val ms = Intent(this, MusicService::class.java)
             startService(ms)

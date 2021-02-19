@@ -3,8 +3,9 @@
 
     <PreferenceCategory android:title="App Settings">
         <SwitchPreferenceCompat
-            app:key="appMute"
-            app:title="@string/appMute"/>
+            app:key="appMusic"
+            app:title="@string/music"
+            app:defaultValue="true"/>
 
         <SwitchPreferenceCompat
             app:key="appNotification"
