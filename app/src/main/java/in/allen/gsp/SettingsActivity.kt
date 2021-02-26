@@ -4,8 +4,6 @@ import `in`.allen.gsp.utils.hideStatusBar
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,11 +18,15 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
 
-        setSupportActionBar(myToolbar)
-        myToolbar.toolbarTitle.text = getString(R.string.lblSettings)
-        myToolbar.btnBack.setOnClickListener {
-            onBackPressed()
-        }
+        supportActionBar?.title = getString(R.string.lblSettings)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.arrow_previous)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return super.onSupportNavigateUp()
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

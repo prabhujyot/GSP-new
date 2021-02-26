@@ -172,8 +172,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/layoutLife"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:onClick="btnActionHome"/>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -237,7 +236,8 @@
                 android:paddingBottom="@dimen/margin2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guidelineTop"
-                android:clickable="true">
+                android:clickable="true"
+                android:focusable="true">
                 <include layout="@layout/update"/>
             </FrameLayout>
 

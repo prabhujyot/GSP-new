@@ -64,9 +64,7 @@ class App: Application(), KodeinAware {
             } catch (ignored: Exception) {}
         }
 
-        PRDownloader.initialize(applicationContext);
-
-        bindMusicService()
+        PRDownloader.initialize(applicationContext)
     }
 
     override fun attachBaseContext(base: Context?) {
@@ -90,7 +88,7 @@ class App: Application(), KodeinAware {
         }
     }
 
-    private fun bindMusicService() {
+    fun bindMusicService() {
         if (!mIsBound) {
             val ms = Intent(this, MusicService::class.java)
             startService(ms)

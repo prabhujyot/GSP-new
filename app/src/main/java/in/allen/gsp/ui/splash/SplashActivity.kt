@@ -44,6 +44,7 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
     private lateinit var viewModel: SplashViewModel
 
     override val kodein by kodein()
+    private lateinit var app: App
     private val repository: UserRepository by instance()
     private val preferences: AppPreferences by instance()
 
@@ -84,8 +85,10 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
         )
 
         printKeyHash()
-
         isReferred()
+
+        app = application as App
+        app.bindMusicService()
 
         // subscribe notification
         if(!preferences.subscribeNotification) {

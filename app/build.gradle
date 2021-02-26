@@ -21,8 +21,8 @@ android {
         applicationId "in.allen.gsp"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 12
-        versionName '2.0'
+        versionCode 13
+        versionName '2.1'
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config

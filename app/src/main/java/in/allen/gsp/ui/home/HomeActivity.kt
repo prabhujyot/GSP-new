@@ -419,9 +419,6 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             R.id.layoutLeaderboard -> {
                 i.setClass(this@HomeActivity, LeaderboardActivity::class.java)
             }
-            R.id.fabProfile -> {
-                i.setClass(this@HomeActivity, ProfileActivity::class.java)
-            }
             R.id.btnPlay -> {
                 i.setClass(this@HomeActivity, QuizActivity::class.java)
             }
