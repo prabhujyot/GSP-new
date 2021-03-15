@@ -253,7 +253,8 @@ class QuizViewModel(
     fun calculateScore(duration: Int) {
         val stats = HashMap<String, Int>()
         stats["qid"] = currentq.qid
-        stats["duration"] = if(duration == 0) 1 else duration
+        val dur = if(duration == 0) 1 else duration
+        stats["duration"] = dur
 
         // check existing qid before adding
         var exists = false
@@ -270,8 +271,8 @@ class QuizViewModel(
         // set to quiz data
         appendPlayedQid()
 
-        xp[currentq.qno] = currentq.qTime.minus(duration).toLong()
-        val cscore: Long = currentq.qTime.minus(duration)
+        xp[currentq.qno] = currentq.qTime.minus(dur).toLong()
+        val cscore: Long = currentq.qTime.minus(dur)
             .times(
                 if(multiplier < 100) 100 else multiplier
             )

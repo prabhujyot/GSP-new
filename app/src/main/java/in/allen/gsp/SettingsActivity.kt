@@ -1,6 +1,5 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.utils.hideStatusBar
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
@@ -8,7 +7,6 @@ import androidx.preference.PreferenceFragmentCompat
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        hideStatusBar()
 
         setContentView(R.layout.settings_activity)
         if (savedInstanceState == null) {

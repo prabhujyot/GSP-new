@@ -11,6 +11,7 @@ import `in`.allen.gsp.databinding.OptionTrueFalseBinding
 import `in`.allen.gsp.utils.*
 import android.animation.ObjectAnimator
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
@@ -133,12 +134,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         it.data?.let { it1 ->
                             var action = ""
                             var str = it1
-                            if(it1.startsWith("quizdata:")) {
+                            if (it1.startsWith("quizdata:")) {
                                 action = "finish"
                                 str = it1.removePrefix("quizdata:")
                             }
                             alertDialog("Error!", str) {
-                                if(action.equals("finish",true)) {
+                                if (action.equals("finish", true)) {
                                     finish()
                                 }
                             }
@@ -172,7 +173,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     }
 
                     "downloadAttachment" -> {
-                        if(viewModel.attachmentList.size > 0) {
+                        if (viewModel.attachmentList.size > 0) {
                             for (file in viewModel.attachmentList) {
                                 downloadFile(file.filename, file.qid.toString())
                             }
@@ -211,7 +212,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         binding.layoutCategory.cat3Text.text = viewModel.wset[2].qcat
                         binding.layoutCategory.cat3.tag = viewModel.wset[2]
 
-                        if(viewModel.attachmentList.size > 0) {
+                        if (viewModel.attachmentList.size > 0) {
                             for (file in viewModel.attachmentList) {
                                 downloadFile(file.filename, file.qid.toString())
                             }
@@ -219,11 +220,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     }
 
                     "offerPurchase" -> {
-                        if(it.data is String) {
+                        if (it.data is String) {
                             when {
-                                it.data.equals("1h",true) -> {
+                                it.data.equals("1h", true) -> {
                                     val minutes = 60
-                                    val timestamp = System.currentTimeMillis().plus(minutes.times(60).times(1000))
+                                    val timestamp = System.currentTimeMillis().plus(
+                                        minutes.times(60).times(
+                                            1000
+                                        )
+                                    )
                                     preferences.timestampLife = timestamp
                                 }
                             }
@@ -255,7 +260,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             if (it.data.equals("displayAttachment", true)) {
                                 displayAttachment(viewModel.currentq)
                             }
-                            if(it.data.equals("displayWild",true)) {
+                            if (it.data.equals("displayWild", true)) {
                                 displayWild()
                             }
                             if (it.data.equals("displayOption", true)) {
@@ -264,7 +269,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             if (it.data.equals("displayFinish", true)) {
                                 displayFinish()
                             }
-                            if(it.data.equals("showOffers",true)) {
+                            if (it.data.equals("showOffers", true)) {
                                 displayOffers()
                             }
                             if (it.data.equals("onBackPressed", true)) {
@@ -287,14 +292,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                         mp.stop()
                                         mp.release()
                                     }
-                                } catch (e: Exception) {}
+                                } catch (e: Exception) {
+                                }
                                 finish()
                             }
-                            if(it.data.equals("timeStart",true)) {
+                            if (it.data.equals("timeStart", true)) {
                                 tag("timeStart ${::app.isInitialized}")
-                                if(::app.isInitialized) {
+                                if (::app.isInitialized) {
                                     when {
-                                        viewModel.currentq.qtype.equals("image",true) -> {
+                                        viewModel.currentq.qtype.equals("image", true) -> {
                                             app.getmServ()?.playMusic("image", true)
                                         }
                                         viewModel.currentq.qdifficulty_level == 2 -> {
@@ -309,9 +315,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                                     }
                                 }
                             }
-                            if (it.data.equals("timeUp",true)) {
-                                if(::app.isInitialized) {
-                                    app.getmServ()?.playMusic("times_up_2",false)
+                            if (it.data.equals("timeUp", true)) {
+                                if (::app.isInitialized) {
+                                    app.getmServ()?.playMusic("times_up_2", false)
                                 }
                             }
                         }
@@ -327,8 +333,8 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     "performLifeline" -> {
                         if (it.data is String) {
                             if (it.data.equals("fifty_fifty", true)) {
-                                if(::app.isInitialized) {
-                                    app.getmServ()?.playMusic("fifty",false)
+                                if (::app.isInitialized) {
+                                    app.getmServ()?.playMusic("fifty", false)
                                 }
 
                                 val temp = ArrayList<Any>()
@@ -415,7 +421,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 viewModel.validateLifeline("quit")
             }
             R.id.btnTranslate -> {
-                if(!viewModel.currentq.qformat.equals("spellings", true)) {
+                if (!viewModel.currentq.qformat.equals("spellings", true)) {
                     if (viewModel.lang.equals("eng", true)) {
                         viewModel.lang = "hindi"
                     } else {
@@ -460,9 +466,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private fun startService() {
         Intent(applicationContext, LifeService::class.java).apply {
             val bundle = Bundle()
-            bundle.putParcelable("user",viewModel.user)
-            bundle.putLong("timestampLife",preferences.timestampLife)
-            putExtra("bundle",bundle)
+            bundle.putParcelable("user", viewModel.user)
+            bundle.putLong("timestampLife", preferences.timestampLife)
+            putExtra("bundle", bundle)
             startService(this)
         }
     }
@@ -475,14 +481,18 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
         for(i in viewModel.qset) {
             val f = 18.times(densityFactor()).toInt()
-            val params = LinearLayout.LayoutParams(f,f)
+            val params = LinearLayout.LayoutParams(f, f)
             val textView = TextView(this)
             textView.layoutParams = params
             textView.gravity = Gravity.CENTER
             textView.text = "${i.qno}"
             textView.textSize = 8.0f
             textView.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
-            textView.background = ResourcesCompat.getDrawable(resources, R.drawable.bg_circle_black,null)
+            textView.background = ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.bg_circle_black,
+                null
+            )
             textView.tag = i.qno
 
             if (i.qno in 1..5) {
@@ -511,12 +521,12 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         viewModel.lifeline["flip"] = true
         viewModel.lifeline["quit"] = true
 
-        stateLifeline(binding.btnDoubleDip,true)
-        stateLifeline(binding.btnFiftyFifty,true)
-        stateLifeline(binding.btnQuit,true)
-        stateLifeline(binding.btnFlip,true)
+        stateLifeline(binding.btnDoubleDip, true)
+        stateLifeline(binding.btnFiftyFifty, true)
+        stateLifeline(binding.btnQuit, true)
+        stateLifeline(binding.btnFlip, true)
         if(viewModel.fset.size < 3) {
-            stateLifeline(binding.btnFlip,false)
+            stateLifeline(binding.btnFlip, false)
         }
     }
 
@@ -573,10 +583,10 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun setSingleChoice(currentQ: Question) {
-        stateLifeline(binding.btnFiftyFifty,viewModel.lifeline["fifty_fifty"]!!)
-        stateLifeline(binding.btnDoubleDip,viewModel.lifeline["double_dip"]!!)
+        stateLifeline(binding.btnFiftyFifty, viewModel.lifeline["fifty_fifty"]!!)
+        stateLifeline(binding.btnDoubleDip, viewModel.lifeline["double_dip"]!!)
         if(viewModel.fset.size > 2) {
-            stateLifeline(binding.btnFlip,viewModel.lifeline["flip"]!!)
+            stateLifeline(binding.btnFlip, viewModel.lifeline["flip"]!!)
         }
 
         binding.layoutOption.removeAllViews()
@@ -649,7 +659,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
             if(view.tag == 1) {
                 viewModel.isDoubleDip = false
                 if(::app.isInitialized) {
-                    app.getmServ()?.playMusic("correct",false)
+                    app.getmServ()?.playMusic("correct", false)
                 }
 
                 view.background = ResourcesCompat.getDrawable(
@@ -680,7 +690,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     onResume()
                 } else {
                     if(::app.isInitialized) {
-                        app.getmServ()?.playMusic("incorrect",false)
+                        app.getmServ()?.playMusic("incorrect", false)
                     }
 
                     viewModel.appendPlayedQid()
@@ -690,6 +700,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         R.drawable.bg_btn_red,
                         null
                     )
+                    showCorrect()
                     viewModel.finishQuiz()
                 }
             }
@@ -697,12 +708,53 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
+    private fun showCorrect() {
+        if(::bindingSingleChoice.isInitialized) {
+            if (bindingSingleChoice.optionA.tag == 1) {
+                bindingSingleChoice.optionA.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_btn_green,
+                    null
+                )
+                bindingSingleChoice.optionA.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                bindingSingleChoice.optionA.startAnimation(animBlink)
+            }
+            if (bindingSingleChoice.optionB.tag == 1) {
+                bindingSingleChoice.optionB.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_btn_green,
+                    null
+                )
+                bindingSingleChoice.optionB.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                bindingSingleChoice.optionB.startAnimation(animBlink)
+            }
+            if (bindingSingleChoice.optionC.tag == 1) {
+                bindingSingleChoice.optionC.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_btn_green,
+                    null
+                )
+                bindingSingleChoice.optionC.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                bindingSingleChoice.optionC.startAnimation(animBlink)
+            }
+            if (bindingSingleChoice.optionD.tag == 1) {
+                bindingSingleChoice.optionD.background = ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_btn_green,
+                    null
+                )
+                bindingSingleChoice.optionD.setTextColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                bindingSingleChoice.optionD.startAnimation(animBlink)
+            }
+        }
+    }
+
 
     private fun setTrueFalse(currentQ: Question) {
-        stateLifeline(binding.btnFiftyFifty,false)
-        stateLifeline(binding.btnDoubleDip,false)
+        stateLifeline(binding.btnFiftyFifty, false)
+        stateLifeline(binding.btnDoubleDip, false)
         if(viewModel.fset.size > 2) {
-            stateLifeline(binding.btnFlip,viewModel.lifeline["flip"]!!)
+            stateLifeline(binding.btnFlip, viewModel.lifeline["flip"]!!)
         }
 
         binding.layoutOption.removeAllViews()
@@ -741,7 +793,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         stateLifeline(binding.btnFiftyFifty, false)
         stateLifeline(binding.btnDoubleDip, false)
         if(viewModel.fset.size > 2) {
-            stateLifeline(binding.btnFlip,viewModel.lifeline["flip"]!!)
+            stateLifeline(binding.btnFlip, viewModel.lifeline["flip"]!!)
         }
 
         binding.layoutOption.removeAllViews()
@@ -845,9 +897,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
                     lifecycleScope.launch {
                         delay(viewModel.TIME_DELAY)
-                        if(spelling.equals(currentQ.option[0].adesc,true)) {
+                        if(spelling.equals(currentQ.option[0].adesc, true)) {
                             if(::app.isInitialized) {
-                                app.getmServ()?.playMusic("correct",false)
+                                app.getmServ()?.playMusic("correct", false)
                             }
 
                             for (k in 0 until bindingSpelling.spelLayout.childCount) {
@@ -869,7 +921,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                             }
                         } else {
                             if(::app.isInitialized) {
-                                app.getmServ()?.playMusic("incorrect",false)
+                                app.getmServ()?.playMusic("incorrect", false)
                             }
 
                             viewModel.appendPlayedQid()
@@ -928,6 +980,20 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         binding.qno.text = "Q.No.: ${currentQ.qno}"
         binding.question.visibility = View.VISIBLE
         viewModel.displayAttachment()
+
+        if (currentQ.qdesc_hindi.isEmpty()
+            || currentQ.qdesc_hindi.equals("null", true)
+            || currentQ.option[0].adesc_hindi.isEmpty()
+            || currentQ.option[0].adesc_hindi.equals("null", true)
+        ) {
+            binding.btnTranslate.backgroundTintList = ColorStateList.valueOf(
+                ResourcesCompat.getColor(resources,R.color.colorAccent,null)
+            )
+        } else {
+            binding.btnTranslate.backgroundTintList = ColorStateList.valueOf(
+                ResourcesCompat.getColor(resources,R.color.green,null)
+            )
+        }
     }
 
     private fun displayOption(currentQ: Question) {
@@ -1000,7 +1066,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private fun displayFinish() {
         if(::app.isInitialized) {
-            app.getmServ()?.playMusic("quit",false)
+            app.getmServ()?.playMusic("quit", false)
         }
 
         startService()
@@ -1017,8 +1083,9 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 .setOnProgressListener { }
                 .start(object : OnDownloadListener {
                     override fun onDownloadComplete() {
-                        viewModel.setSuccess("","share")
+                        viewModel.setSuccess("", "share")
                     }
+
                     override fun onError(error: com.downloader.Error?) {
                         viewModel.setLoading(false)
                     }
@@ -1041,7 +1108,11 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
 
         binding.layoutFinish.progressScore.max = viewModel.qset.size * 1000
-        ObjectAnimator.ofInt(binding.layoutFinish.progressScore,"progress", viewModel.statsData.size * 1000)
+        ObjectAnimator.ofInt(
+            binding.layoutFinish.progressScore,
+            "progress",
+            viewModel.statsData.size * 1000
+        )
             .setDuration(viewModel.TIME_DELAY)
             .start()
         binding.layoutFinish.progressText.text = "Achieved No. of Q. ${viewModel.statsData.size}"
@@ -1062,15 +1133,15 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private fun displayOffers() {
         viewModel.setLoading(false)
         binding.layoutOffers.offer1.setOnClickListener {
-            offerPurchase("1",(it.tag as String).toInt())
+            offerPurchase("1", (it.tag as String).toInt())
         }
 
         binding.layoutOffers.offer2.setOnClickListener {
-            offerPurchase("5",(it.tag as String).toInt())
+            offerPurchase("5", (it.tag as String).toInt())
         }
 
         binding.layoutOffers.offer3.setOnClickListener {
-            offerPurchase("1h",(it.tag as String).toInt())
+            offerPurchase("1h", (it.tag as String).toInt())
         }
 
         binding.layoutOffers.btnClose.setOnClickListener {
@@ -1082,7 +1153,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         }
     }
 
-    private fun offerPurchase(offer: String,coins: Int) {
+    private fun offerPurchase(offer: String, coins: Int) {
         confirmDialog(
             "Coins Redeem",
             "$coins coins will be redeem",
@@ -1090,7 +1161,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 if (offersSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     offersSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
-                viewModel.offerPurchase(offer,coins)
+                viewModel.offerPurchase(offer, coins)
             },
             {}
         )
@@ -1115,7 +1186,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
 
     private fun displayLifeline(type: String) {
         if(::app.isInitialized) {
-            app.getmServ()?.playMusic("lifeline",false)
+            app.getmServ()?.playMusic("lifeline", false)
         }
 
         val dialogBuilder = AlertDialog.Builder(this)
@@ -1206,7 +1277,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                         }
                         mp.setDataSource(url)
                         mp.prepare()
-                        if(!mp.isPlaying) {
+                        if (!mp.isPlaying) {
                             mp.start()
                         }
                         mp.setOnCompletionListener {
@@ -1233,7 +1304,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 }
                 else -> {
                     image.loadImage(
-                        url,false, true
+                        url, false, true
                     )
                     image.show()
                     lifecycleScope.launch {
@@ -1258,7 +1329,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                 resetAttachmantBackground()
             }
             "video" -> {
-                if(video.visibility == View.VISIBLE) {
+                if (video.visibility == View.VISIBLE) {
                     video.stopPlayback()
                 }
                 resetAttachmantBackground()
@@ -1278,7 +1349,13 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
         image.show()
 
         if(image.visibility == View.VISIBLE) {
-            image.setImageDrawable(ResourcesCompat.getDrawable(resources,R.drawable.bg_play_o,null))
+            image.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.bg_play_o,
+                    null
+                )
+            )
         }
     }
 

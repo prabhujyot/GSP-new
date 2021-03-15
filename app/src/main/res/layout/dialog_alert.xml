@@ -38,7 +38,7 @@
         <Button
             android:id="@+id/btnOk"
             android:layout_width="120dp"
-            android:layout_height="36dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin16"
             android:background="@drawable/bg_btn_orange"
             android:text="@string/lblOk"

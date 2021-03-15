@@ -44,8 +44,6 @@ class YTPlayerActivity: YouTubeBaseActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hideStatusBar()
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_yt_player)
 
         this.setFinishOnTouchOutside(false)

@@ -40,8 +40,6 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        hideStatusBar()
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_leaderboard)
         viewModel = LeaderboardViewModel(userRepository,repository)
 

@@ -79,7 +79,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        hideStatusBar()
+//        hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
@@ -349,20 +349,22 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             image.loadImage("${BuildConfig.BASE_URL}gsp-admin/uploads/banners/${item?.image}")
             image.setOnClickListener {
                 if(item?.action?.trim()!!.length > 10) {
-                    val i = Intent()
-                    i.setClassName(context, item.action)
-                    if(item.meta.trim().length > 4) {
-                        val obj = JSONObject(item.meta)
-                        when {
-                            obj.has("url") -> {
-                                i.putExtra("url", obj.getString("url"))
-                            }
-                            obj.has("contest_id") -> {
-                                i.putExtra("contest_id", obj.getString("contest_id"))
+                    try {
+                        val i = Intent()
+                        i.setClassName(context, item.action)
+                        if(item.meta.trim().length > 4) {
+                            val obj = JSONObject(item.meta)
+                            when {
+                                obj.has("url") -> {
+                                    i.putExtra("url", obj.getString("url"))
+                                }
+                                obj.has("contest_id") -> {
+                                    i.putExtra("contest_id", obj.getString("contest_id"))
+                                }
                             }
                         }
-                    }
-                    context.startActivity(i)
+                        context.startActivity(i)
+                    } catch (e: Exception) {}
                 }
             }
         }
@@ -541,7 +543,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     // testing in app update
     private fun testingInAppUpdate() {
         val appUpdateManager = FakeAppUpdateManager(baseContext)
-        appUpdateManager.setUpdateAvailable(13)
+        appUpdateManager.setUpdateAvailable(14)
 
         val appUpdateInfo = appUpdateManager.appUpdateInfo
         appUpdateInfo.addOnSuccessListener {

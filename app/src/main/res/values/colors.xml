@@ -31,6 +31,8 @@
     <color name="opacBlack">#B3000000</color>
     <color name="grey">#707070</color>
     <color name="greyLight">#d9d9d9</color>
+    <color name="greyDark">#f5efef</color>
+    <color name="darkRed">#d7443e</color>
     <color name="disable">#9e9f9f</color>
     <color name="yellow">#ffee00</color>
     <color name="blue">#f2141574</color>
@@ -38,4 +40,6 @@
     <color name="voilet">#a228d9</color>
     <color name="lightBlue">#10828f</color>
     <color name="allenBlue">#3c47e9</color>
+    <color name="statusbar">#e9bd00</color>
+    <color name="green">#558B2F</color>
 </resources>

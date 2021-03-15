@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
 
 android {
     signingConfigs {
@@ -21,8 +22,8 @@ android {
         applicationId "in.allen.gsp"
         minSdkVersion 19
         targetSdkVersion 30
-        versionCode 13
-        versionName '2.1'
+        versionCode 15
+        versionName '2.2.1'
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.config
@@ -47,7 +48,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+//    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -59,7 +60,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
     implementation 'androidx.preference:preference-ktx:1.1.1'
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
@@ -77,6 +78,7 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-config'
     implementation 'com.google.firebase:firebase-dynamic-links'
     implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-perf-ktx'
 
     // facebook
     implementation 'com.facebook.android:facebook-login:5.15.3'
@@ -96,9 +98,6 @@ dependencies {
     implementation 'in.codeshuffle.scratchcardlayout:ScratchCardLayout:1.0.8'
 
     implementation 'com.asksira.android:loopingviewpager:1.3.1'
-
-    // blur
-    implementation 'jp.wasabeef:blurry:4.0.0'
 
     implementation 'com.mindorks.android:prdownloader:0.6.0'
 
@@ -142,6 +141,5 @@ dependencies {
     implementation "androidx.navigation:navigation-dynamic-features-fragment:2.3.3"
 
     // in app update,dynamic modules
-    implementation 'com.google.android.play:core:1.9.1'
-
+    implementation 'com.google.android.play:core:1.10.0'
 }

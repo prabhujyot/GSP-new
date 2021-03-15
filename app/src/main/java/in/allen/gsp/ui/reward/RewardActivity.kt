@@ -30,7 +30,6 @@ import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
-import jp.wasabeef.blurry.Blurry
 import kotlinx.android.synthetic.main.bottomsheet_redemption.view.*
 import kotlinx.android.synthetic.main.checkin.view.*
 import kotlinx.android.synthetic.main.fragment_prize.view.*
@@ -55,8 +54,6 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_reward)
         viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
@@ -264,10 +261,6 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initBottomSheet() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            Blurry.with(applicationContext).radius(25).sampling(2).onto(binding.rootLayout.bottomSheetRedeem)
-        }
-
         redeemSheetBehavior = BottomSheetBehavior.from(binding.rootLayout.bottomSheetRedeem)
         redeemSheetBehavior.isDraggable = false
 

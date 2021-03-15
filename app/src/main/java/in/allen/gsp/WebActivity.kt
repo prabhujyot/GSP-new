@@ -1,6 +1,5 @@
 package `in`.allen.gsp
 
-import `in`.allen.gsp.utils.hideStatusBar
 import `in`.allen.gsp.utils.tag
 import android.os.Bundle
 import android.webkit.WebChromeClient
@@ -17,8 +16,6 @@ class WebActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        hideStatusBar()
 
         setContentView(R.layout.activity_web)
 
