@@ -36,6 +36,14 @@ class AppPreferences(context: Context) {
             editor.putBoolean("appMusic", value).commit()
         }
 
+    var previewMode: Boolean
+        get() {
+            return  sharedPreferences.getBoolean("previewMode", false)
+        }
+        set(value) {
+            editor.putBoolean("previewMode", value).commit()
+        }
+
     var timestampChannel1: Long
         get() {
             return  sharedPreferences.getLong("timestampChannel1", 0)

@@ -172,7 +172,7 @@
             <com.asksira.loopingviewpager.LoopingViewPager
                 android:id="@+id/viewpager_banner"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
+                android:layout_height="148dp"
                 android:layout_marginTop="@dimen/margin8"
                 android:clipToPadding="false"
                 android:paddingLeft="@dimen/margin24"
@@ -190,7 +190,7 @@
                 app:layout_constraintTop_toBottomOf="@id/viewpager_banner"
                 app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginTop="@dimen/margin4"
-                android:background="@drawable/gradiant_yellow"
+                android:background="@color/statusbar"
                 android:orientation="horizontal">
 
                 <include layout="@layout/item_ranks"/>

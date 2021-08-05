@@ -11,6 +11,11 @@
             app:key="appNotification"
             app:title="@string/lblNotification"
             app:defaultValue="true"/>
+
+        <SwitchPreferenceCompat
+            app:key="previewMode"
+            app:title="@string/lblPreviewMode"
+            app:defaultValue="false"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="General">

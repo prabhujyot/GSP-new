@@ -123,7 +123,7 @@ class QuizViewModel(
             viewModelScope.launch {
                 try {
                     if(user?.life!! > 0) {
-                        if(!user?.is_admin!!) {
+                        if(!preferences.previewMode) {
                             val res = quizRepository.getQuiz(user!!.user_id)
                             setQuizData(res)
                         } else {
@@ -525,7 +525,7 @@ class QuizViewModel(
         viewModelScope.launch {
             delay(TIME_MOVE_TO_NEXT)
             isPopupOpen = true
-            if(!user?.is_admin!!) {
+            if(!preferences.previewMode) {
                 saveData()
             }
             setSuccess("displayFinish","quizStatus")

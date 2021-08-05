@@ -3,16 +3,21 @@ package `in`.allen.gsp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 
 class SettingsActivity : AppCompatActivity() {
+    private var is_admin: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.settings_activity)
+
+        is_admin = intent.getBooleanExtra("is_admin",false)
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.settings, SettingsFragment())
+                .replace(R.id.settings, SettingsFragment(is_admin))
                 .commit()
         }
 
@@ -27,9 +32,11 @@ class SettingsActivity : AppCompatActivity() {
         return super.onSupportNavigateUp()
     }
 
-    class SettingsFragment : PreferenceFragmentCompat() {
+    class SettingsFragment(private val is_admin: Boolean) : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+            val pref: SwitchPreferenceCompat? = preferenceManager.findPreference("previewMode")
+            pref?.isVisible = is_admin
         }
     }
 }

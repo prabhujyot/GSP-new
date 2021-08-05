@@ -21,6 +21,7 @@ class HomeViewModel(
     private val messageRepository: MessageRepository
 ): ViewModel() {
 
+    var admin: Boolean = false
     val ALERT = "alert"
     val SNACKBAR = "snackbar"
     val TAG = "tag"
@@ -55,10 +56,12 @@ class HomeViewModel(
         _success.value = Resource.Success(data, filter)
     }
 
+
     fun userData() {
         viewModelScope.launch {
             val dbUser = userRepository.getDBUser()
             if (dbUser != null) {
+                admin = dbUser.is_admin
                 messageRepository.getUnreadCount(dbUser.user_id)
                 setSuccess(dbUser,"user")
             } else {

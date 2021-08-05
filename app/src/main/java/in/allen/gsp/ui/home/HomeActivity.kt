@@ -79,7 +79,6 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
@@ -432,6 +431,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnSetting -> {
                 i.setClass(this@HomeActivity, SettingsActivity::class.java)
+                i.putExtra("is_admin", viewModel.admin)
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
