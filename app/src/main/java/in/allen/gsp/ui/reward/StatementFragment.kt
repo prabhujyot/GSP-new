@@ -18,17 +18,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import org.json.JSONArray
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class StatementFragment : Fragment(), KodeinAware {
+class StatementFragment : Fragment(), DIAware {
 
     private val TAG = StatementFragment::class.java.name
     private lateinit var binding: FragmentStatementBinding
     private lateinit var viewModel: RewardViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (requireContext() as DIAware).di }
     private val factory:RewardViewModelFactory by instance()
 
     private var type = ""
@@ -112,8 +112,8 @@ class StatementFragment : Fragment(), KodeinAware {
                                     for (i in 0 until arr.length()) {
                                         val obj = arr[i] as JSONObject
                                         if (obj.getString("value")
-                                                .equals("0", ignoreCase = true) && obj.getString("status")
-                                                .equals("1", ignoreCase = true)
+                                                .equals("initiated", ignoreCase = true) && obj.getString("status")
+                                                .equals("processed", ignoreCase = true)
                                         ) {
                                             continue
                                         }

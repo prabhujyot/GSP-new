@@ -10,27 +10,27 @@ import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.activity_videos.view.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONArray
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class VideosActivity : AppCompatActivity(), KodeinAware {
+class VideosActivity : AppCompatActivity(), DIAware {
 
     private val TAG = VideosActivity::class.java.name
     private lateinit var binding: ActivityVideosBinding
     private lateinit var viewModel: VideosViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val userRepository: UserRepository by instance()
     private val videoRepository: VideosRepository by instance()
 
@@ -40,7 +40,10 @@ class VideosActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_videos)
         viewModel = VideosViewModel(userRepository, videoRepository)
 
-        binding.rootLayout.toolbar.btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
 
@@ -50,17 +53,17 @@ class VideosActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -79,11 +82,11 @@ class VideosActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
+        viewModel.getSuccess().observe(this) {
             tag("$TAG _success: ${it.data}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -111,7 +114,7 @@ class VideosActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     // tabs

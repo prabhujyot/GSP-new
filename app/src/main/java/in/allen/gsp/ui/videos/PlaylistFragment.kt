@@ -22,17 +22,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class PlaylistFragment : Fragment(), KodeinAware {
+class PlaylistFragment : Fragment(), DIAware {
 
     private val TAG = PlaylistFragment::class.java.name
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var viewModel: VideosViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (requireContext() as DIAware).di }
     private val userRepository: UserRepository by instance()
     private val videosRepository: VideosRepository by instance()
 
@@ -65,28 +65,29 @@ class PlaylistFragment : Fragment(), KodeinAware {
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(viewLifecycleOwner, {
-            if(it != null) {
+        viewModel.getSuccess().observe(viewLifecycleOwner) {
+            if (it != null) {
                 when (it.message) {
                     "videoList" -> {
-                        if(it.data is Deferred<*>) {
+                        if (it.data is Deferred<*>) {
                             val deferredList = it.data as Deferred<LiveData<List<Video>>>
                             lifecycleScope.launch {
-                                deferredList.await().observe(viewLifecycleOwner, { list->
+                                deferredList.await().observe(viewLifecycleOwner) { list ->
                                     binding.tinyProgressBar.show(false)
-                                    val recyclerAdapter = context?.let { it1 -> RecyclerViewAdapter(list, it1) }
+                                    val recyclerAdapter =
+                                        context?.let { it1 -> RecyclerViewAdapter(list, it1) }
                                     binding.recyclerView.apply {
-                                        layoutManager =  LinearLayoutManager(context)
+                                        layoutManager = LinearLayoutManager(context)
                                         setHasFixedSize(true)
                                         adapter = recyclerAdapter
                                     }
-                                })
+                                }
                             }
                         }
                     }
                 }
             }
-        })
+        }
     }
 
     companion object {

@@ -9,17 +9,17 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.x.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class PrizeFragment : Fragment(), KodeinAware {
+class PrizeFragment : Fragment(), DIAware {
 
     private val TAG = PrizeFragment::class.java.name
     private lateinit var binding: FragmentPrizeBinding
     private lateinit var viewModel: RewardViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (requireContext() as DIAware).di }
     private val factory:RewardViewModelFactory by instance()
 
     private var position = 0

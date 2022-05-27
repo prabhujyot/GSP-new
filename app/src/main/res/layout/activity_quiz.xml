@@ -16,6 +16,7 @@
         tools:context=".ui.quiz.ContestActivity"
         android:background="@color/greyLight">
 
+        <!-- Category bottom sheet -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/quizLayout"
             android:layout_width="match_parent"
@@ -23,14 +24,14 @@
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <include
-                layout="@layout/attachment_question"
                 android:id="@+id/layoutAttachment"
+                layout="@layout/attachment_question"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@id/guidelineAttachment"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/guidelineAttachment"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineAttachment"
@@ -50,13 +51,13 @@
                 android:id="@+id/btnTranslate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/guidelineTranslate"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="@dimen/margin16"
-                android:src="@drawable/ic_translate"
                 android:onClick="btnActionPlay"
+                android:src="@drawable/ic_translate"
                 app:fabCustomSize="56dp"
-                app:maxImageSize="24dp"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/guidelineTranslate"
+                app:maxImageSize="24dp" />
 
             <ProgressBar
                 android:id="@+id/progressMultiplier"
@@ -67,49 +68,54 @@
                 android:progressDrawable="@drawable/progressbar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/guidelineAttachment" />
-
+            
             <include
                 android:id="@+id/layoutTable"
+                layout="@layout/layout_qnos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                layout="@layout/layout_qnos"
-                app:layout_constraintTop_toBottomOf="@id/progressMultiplier"
-                app:layout_constraintStart_toStartOf="parent"
                 android:layout_marginStart="@dimen/margin16"
-                android:layout_marginTop="@dimen/margin2"/>
-
+                android:layout_marginTop="@dimen/margin2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/progressMultiplier" />
 
             <!-- Question -->
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/question"
+            <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:gravity="center"
-                android:text="The Jatropha curcas."
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textStyle="bold"
-                android:textSize="17sp"
-                android:textColor="@color/black"
-                app:layout_constraintBottom_toTopOf="@id/guidelineQuestion"
-                app:layout_constraintEnd_toEndOf="@id/textScore"
-                app:layout_constraintStart_toStartOf="@id/qno"
-                app:layout_constraintTop_toBottomOf="@id/btnTranslate" />
-
-            <LinearLayout
-                android:id="@+id/layoutOption"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="@dimen/margin8"
-                android:layout_marginBottom="@dimen/margin8"
-                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@id/btnTranslate"
                 app:layout_constraintBottom_toTopOf="@id/qno"
                 app:layout_constraintEnd_toEndOf="@id/textScore"
-                app:layout_constraintStart_toStartOf="@id/qno"
-                app:layout_constraintTop_toBottomOf="@id/guidelineQuestion">
-                <include
-                    android:id="@+id/layoutOptionInclude"
-                    layout="@layout/option_linear"/>
-            </LinearLayout>
+                app:layout_constraintStart_toStartOf="@id/qno">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/question"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="100dp"
+                        android:gravity="center"
+                        android:text="The Jatropha curcas."
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"/>
+                    <LinearLayout
+                        android:id="@+id/layoutOption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin8"
+                        android:orientation="vertical">
+                        <include
+                            android:id="@+id/layoutOptionInclude"
+                            layout="@layout/option_linear" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </ScrollView>
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guidelineQuestion"
@@ -127,10 +133,10 @@
                 android:layout_marginStart="@dimen/margin24"
                 android:text="Q.No.: 0"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"
                 android:textColor="@color/black"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/progressTimer" />
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/progressTimer"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/lblScore"
@@ -139,8 +145,8 @@
                 android:layout_marginRight="@dimen/margin8"
                 android:text="@string/lblScore"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"
                 android:textColor="@color/black"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/textScore"
                 app:layout_constraintEnd_toStartOf="@id/textScore"
                 app:layout_constraintTop_toTopOf="@id/textScore" />
@@ -167,6 +173,7 @@
                 android:layout_height="40dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/bg_circle_grey"
+                android:onClick="btnActionPlay"
                 android:padding="@dimen/margin8"
                 android:scaleType="centerInside"
                 android:src="@drawable/double_dip"
@@ -175,8 +182,7 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintHorizontal_chainStyle="spread"
                 app:layout_constraintStart_toStartOf="@id/qno"
-                app:layout_constraintTop_toTopOf="@id/progressTimer"
-                android:onClick="btnActionPlay"/>
+                app:layout_constraintTop_toTopOf="@id/progressTimer" />
 
             <ImageButton
                 android:id="@+id/btnFiftyFifty"
@@ -184,6 +190,7 @@
                 android:layout_height="40dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/bg_circle_grey"
+                android:onClick="btnActionPlay"
                 android:padding="@dimen/margin8"
                 android:scaleType="centerInside"
                 android:src="@drawable/fifty"
@@ -191,8 +198,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/progressTimer"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/btnDoubleDip"
-                app:layout_constraintTop_toTopOf="@id/progressTimer"
-                android:onClick="btnActionPlay"/>
+                app:layout_constraintTop_toTopOf="@id/progressTimer" />
 
             <ProgressBar
                 android:id="@+id/progressTimer"
@@ -200,16 +206,16 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:layout_marginTop="@dimen/margin24"
-                android:padding="@dimen/margin3"
+                android:layout_marginBottom="@dimen/margin16"
                 android:indeterminate="false"
                 android:max="100"
+                android:padding="@dimen/margin3"
                 android:progress="80"
-                android:layout_marginBottom="@dimen/margin16"
                 android:progressDrawable="@drawable/circular_progressbar"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btnFlip"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/btnFiftyFifty"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toEndOf="@+id/btnFiftyFifty" />
 
             <TextView
                 android:id="@+id/textTimer"
@@ -218,8 +224,8 @@
                 android:gravity="center"
                 android:text="90"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"
                 android:textColor="@color/black"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@id/progressTimer"
                 app:layout_constraintEnd_toEndOf="@id/progressTimer"
                 app:layout_constraintStart_toStartOf="@id/progressTimer"
@@ -231,6 +237,7 @@
                 android:layout_height="40dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/bg_circle_grey"
+                android:onClick="btnActionPlay"
                 android:padding="@dimen/margin8"
                 android:scaleType="centerInside"
                 android:src="@drawable/flip"
@@ -238,8 +245,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/btnQuit"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/progressTimer"
-                app:layout_constraintTop_toTopOf="@id/progressTimer"
-                android:onClick="btnActionPlay"/>
+                app:layout_constraintTop_toTopOf="@id/progressTimer" />
 
             <ImageButton
                 android:id="@+id/btnQuit"
@@ -247,6 +253,7 @@
                 android:layout_height="40dp"
                 android:adjustViewBounds="true"
                 android:background="@drawable/bg_circle_grey"
+                android:onClick="btnActionPlay"
                 android:padding="@dimen/margin8"
                 android:scaleType="centerInside"
                 android:src="@drawable/quit"
@@ -254,8 +261,7 @@
                 app:layout_constraintEnd_toEndOf="@id/textScore"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/btnFlip"
-                app:layout_constraintTop_toTopOf="@id/progressTimer"
-                android:onClick="btnActionPlay"/>
+                app:layout_constraintTop_toTopOf="@id/progressTimer" />
 
 
             <FrameLayout
@@ -265,14 +271,13 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/guidelineTranslate"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/guidelineTranslate" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Category bottom sheet -->
         <include android:id="@+id/layoutCategory" layout="@layout/bottomsheet_category" />
 
         <!-- Quiz finish bottom sheet -->

@@ -37,8 +37,8 @@
                 android:padding="@dimen/margin16"
                 android:scaleType="center"
                 android:src="@drawable/ic_close"
-                android:tint="@color/white"
-                android:visibility="gone" />
+                android:visibility="gone"
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@+id/lblotp"

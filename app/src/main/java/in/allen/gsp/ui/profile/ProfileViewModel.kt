@@ -127,7 +127,7 @@ class ProfileViewModel(
                         val responseObj = JSONObject(response)
                         if (responseObj.getInt("status") == 1) {
                             user?.mobile = mobile
-                            user?.is_verified = 1
+                                user?.is_verified = 1
                             repository.setDBUser(user!!)
 
                             val data = responseObj.getString("message")

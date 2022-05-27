@@ -10,7 +10,7 @@ class RewardViewModelFactory(
     private val userRepository: UserRepository,
     private val rewardRepository: RewardRepository
 ) : ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return RewardViewModel(userRepository,rewardRepository) as T
     }
 }

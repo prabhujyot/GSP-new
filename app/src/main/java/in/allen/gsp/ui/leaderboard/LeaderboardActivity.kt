@@ -11,29 +11,29 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class LeaderboardActivity : AppCompatActivity(), KodeinAware {
+class LeaderboardActivity : AppCompatActivity(), DIAware {
 
     private val TAG = LeaderboardActivity::class.java.name
     private lateinit var binding: ActivityLeaderboardBinding
     lateinit var viewModel: LeaderboardViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val userRepository: UserRepository by instance()
     private val repository: LeaderboardRepository by instance()
 
@@ -43,8 +43,10 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_leaderboard)
         viewModel = LeaderboardViewModel(userRepository,repository)
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
 
@@ -54,17 +56,17 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.tinyProgressBar.show(false)
             if (it.data is Boolean && it.data) {
                 binding.tinyProgressBar.show()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 when (it.message) {
@@ -82,62 +84,72 @@ class LeaderboardActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
-            if(it != null) {
+        viewModel.getSuccess().observe(this) {
+            if (it != null) {
                 when (it.message) {
                     "leaderboard" -> {
-                        if(it.data is Deferred<*>) {
+                        if (it.data is Deferred<*>) {
                             val deferredList = it.data as Deferred<LiveData<List<Leaderboard>>>
                             lifecycleScope.launch {
-                                deferredList.await().observe(this@LeaderboardActivity, { list->
+                                deferredList.await().observe(this@LeaderboardActivity) { list ->
                                     binding.tinyProgressBar.show(false)
-                                    if(list.size > 4) {
-                                        val listTop = list.subList(0,3)
-                                        var listOther: List<Leaderboard> = if(list.size < 100) {
+                                    if (list.size > 4) {
+                                        val listTop = list.subList(0, 3)
+                                        val listOther: List<Leaderboard> = if (list.size < 100) {
                                             list.subList(3, list.size)
                                         } else {
                                             list.subList(3, 100)
                                         }
 
                                         // rank 1
-                                        binding.root.findViewById<TextView>(R.id.rank_first_name).text = listTop[0].name
-                                        binding.root.findViewById<TextView>(R.id.rank_first_score).text = "Score ${listTop[0].score}"
-                                        listTop[0].avatar.let {
-                                                it1 -> binding.root.findViewById<FloatingActionButton>(R.id.rank_first_avatar).loadImage(it1,true)
+                                        binding.root.findViewById<TextView>(R.id.rank_first_name).text =
+                                            listTop[0].name
+                                        binding.root.findViewById<TextView>(R.id.rank_first_score).text =
+                                            "Score ${listTop[0].score}"
+                                        listTop[0].avatar.let { it1 ->
+                                            binding.root.findViewById<FloatingActionButton>(R.id.rank_first_avatar)
+                                                .loadImage(it1, true)
                                         }
 
                                         // rank 2
-                                        binding.root.findViewById<TextView>(R.id.rank_second_name).text = listTop[1].name
-                                        binding.root.findViewById<TextView>(R.id.rank_second_score).text = "Score ${listTop[1].score}"
-                                        listTop[1].avatar.let {
-                                                it1 -> binding.root.findViewById<FloatingActionButton>(R.id.rank_second_avatar).loadImage(it1,true)
+                                        binding.root.findViewById<TextView>(R.id.rank_second_name).text =
+                                            listTop[1].name
+                                        binding.root.findViewById<TextView>(R.id.rank_second_score).text =
+                                            "Score ${listTop[1].score}"
+                                        listTop[1].avatar.let { it1 ->
+                                            binding.root.findViewById<FloatingActionButton>(R.id.rank_second_avatar)
+                                                .loadImage(it1, true)
                                         }
 
                                         // rank 3
-                                        binding.root.findViewById<TextView>(R.id.rank_third_name).text = listTop[2].name
-                                        binding.root.findViewById<TextView>(R.id.rank_third_score).text = "Score ${listTop[2].score}"
-                                        listTop[2].avatar.let {
-                                                it1 -> binding.root.findViewById<FloatingActionButton>(R.id.rank_third_avatar).loadImage(it1,true)
+                                        binding.root.findViewById<TextView>(R.id.rank_third_name).text =
+                                            listTop[2].name
+                                        binding.root.findViewById<TextView>(R.id.rank_third_score).text =
+                                            "Score ${listTop[2].score}"
+                                        listTop[2].avatar.let { it1 ->
+                                            binding.root.findViewById<FloatingActionButton>(R.id.rank_third_avatar)
+                                                .loadImage(it1, true)
                                         }
 
-                                        val recyclerAdapter = RecyclerViewAdapter(listOther, this@LeaderboardActivity)
+                                        val recyclerAdapter =
+                                            RecyclerViewAdapter(listOther, this@LeaderboardActivity)
                                         binding.recyclerView.apply {
-                                            layoutManager =  LinearLayoutManager(context)
+                                            layoutManager = LinearLayoutManager(context)
                                             setHasFixedSize(true)
                                             adapter = recyclerAdapter
                                         }
                                     }
-                                })
+                                }
                             }
                         }
                     }
                 }
             }
-        })
+        }
     }
 
     private class RecyclerViewAdapter(

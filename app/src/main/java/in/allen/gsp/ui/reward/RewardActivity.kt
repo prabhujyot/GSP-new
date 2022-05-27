@@ -17,9 +17,10 @@ import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.cardview.widget.CardView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
@@ -30,27 +31,26 @@ import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.android.synthetic.main.bottomsheet_redemption.view.*
-import kotlinx.android.synthetic.main.checkin.view.*
-import kotlinx.android.synthetic.main.fragment_prize.view.*
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
 
-class RewardActivity : AppCompatActivity(), KodeinAware {
+class RewardActivity : AppCompatActivity(), DIAware {
 
     private val TAG = RewardActivity::class.java.name
     private lateinit var binding: ActivityRewardBinding
     private lateinit var viewModel: RewardViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val factory:RewardViewModelFactory by instance()
 
+    private lateinit var bottomSheetRedeem: LinearLayout
     private lateinit var redeemSheetBehavior: BottomSheetBehavior<View>
+
+    private lateinit var btnCheckin: Button
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,10 +58,14 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_reward)
         viewModel = ViewModelProvider(this, factory).get(RewardViewModel::class.java)
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
+
+        btnCheckin = binding.root.findViewById(R.id.btnCheckin)
 
         binding.viewPager2.isUserInputEnabled = false
         binding.viewPager2.adapter = FragmentAdapter(this)
@@ -137,17 +141,17 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -166,11 +170,11 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
+        viewModel.getSuccess().observe(this) {
             tag("$TAG _success: ${it.data}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -221,7 +225,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private class FragmentAdapter(
@@ -234,7 +238,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
         }
 
         override fun createFragment(position: Int): Fragment {
-            val frg: Fragment? = when (position) {
+            val frg: Fragment = when (position) {
                 0 -> {
                     PrizeFragment.newInstance(position)
                 }
@@ -247,11 +251,9 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
 
             if(fragmentList.size < itemCount && !fragmentList.contains(frg)) {
-                if (frg != null) {
-                    fragmentList.add(frg)
-                }
+                fragmentList.add(frg)
             }
-            return frg!!
+            return frg
         }
 
         fun getFragment(position: Int): Fragment {
@@ -261,24 +263,27 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun initBottomSheet() {
-        redeemSheetBehavior = BottomSheetBehavior.from(binding.rootLayout.bottomSheetRedeem)
+        bottomSheetRedeem = binding.root.findViewById(R.id.bottomSheetRedeem)
+        val webView = bottomSheetRedeem.findViewById<WebView>(R.id.webView)
+
+        redeemSheetBehavior = BottomSheetBehavior.from(bottomSheetRedeem)
         redeemSheetBehavior.isDraggable = false
 
-        binding.rootLayout.bottomSheetRedeem.webView.webChromeClient = object : WebChromeClient() {
+        webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
-                binding.rootLayout.bottomSheetRedeem.progressBar.progress = newProgress
+                bottomSheetRedeem.findViewById<ProgressBar>(R.id.progressBar).progress = newProgress
             }
         }
 
-        binding.rootLayout.bottomSheetRedeem.webView.webViewClient = object : WebViewClient() {
+        webView.webViewClient = object : WebViewClient() {
         }
 
-        binding.rootLayout.bottomSheetRedeem.webView.settings.javaScriptEnabled = true
+        webView.settings.javaScriptEnabled = true
         val url = BuildConfig.BASE_URL + "gsp-admin/index.php/site/page/redemption-rule"
-        binding.rootLayout.bottomSheetRedeem.webView.loadUrl(url)
+        webView.loadUrl(url)
 
-        binding.rootLayout.bottomSheetRedeem.card50.apply {
+        bottomSheetRedeem.findViewById<CardView>(R.id.card50).apply {
             val coins: Int = 50 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins50).text = "$coins"
             setOnClickListener {
@@ -286,7 +291,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
         }
 
-        binding.rootLayout.bottomSheetRedeem.card100.apply {
+        bottomSheetRedeem.findViewById<CardView>(R.id.card100).apply {
             val coins: Int = 100 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins100).text = "$coins"
             setOnClickListener {
@@ -294,7 +299,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
         }
 
-        binding.rootLayout.bottomSheetRedeem.card150.apply {
+        bottomSheetRedeem.findViewById<CardView>(R.id.card150).apply {
             val coins: Int = 150 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins150).text = "$coins"
             setOnClickListener {
@@ -302,7 +307,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
         }
 
-        binding.rootLayout.bottomSheetRedeem.card200.apply {
+        bottomSheetRedeem.findViewById<CardView>(R.id.card200).apply {
             val coins: Int = 200 * viewModel.coinsValue
             this.findViewById<TextView>(R.id.coins200).text = "$coins"
             setOnClickListener {
@@ -337,7 +342,7 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
             }
 
             R.id.btnCheckin -> {
-                binding.rootLayout.btnCheckin.show(false)
+                btnCheckin.show(false)
                 viewModel.setDailyReward(view.tag as Int)
             }
 
@@ -369,10 +374,10 @@ class RewardActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun setDailyCheckinViews(diff: Int, todayValue: Int) {
-        binding.rootLayout.btnCheckin.show(false)
+        btnCheckin.show(false)
         if (diff > 0) {
-            binding.rootLayout.btnCheckin.tag = todayValue
-            binding.rootLayout.btnCheckin.show()
+            btnCheckin.tag = todayValue
+            btnCheckin.show()
         }
 
         // Setting drawables

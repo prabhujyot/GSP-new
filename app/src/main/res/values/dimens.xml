@@ -15,4 +15,5 @@
     <dimen name="margin3">3dp</dimen>
     <dimen name="margin44">44dp</dimen>
     <dimen name="margin20">20dp</dimen>
+    <dimen name="margin80">80dp</dimen>
 </resources>

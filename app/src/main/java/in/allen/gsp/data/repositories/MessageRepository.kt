@@ -14,7 +14,9 @@ class MessageRepository(
 
     val unreadMsg = MutableLiveData<Int>()
 
-    suspend fun setItem(message: Message) = db.getMessageDao().insert(message)
+    suspend fun setItem(message: Message): Long {
+        return db.getMessageDao().insert(message)
+    }
 
     suspend fun getItem(id: Int): Message {
         return withContext(Dispatchers.IO) {

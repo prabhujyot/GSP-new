@@ -32,17 +32,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.io.File
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
-class ContestActivity : AppCompatActivity(), KodeinAware {
+class ContestActivity : AppCompatActivity(), DIAware {
 
     private val TAG = ContestActivity::class.java.name
     private lateinit var binding: ActivityContestBinding
@@ -50,7 +48,7 @@ class ContestActivity : AppCompatActivity(), KodeinAware {
     private lateinit var bindingTrueFalse: OptionTrueFalseBinding
     private lateinit var viewModel: ContestViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val factory:ContestViewModelFactory by instance()
 
     // animations
@@ -65,7 +63,7 @@ class ContestActivity : AppCompatActivity(), KodeinAware {
         hideStatusBar()
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_contest)
-        viewModel = ViewModelProvider(this, factory).get(ContestViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[ContestViewModel::class.java]
 
         initAnimations()
 

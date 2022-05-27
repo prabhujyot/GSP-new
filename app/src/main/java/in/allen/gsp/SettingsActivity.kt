@@ -2,6 +2,7 @@ package `in`.allen.gsp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 
@@ -10,8 +11,9 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.settings_activity)
+
+        window.statusBarColor = ContextCompat.getColor(this,R.color.blue)
 
         is_admin = intent.getBooleanExtra("is_admin",false)
         if (savedInstanceState == null) {
@@ -25,6 +27,7 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.arrow_previous)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.gradiant_blue))
     }
 
     override fun onSupportNavigateUp(): Boolean {

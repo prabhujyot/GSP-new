@@ -40,18 +40,16 @@ import com.downloader.PRDownloader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.io.File
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 
-class QuizActivity : AppCompatActivity(), KodeinAware {
+class QuizActivity : AppCompatActivity(), DIAware {
 
     private val TAG = QuizActivity::class.java.name
     private lateinit var binding: ActivityQuizBinding
@@ -59,7 +57,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     private lateinit var bindingTrueFalse: OptionTrueFalseBinding
     private lateinit var viewModel: QuizViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val factory:QuizViewModelFactory by instance()
 
     // bottomsheets
@@ -116,17 +114,17 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 when (it.message) {
@@ -156,11 +154,11 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, { it ->
+        viewModel.getSuccess().observe(this) { it ->
             if (it != null) {
                 when (it.message) {
                     "user" -> {
@@ -403,7 +401,7 @@ class QuizActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     fun btnActionPlay(view: View) {

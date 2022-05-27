@@ -7,17 +7,19 @@ import `in`.allen.gsp.utils.tag
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
+
 import java.util.*
-import kotlin.collections.HashMap
 
 
-class LifeService : Service(), KodeinAware {
+class LifeService : Service(), DIAware {
 
-    override val kodein by kodein()
+//    override val di: DI by subDI(di) {}
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val userRepository: UserRepository by instance()
+
     private lateinit var timer: Timer
     private lateinit var taskRegular: TimerTask
     private lateinit var taskInfinite: TimerTask
@@ -70,7 +72,6 @@ class LifeService : Service(), KodeinAware {
                             true
                         )) {
                         maxLife = maxChance.toInt()
-                        interval = intervalSession.toInt().div(maxLife)
                         interval = intervalSession.toInt().div(maxLife)
                     }
 

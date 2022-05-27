@@ -2,9 +2,7 @@ package `in`.allen.gsp.ui.splash
 
 import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.repositories.UserRepository
-import `in`.allen.gsp.utils.Encryption
-import `in`.allen.gsp.utils.Resource
-import `in`.allen.gsp.utils.tag
+import `in`.allen.gsp.utils.*
 import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,7 +21,7 @@ class SplashViewModel(
 ): ViewModel() {
 
     lateinit var fbAccessToken: AccessToken
-    private var currentUser: FirebaseUser?
+    private var currentUser: FirebaseUser? = null
     val ALERT = "alert"
     val SNACKBAR = "snackbar"
     val TAG = "tag"
@@ -65,11 +63,6 @@ class SplashViewModel(
     var referredById = ""
     var firebaseToken = ""
 
-    init {
-        currentUser = auth.currentUser
-        tag("firebaseAuthWithFB init: authUser: $currentUser")
-        authUser(currentUser)
-    }
 
     fun firebaseAuthWithGoogle(idToken: String) {
         tag("firebaseAuthWithGoogle")
@@ -97,6 +90,8 @@ class SplashViewModel(
             params["name"] = obj.getString("name")
             params["email"] = obj.getString("email")
             params["avatar"] = obj.getJSONObject("picture").getJSONObject("data").getString("url")
+            params["firebase_token"] = firebaseToken
+            params["referred_by_id"] = referredById
             authToServer(params)
         }
 
@@ -125,6 +120,7 @@ class SplashViewModel(
                     params["referred_by_id"] = referredById
                     authToServer(params)
                 } else {
+                    tag("signInWithCredential Exception: " + task.exception)
                     if(task.exception is FirebaseAuthUserCollisionException
                         && provider.equals("facebook",true)) {
                         fbGraphRequest(fbAccessToken)
@@ -172,7 +168,9 @@ class SplashViewModel(
                         setError(responseObj.getString("message"), SNACKBAR)
                     }
                 }
-            } catch (e: Exception) {
+            } catch (e: ApiException) {
+                setError(e.message.toString(), SNACKBAR)
+            } catch (e: NoInternetExeption) {
                 setError(e.message.toString(), SNACKBAR)
             }
         }
@@ -182,15 +180,19 @@ class SplashViewModel(
         auth.signOut()
     }
 
-    private fun authUser(firebaseUser: FirebaseUser?) {
-        val isSignedIn = firebaseUser != null
+    fun authUser() {
+        currentUser = auth.currentUser
+        tag("firebaseAuthWithFB init: authUser: $currentUser")
+
+
+        val isSignedIn = currentUser != null
         // Status text
         if (isSignedIn) {
             val params = HashMap<String, String>()
-            params["name"] = firebaseUser?.displayName!!
-            params["email"] = firebaseUser.email!!
-            params["avatar"] = firebaseUser.photoUrl.toString()
-            params["firebase_uid"] = firebaseUser.uid
+            params["name"] = currentUser?.displayName!!
+            params["email"] = currentUser!!.email!!
+            params["avatar"] = currentUser!!.photoUrl.toString()
+            params["firebase_uid"] = currentUser!!.uid
             params["firebase_token"] = firebaseToken
             params["referred_by_id"] = referredById
 
@@ -201,12 +203,12 @@ class SplashViewModel(
                     tag(
                         "authUser: dbUser uid ${
                             dbUser.firebase_uid.equals(
-                                firebaseUser?.uid,
+                                currentUser!!.uid,
                                 true
                             )
                         }"
                     )
-                    if(dbUser.firebase_uid.equals(firebaseUser?.uid, true)) {
+                    if(dbUser.firebase_uid.equals(currentUser!!.uid, true)) {
                         val encryption = Encryption()
                         try {
                             val sessionToken = encryption.decrypt(dbUser.session_token)

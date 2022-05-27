@@ -10,7 +10,7 @@ class NotificationViewModelFactory(
     private val userRepository: UserRepository,
     private val messageRepository: MessageRepository
 ) : ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return NotificationViewModel(userRepository,messageRepository) as T
     }
 }

@@ -20,219 +20,232 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/margin88">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layoutTop"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/greyDark"
-                android:paddingStart="@dimen/margin16"
-                android:paddingTop="@dimen/margin8"
-                android:paddingEnd="@dimen/margin16"
-                android:paddingBottom="@dimen/margin8"
-                android:layout_marginTop="@dimen/margin60"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutVideo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:onClick="btnActionHome"
-                    app:layout_constraintEnd_toStartOf="@+id/layoutLeaderboard"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageView
-                        android:id="@+id/icon_video"
-                        android:layout_width="28dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/margin24"
-                        android:layout_marginTop="@dimen/margin8"
-                        android:src="@drawable/ic_video"
-                        app:layout_constraintBottom_toTopOf="@id/lblVideo"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="spread_inside"/>
-
-                    <TextView
-                        android:id="@+id/lblVideo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin2"
-                        android:text="@string/lblVideos"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/black"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@id/icon_video"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="@id/icon_video"
-                        app:layout_constraintTop_toBottomOf="@+id/icon_video" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutLeaderboard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:onClick="btnActionHome"
-                    app:layout_constraintEnd_toStartOf="@+id/layoutLife"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/layoutVideo"
-                    app:layout_constraintTop_toTopOf="@id/layoutVideo">
-
-                    <ImageView
-                        android:id="@+id/icon_leaderboard"
-                        android:layout_width="28dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        android:src="@drawable/ic_leaderboard"
-                        app:layout_constraintBottom_toTopOf="@id/lblLeaderboard"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="spread_inside" />
-
-                    <TextView
-                        android:id="@+id/lblLeaderboard"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin2"
-                        android:text="@string/lblLeaderboard"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/black"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@id/icon_leaderboard"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="@id/icon_leaderboard"
-                        app:layout_constraintTop_toBottomOf="@+id/icon_leaderboard" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/layoutLife"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    app:layout_constraintEnd_toStartOf="@+id/fabProfile"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/layoutLeaderboard"
-                    app:layout_constraintTop_toTopOf="@id/layoutLeaderboard">
-
-                    <include
-                        android:id="@+id/icon_life"
-                        layout="@layout/icon_life"
-                        android:layout_width="28dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/margin4"
-                        app:layout_constraintBottom_toTopOf="@+id/lifeTimer"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintVertical_chainStyle="spread_inside" />
-
-                    <TextView
-                        android:id="@+id/lifeTimer"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin2"
-                        android:text="00:00"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                        android:textColor="@color/black"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@id/icon_life"
-                        app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toStartOf="@id/icon_life"
-                        app:layout_constraintTop_toBottomOf="@+id/icon_life" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/fabProfile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/margin24"
-                    app:backgroundTint="@color/disable"
-                    app:fabCustomSize="48dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/layoutLife"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:maxImageSize="48dp"
-                    app:tint="@null" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.asksira.loopingviewpager.LoopingViewPager
-                android:id="@+id/viewpager_banner"
-                android:layout_width="match_parent"
-                android:layout_height="148dp"
-                android:layout_marginTop="@dimen/margin8"
-                android:clipToPadding="false"
-                android:paddingLeft="@dimen/margin24"
-                android:paddingRight="@dimen/margin24"
-                app:autoScroll="true"
-                app:isInfinite="true"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutTop"
-                app:scrollInterval="5000" />
-
-            <LinearLayout
-                android:id="@+id/layoutRanks"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/viewpager_banner"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginTop="@dimen/margin4"
-                android:background="@color/statusbar"
-                android:orientation="horizontal">
-
-                <include layout="@layout/item_ranks"/>
-
-            </LinearLayout>
-
-            <HorizontalScrollView
-                android:id="@+id/hScroll"
-                android:layout_width="match_parent"
+            <ScrollView
+                android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="@dimen/margin8"
-                android:scrollbars="none"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layoutRanks"
-                app:layout_constraintBottom_toBottomOf="parent">
-
-                <LinearLayout
-                    android:id="@+id/hScrollContainer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:paddingStart="@dimen/margin16"
-                    android:paddingEnd="@dimen/margin16"/>
-
-            </HorizontalScrollView>
-
-            <FrameLayout
-                android:id="@+id/layoutUpdate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:paddingStart="@dimen/margin16"
-                android:paddingEnd="@dimen/margin16"
-                android:paddingTop="@dimen/margin8"
-                android:paddingBottom="@dimen/margin8"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginTop="@dimen/margin60"
-                android:clickable="true"
-                android:focusable="true">
-                <include layout="@layout/update"/>
-            </FrameLayout>
+                app:layout_constraintBottom_toBottomOf="parent">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/layoutTop"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/greyDark"
+                        android:paddingStart="@dimen/margin16"
+                        android:paddingTop="@dimen/margin8"
+                        android:paddingEnd="@dimen/margin16"
+                        android:paddingBottom="@dimen/margin8"
+                        android:layout_marginTop="@dimen/margin4"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutVideo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:onClick="btnActionHome"
+                            app:layout_constraintEnd_toStartOf="@+id/layoutLeaderboard"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintHorizontal_chainStyle="spread_inside"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:id="@+id/icon_video"
+                                android:layout_width="28dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/margin24"
+                                android:layout_marginTop="@dimen/margin8"
+                                android:src="@drawable/ic_video"
+                                app:layout_constraintBottom_toTopOf="@id/lblVideo"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_chainStyle="spread_inside"/>
+
+                            <TextView
+                                android:id="@+id/lblVideo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin2"
+                                android:text="@string/lblVideos"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                android:textColor="@color/black"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="@id/icon_video"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="@id/icon_video"
+                                app:layout_constraintTop_toBottomOf="@+id/icon_video" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutLeaderboard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:onClick="btnActionHome"
+                            app:layout_constraintEnd_toStartOf="@+id/layoutLife"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/layoutVideo"
+                            app:layout_constraintTop_toTopOf="@id/layoutVideo">
+
+                            <ImageView
+                                android:id="@+id/icon_leaderboard"
+                                android:layout_width="28dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin4"
+                                android:src="@drawable/ic_leaderboard"
+                                app:layout_constraintBottom_toTopOf="@id/lblLeaderboard"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_chainStyle="spread_inside" />
+
+                            <TextView
+                                android:id="@+id/lblLeaderboard"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin2"
+                                android:text="@string/lblLeaderboard"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                android:textColor="@color/black"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="@id/icon_leaderboard"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="@id/icon_leaderboard"
+                                app:layout_constraintTop_toBottomOf="@+id/icon_leaderboard" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutLife"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            app:layout_constraintEnd_toStartOf="@+id/fabProfile"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/layoutLeaderboard"
+                            app:layout_constraintTop_toTopOf="@id/layoutLeaderboard">
+
+                            <include
+                                android:id="@+id/icon_life"
+                                layout="@layout/icon_life"
+                                android:layout_width="28dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/margin4"
+                                app:layout_constraintBottom_toTopOf="@+id/lifeTimer"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_chainStyle="spread_inside" />
+
+                            <TextView
+                                android:id="@+id/lifeTimer"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/margin2"
+                                android:text="00:00"
+                                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                                android:textColor="@color/black"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="@id/icon_life"
+                                app:layout_constraintHorizontal_bias="0.5"
+                                app:layout_constraintStart_toStartOf="@id/icon_life"
+                                app:layout_constraintTop_toBottomOf="@+id/icon_life" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fabProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/margin24"
+                            app:backgroundTint="@color/disable"
+                            app:fabCustomSize="48dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintHorizontal_bias="0.5"
+                            app:layout_constraintStart_toEndOf="@+id/layoutLife"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:maxImageSize="48dp"
+                            app:tint="@null" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.asksira.loopingviewpager.LoopingViewPager
+                        android:id="@+id/viewpager_banner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clipToPadding="false"
+                        android:paddingLeft="@dimen/margin24"
+                        android:paddingRight="@dimen/margin24"
+                        android:layout_marginTop="@dimen/margin8"
+                        app:autoScroll="true"
+                        app:isInfinite="true"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layoutTop"
+                        app:scrollInterval="5000" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutRanks"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/viewpager_banner"
+                        app:layout_constraintStart_toStartOf="parent"
+                        android:layout_marginTop="@dimen/margin4"
+                        android:background="@color/statusbar"
+                        android:orientation="horizontal">
+
+                        <include layout="@layout/item_ranks"/>
+
+                    </LinearLayout>
+
+                    <HorizontalScrollView
+                        android:id="@+id/hScroll"
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp"
+                        android:layout_marginTop="@dimen/margin8"
+                        android:layout_marginBottom="@dimen/margin60"
+                        android:scrollbars="none"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/layoutRanks"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <LinearLayout
+                            android:id="@+id/hScrollContainer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:paddingStart="@dimen/margin16"
+                            android:paddingEnd="@dimen/margin16"/>
+
+                    </HorizontalScrollView>
+
+                    <FrameLayout
+                        android:id="@+id/layoutUpdate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        android:paddingStart="@dimen/margin16"
+                        android:paddingEnd="@dimen/margin16"
+                        android:paddingTop="@dimen/margin8"
+                        android:paddingBottom="@dimen/margin8"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginTop="@dimen/margin4"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <include layout="@layout/update"/>
+                    </FrameLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </ScrollView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

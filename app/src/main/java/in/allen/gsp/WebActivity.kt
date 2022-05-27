@@ -1,46 +1,53 @@
 package `in`.allen.gsp
 
+import `in`.allen.gsp.databinding.ActivityWebBinding
 import `in`.allen.gsp.utils.tag
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_web.*
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
+import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
+
+//import kotlinx.android.synthetic.main.activity_web.*
+//import kotlinx.android.synthetic.main.toolbar.*
+//import kotlinx.android.synthetic.main.toolbar.view.*
 
 class WebActivity : AppCompatActivity() {
 
     private val TAG = WebActivity::class.java.name
+    private lateinit var binding: ActivityWebBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_web)
 
-        setContentView(R.layout.activity_web)
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
 
-        webView.webChromeClient = object : WebChromeClient() {
+        binding.webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
-                progressBar.progress = newProgress
+                binding.progressBar.progress = newProgress
             }
         }
 
-        webView.webViewClient = object : WebViewClient() {
+        binding.webView.webViewClient = object : WebViewClient() {
         }
 
-        webView.settings.javaScriptEnabled = true
+        binding.webView.settings.javaScriptEnabled = true
 
         intent.getStringExtra("url").let {
             val url = intent.getStringExtra("url")
             tag("$TAG, $url")
             if (url != null) {
-                webView.loadUrl(url)
+                binding.webView.loadUrl(url)
             }
         }
     }

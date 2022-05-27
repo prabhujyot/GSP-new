@@ -18,8 +18,8 @@
             android:padding="@dimen/margin16"
             android:src="@drawable/arrow_previous"
             app:layout_constraintStart_toStartOf="parent"
-            android:tint="@color/white"
-            android:contentDescription="@string/lblBack" />
+            android:contentDescription="@string/lblBack"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/toolbarTitle"

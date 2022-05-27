@@ -10,27 +10,33 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
+import com.chaos.view.PinView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.bottomsheet_verification.view.*
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class ProfileEditActivity : AppCompatActivity(), KodeinAware {
+class ProfileEditActivity : AppCompatActivity(), DIAware {
 
     private val TAG = ProfileEditActivity::class.java.name
     private lateinit var binding: ActivityProfileEditBinding
     private lateinit var viewModel: ProfileViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val repository: UserRepository by instance()
     private val rewardRepository: RewardRepository by instance()
 
+    private lateinit var bottomSheetOTP: FrameLayout
     private lateinit var otpSheetBehavior: BottomSheetBehavior<View>
+    private lateinit var otp: PinView
+    private lateinit var btnResendOtp: Button
+    private lateinit var btnSubmit: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +44,23 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile_edit)
         viewModel = ProfileViewModel(repository,rewardRepository)
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
 
         // bottomsheet for otp
-        otpSheetBehavior = BottomSheetBehavior.from(binding.rootLayout.bottomSheetOTP)
+        bottomSheetOTP = binding.root.findViewById(R.id.bottomSheetOTP)
+        otpSheetBehavior = BottomSheetBehavior.from(bottomSheetOTP)
         otpSheetBehavior.isDraggable = false
-        binding.rootLayout.otp.addTextChangedListener(textWatcher)
+
+        otp = bottomSheetOTP.findViewById(R.id.otp)
+        otp.addTextChangedListener(textWatcher)
+
+        btnResendOtp = bottomSheetOTP.findViewById(R.id.btnResendOtp)
+        btnSubmit = bottomSheetOTP.findViewById(R.id.btnSubmit)
 
         observeLoading()
         observeError()
@@ -57,17 +71,17 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -86,12 +100,12 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
-            if(it != null) {
+        viewModel.getSuccess().observe(this) {
+            if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
                     "user" -> {
@@ -101,7 +115,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                         binding.username.text = user.name
                         if (user.mobile.length > 9) {
                             binding.mobile.setText(user.mobile)
-                            if(user.is_verified == 0) {
+                            if (user.is_verified == 0) {
                                 binding.verificationStatus.text = "Not Verified"
                                 binding.btnVerify.text = "Verify"
                             } else {
@@ -109,13 +123,13 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                                 binding.btnVerify.text = "Update"
                             }
                         }
-                        if (!user.location.equals("null",true))
+                        if (!user.location.equals("null", true))
                             binding.location.setText(user.location)
-                        if (!user.about.equals("null",true))
+                        if (!user.about.equals("null", true))
                             binding.about.setText(user.about)
                     }
                     "verifyMobile" -> {
-                        if(otpSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                        if (otpSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                             otpSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                         }
                         binding.btnVerify.text = "Update"
@@ -125,35 +139,35 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
                         toast("${it.data}")
                     }
                     "getOTP" -> {
-                        if(otpSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                        if (otpSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                             otpSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                         }
 
-                        binding.rootLayout.otp.setText("")
+                        bottomSheetOTP.findViewById<PinView>(R.id.otp).setText("")
                         binding.verificationStatus.text = "Not Verified"
                         viewModel.countdownStart(5 * 60 * 1000)
                     }
                     "disableOTP" -> {
-                        binding.rootLayout.btnResendOtp.isEnabled = false
-                        binding.rootLayout.btnResendOtp.text = it.data as String
+                        btnResendOtp.isEnabled = false
+                        btnResendOtp.text = it.data as String
 
                         binding.btnVerify.isEnabled = false
                         binding.btnVerify.text = it.data
                     }
                     "enableOTP" -> {
-                        binding.rootLayout.btnResendOtp.isEnabled = true
-                        binding.rootLayout.btnResendOtp.text = it.data as String
+                        btnResendOtp.isEnabled = true
+                        btnResendOtp.text = it.data as String
 
                         binding.btnVerify.isEnabled = true
                         binding.btnVerify.text = "Verify"
                     }
                     "updateProfile" -> {
-                        binding.rootLayout.otp.requestFocus()
-                        viewModel.setError("Profile updated",viewModel.SNACKBAR)
+                        otp.requestFocus()
+                        viewModel.setError("Profile updated", viewModel.SNACKBAR)
                     }
                 }
             }
-        })
+        }
     }
 
     fun btnActionProfileEdit(view: View) {
@@ -193,7 +207,7 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnSubmit -> {
                 hideKeyboard(view)
-                val otp = binding.rootLayout.otp.text.toString()
+                val otp = otp.text.toString()
                 viewModel.verifyMobile(mobile,otp)
             }
         }
@@ -204,9 +218,9 @@ class ProfileEditActivity : AppCompatActivity(), KodeinAware {
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            binding.rootLayout.btnSubmit.isEnabled = false
-            if(binding.rootLayout.otp.text.toString().length == 4) {
-                binding.rootLayout.btnSubmit.isEnabled = true
+            btnSubmit.isEnabled = false
+            if(otp.text.toString().length == 4) {
+                btnSubmit.isEnabled = true
             }
         }
 

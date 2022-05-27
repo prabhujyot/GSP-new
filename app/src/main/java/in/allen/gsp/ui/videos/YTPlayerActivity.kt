@@ -18,21 +18,21 @@ import com.google.android.youtube.player.YouTubeBaseActivity
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
 
 class YTPlayerActivity: YouTubeBaseActivity(),
-    YouTubePlayer.OnInitializedListener, KodeinAware {
+    YouTubePlayer.OnInitializedListener, DIAware {
 
     private val TAG = YTPlayerActivity::class.java.name
     private lateinit var binding: ActivityYtPlayerBinding
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val videosRepository: VideosRepository by instance()
 
     private var videoId = ""

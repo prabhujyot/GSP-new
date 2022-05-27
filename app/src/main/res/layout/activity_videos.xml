@@ -22,9 +22,7 @@
                 app:contentScrim="@color/blue"
                 app:titleEnabled="false">
 
-                <include
-                    android:id="@+id/toolbar"
-                    layout="@layout/toolbar"/>
+                <include layout="@layout/toolbar"/>
 
                 <include
                     android:id="@+id/channelItem"

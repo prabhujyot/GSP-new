@@ -19,8 +19,10 @@ import android.view.*
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
@@ -32,23 +34,21 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import dev.skymansandy.scratchcardlayout.listener.ScratchListener
 import dev.skymansandy.scratchcardlayout.ui.ScratchCardLayout
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
 import org.json.JSONArray
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import kotlin.random.Random
 
 
-class ProfileActivity : AppCompatActivity(), KodeinAware {
+class ProfileActivity : AppCompatActivity(), DIAware {
 
     private val TAG = ProfileActivity::class.java.name
     private lateinit var binding: ActivityProfileBinding
     private lateinit var viewModel: ProfileViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val repository: UserRepository by instance()
     private val rewardRepository: RewardRepository by instance()
 
@@ -71,8 +71,10 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
         viewModel = ProfileViewModel(repository,rewardRepository)
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
 
@@ -132,17 +134,17 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -161,12 +163,12 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
-            if(it != null) {
+        viewModel.getSuccess().observe(this) {
+            if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
                     "user" -> {
@@ -177,11 +179,15 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                         binding.email.text = user.email
                         if (user.mobile.length > 9) {
                             binding.mobile.text = "Mob. ${user.mobile} "
-                            if(user.is_verified == 1) {
+                            if (user.is_verified == 1) {
                                 binding.mobile.setCompoundDrawablesWithIntrinsicBounds(
                                     null,
                                     null,
-                                    ResourcesCompat.getDrawable(resources,R.drawable.ic_check,null),
+                                    ResourcesCompat.getDrawable(
+                                        resources,
+                                        R.drawable.ic_check,
+                                        null
+                                    ),
                                     null
                                 )
                             }
@@ -190,7 +196,7 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
 
                         viewModel.statsData(user.user_id)
 
-                        if (!::recyclerAdapter.isInitialized){
+                        if (!::recyclerAdapter.isInitialized) {
                             initRecyclerView()
                             reset()
                             viewModel.scratchcards(page)
@@ -206,20 +212,23 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
 
                     "scratchcards" -> {
                         loading = true
-                        if(it.data is JSONObject) {
+                        if (it.data is JSONObject) {
                             val data = it.data
-                            if (!data.getString("cards").equals("false",true)) {
+                            if (!data.getString("cards").equals("false", true)) {
                                 val arr: JSONArray = data.getJSONArray("cards")
                                 if (arr.length() > 0) {
                                     for (i in 0 until arr.length()) {
                                         val obj = arr[i] as JSONObject
                                         if (obj.getString("value")
-                                                .equals("0", ignoreCase = true) && obj.getString("status")
+                                                .equals(
+                                                    "0",
+                                                    ignoreCase = true
+                                                ) && obj.getString("status")
                                                 .equals("1", ignoreCase = true)
                                         ) {
                                             continue
                                         }
-                                        val hashMap = HashMap<String,String>()
+                                        val hashMap = HashMap<String, String>()
                                         hashMap["id"] = obj.getString("id")
                                         hashMap["type"] = obj.getString("type")
                                         hashMap["description"] = obj.getString("description")
@@ -253,7 +262,7 @@ class ProfileActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun setStatistics(data: JSONObject) {

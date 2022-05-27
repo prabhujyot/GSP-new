@@ -7,33 +7,36 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.toolbar.*
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
 
-class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
+class ContestInstructionActivity : AppCompatActivity(), DIAware {
 
     private val TAG = ContestInstructionActivity::class.java.name
     private lateinit var binding: ActivityContestInstructionBinding
     private lateinit var viewModel: ContestViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val factory:ContestViewModelFactory by instance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_contest_instruction)
-        viewModel = ViewModelProvider(this, factory).get(ContestViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[ContestViewModel::class.java]
 
-        setSupportActionBar(myToolbar)
-        btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
 
@@ -58,17 +61,17 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 when (it.message) {
@@ -76,12 +79,12 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
                         it.data?.let { it1 ->
                             var action = ""
                             var str = ""
-                            if(it1.startsWith("contestData:")) {
+                            if (it1.startsWith("contestData:")) {
                                 action = "finish"
                                 str = it1.removePrefix("contestData:")
                             }
                             alertDialog("Error!", str) {
-                                if(action.equals("finish",true)) {
+                                if (action.equals("finish", true)) {
                                     finish()
                                 }
                             }
@@ -98,11 +101,11 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, { it ->
+        viewModel.getSuccess().observe(this) { it ->
             if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
@@ -114,21 +117,25 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
                         resetviews()
 
                         val dataObj = it.data as JSONObject
-                        if(!dataObj.getString("contest").equals("false", true)) {
+                        if (!dataObj.getString("contest").equals("false", true)) {
                             val contestObj = dataObj.getJSONObject("contest")
                             // contest enrolVisibilty
 //                            tag(contestObj)
                             viewModel.enrolVisibility(contestObj)
 
                             // contest play visibility
-                            if(binding.wrapperCountdownEnrollment.visibility != View.VISIBLE) {
+                            if (binding.wrapperCountdownEnrollment.visibility != View.VISIBLE) {
                                 viewModel.playVisibility(dataObj)
                             }
-                            binding.webView.loadData(contestObj.getString("desc"), "text/html; charset=utf-8", "UTF-8")
+                            binding.webView.loadData(
+                                contestObj.getString("desc"),
+                                "text/html; charset=utf-8",
+                                "UTF-8"
+                            )
                         }
 
-                        if(dataObj.has("msg")) {
-                            viewModel.setError(dataObj.getString("msg"),viewModel.SNACKBAR)
+                        if (dataObj.has("msg")) {
+                            viewModel.setError(dataObj.getString("msg"), viewModel.SNACKBAR)
                         }
                     }
 
@@ -154,8 +161,11 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
                     }
 
                     "startCountdownContest" -> {
-                        if(it.data is HashMap<*, *>) {
-                            startCountdownContest(it.data["diff"] as Long,it.data["contestObj"] as JSONObject)
+                        if (it.data is HashMap<*, *>) {
+                            startCountdownContest(
+                                it.data["diff"] as Long,
+                                it.data["contestObj"] as JSONObject
+                            )
                         }
                     }
 
@@ -166,11 +176,11 @@ class ContestInstructionActivity : AppCompatActivity(), KodeinAware {
                     "countdownContestFinish" -> {
                         tag("enableContestPlay finish")
                         binding.textCountdown.show(false)
-                        viewModel.setSuccess(it.data as JSONObject,"enableContestPlay")
+                        viewModel.setSuccess(it.data as JSONObject, "enableContestPlay")
                     }
                 }
             }
-        })
+        }
     }
 
     private fun enableContestEnrollment() {

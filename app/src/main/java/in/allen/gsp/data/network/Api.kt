@@ -25,7 +25,7 @@ interface Api {
 
             return Retrofit.Builder()
                 .client(okHttpClient)
-                .baseUrl(BuildConfig.BASE_URL + "gsp-admin/index.php/and0roid_v2/")
+                .baseUrl(BuildConfig.BASE_URL + "gsp-admin/api/v2/")
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

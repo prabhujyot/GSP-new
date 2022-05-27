@@ -16,27 +16,28 @@ import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ImageButton
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.android.synthetic.main.bottomsheet_message.view.*
-import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.android.synthetic.main.toolbar.view.*
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class NotificationActivity : AppCompatActivity(), KodeinAware {
+class NotificationActivity : AppCompatActivity(), DIAware {
 
     private val TAG = NotificationActivity::class.java.name
     private lateinit var binding: ActivityNotificationBinding
     private lateinit var viewModel: NotificationViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val factory:NotificationViewModelFactory by instance()
 
     private var page = 1
@@ -49,18 +50,23 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
     private var list = ArrayList<Message>()
     private lateinit var recyclerAdapter: RecyclerViewAdapter
 
+    private lateinit var bottomSheetMessage: ConstraintLayout
     private lateinit var messageSheetBehavior: BottomSheetBehavior<View>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_notification)
-        viewModel = ViewModelProvider(this, factory).get(NotificationViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[NotificationViewModel::class.java]
 
-        setSupportActionBar(myToolbar)
-        myToolbar.btnBack.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             onBackPressed()
         }
+
+        bottomSheetMessage = binding.root.findViewById(R.id.bottomSheetMessage)
 
         initBottomSheet()
         reset()
@@ -79,7 +85,7 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 when (it.message) {
@@ -97,22 +103,22 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
+        viewModel.getSuccess().observe(this) {
             tag("$TAG _success: ${it.data}")
             if (it != null) {
                 when (it.message) {
                     "notifications" -> {
                         loading = true
-                        if(it.data is HashMap<*, *>) {
+                        if (it.data is HashMap<*, *>) {
                             val mList = ArrayList(it.data["list"] as List<Message>)
                             page = it.data["page"] as Int
-                            if(mList.size > 0) {
+                            if (mList.size > 0) {
                                 list = mList
-                                if(page == 2) {
+                                if (page == 2) {
                                     initRecyclerView()
                                 } else {
                                     recyclerAdapter.notifyDataSetChanged()
@@ -122,19 +128,20 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
                             }
                         }
 
-                        if(list.isNotEmpty()) {
+                        if (list.isNotEmpty()) {
                             binding.noData.show(false)
                         }
                     }
                     "open" -> {
-                        if(it.data is HashMap<*,*>) {
+                        if (it.data is HashMap<*, *>) {
                             val msg = it.data["item"] as Message
                             val position = it.data["position"] as Int
-                            binding.rootLayout.bottomSheetMessage.webView.loadData(
+                            bottomSheetMessage.findViewById<WebView>(R.id.webView).loadData(
                                 msg.msg,
                                 "text/html; charset=UTF-8",
-                                null)
-                            if(messageSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                                null
+                            )
+                            if (messageSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                                 messageSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                             }
 
@@ -146,24 +153,26 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun initBottomSheet() {
-        messageSheetBehavior = BottomSheetBehavior.from(binding.rootLayout.bottomSheetMessage)
+        messageSheetBehavior = BottomSheetBehavior.from(bottomSheetMessage)
         messageSheetBehavior.isDraggable = false
 
-        binding.rootLayout.bottomSheetMessage.webView.webChromeClient = object : WebChromeClient() {
+        val webView:WebView = bottomSheetMessage.findViewById(R.id.webView)
+
+        webView.webChromeClient = object : WebChromeClient() {
             override fun onProgressChanged(view: WebView, newProgress: Int) {
                 super.onProgressChanged(view, newProgress)
-                binding.rootLayout.bottomSheetMessage.progressBar.progress = newProgress
+                bottomSheetMessage.findViewById<ProgressBar>(R.id.progressBar).progress = newProgress
             }
         }
 
-        binding.rootLayout.bottomSheetMessage.webView.webViewClient = object : WebViewClient() {
+        webView.webViewClient = object : WebViewClient() {
         }
 
-        binding.rootLayout.bottomSheetMessage.btnClose.setOnClickListener {
+        bottomSheetMessage.findViewById<ImageButton>(R.id.btnClose).setOnClickListener {
             if(messageSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 messageSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
@@ -267,9 +276,9 @@ class NotificationActivity : AppCompatActivity(), KodeinAware {
                 binding.time.text = timeInAgo(data.date,"yyyy-MM-dd HH:mm:ss")
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    binding.msg.text = Html.fromHtml(data.msg, Html.FROM_HTML_MODE_COMPACT)
+                    binding.msg.text = Html.fromHtml(data.msg + "...", Html.FROM_HTML_MODE_COMPACT)
                 } else {
-                    binding.msg.text = Html.fromHtml(data.msg)
+                    binding.msg.text = Html.fromHtml(data.msg + "...")
                 }
 
                 binding.item.setOnClickListener {

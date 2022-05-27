@@ -14,7 +14,7 @@ class QuizViewModelFactory(
     private val rewardRepository: RewardRepository,
     private val preferences: AppPreferences
 ) : ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return QuizViewModel(userRepository,quizRepository,rewardRepository,preferences) as T
     }
 }

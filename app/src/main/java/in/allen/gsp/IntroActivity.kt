@@ -1,5 +1,6 @@
 package `in`.allen.gsp
 
+import `in`.allen.gsp.databinding.ActivityIntroBinding
 import `in`.allen.gsp.ui.home.HomeActivity
 import `in`.allen.gsp.utils.hideStatusBar
 import android.content.Intent
@@ -10,22 +11,22 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.gohn.parallaxviewpager.ParallaxViewPager
-import kotlinx.android.synthetic.main.activity_intro.*
 
 class IntroActivity : AppCompatActivity() {
 
     private val TAG = IntroActivity::class.java.name
+    private lateinit var binding: ActivityIntroBinding
     private lateinit var parallaxViewPager: ParallaxViewPager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_intro)
 
         hideStatusBar()
-
-        setContentView(R.layout.activity_intro)
 
         parallaxViewPager = findViewById(R.id.parallaxViewPager)
         parallaxViewPager.addMovementToView(R.id.title, 0.0f) // Stop On View
@@ -42,9 +43,9 @@ class IntroActivity : AppCompatActivity() {
 
             override fun onPageSelected(position: Int) {
                 if(position == 2) {
-                    btnNext.text = "Done"
+                    binding.btnNext.text = "Done"
                 } else {
-                    btnNext.text = "Next"
+                    binding.btnNext.text = "Next"
                 }
             }
 

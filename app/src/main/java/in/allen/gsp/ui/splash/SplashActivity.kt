@@ -7,7 +7,6 @@ import `in`.allen.gsp.data.repositories.UserRepository
 import `in`.allen.gsp.data.services.LifeService
 import `in`.allen.gsp.databinding.ActivitySplashBinding
 import `in`.allen.gsp.ui.home.HomeActivity
-import `in`.allen.gsp.ui.message.NotificationActivity
 import `in`.allen.gsp.utils.*
 import android.content.Intent
 import android.graphics.Color
@@ -28,22 +27,24 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData
 import com.google.firebase.messaging.FirebaseMessaging
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
 
 private const val GOOGLE_SIGN_IN : Int = 9001
 
 
-class SplashActivity : AppCompatActivity(), KodeinAware {
+class SplashActivity : AppCompatActivity(), DIAware {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private val TAG = SplashActivity::class.java.name
     private lateinit var binding: ActivitySplashBinding
     private lateinit var viewModel: SplashViewModel
 
-    override val kodein by kodein()
+//    override val di: DI by subDI(di) {}
+    override val di: DI by lazy { (applicationContext as DIAware).di }
+
     private lateinit var app: App
     private val repository: UserRepository by instance()
     private val preferences: AppPreferences by instance()
@@ -100,6 +101,8 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
         googleSignInClient = initGoogle()
         initFB()
+
+        viewModel.authUser()
 
         observeSuccess()
         observeLoading()
@@ -180,6 +183,8 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
     private fun isReferred() {
         viewModel.firebaseToken = preferences.firebaseToken
+        tag("isReferred: " + viewModel.firebaseToken)
+
         FirebaseDynamicLinks
             .getInstance()
             .getDynamicLink(intent)
@@ -197,17 +202,17 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -227,45 +232,46 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
+        viewModel.getSuccess().observe(this) {
             tag("$TAG _success: ${it.data}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
                 when (it.message) {
                     "user" -> {
                         val user = it.data as User
-                        catchNotification(user)
 
                         Intent(applicationContext, LifeService::class.java).apply {
                             val bundle = Bundle()
-                            bundle.putParcelable("user",user)
-                            bundle.putLong("timestampLife",preferences.timestampLife)
-                            putExtra("bundle",bundle)
+                            bundle.putParcelable("user", user)
+                            bundle.putLong("timestampLife", preferences.timestampLife)
+                            putExtra("bundle", bundle)
                             startService(this)
                         }
 
-                        if(!preferences.appIntro) {
+                        if (!preferences.appIntro) {
                             Intent(this, IntroActivity::class.java)
                                 .also { it1 ->
-                                    it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    it1.flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     startActivity(it1)
                                 }
                             preferences.appIntro = true
                         } else {
                             Intent(this, HomeActivity::class.java)
                                 .also { it1 ->
-                                    it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    it1.flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     startActivity(it1)
                                 }
                         }
                     }
                 }
             }
-        })
+        }
     }
 
     private fun askToLogin() {
@@ -280,18 +286,6 @@ class SplashActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnGG -> {
                 actionGoogle()
-            }
-        }
-    }
-
-    private fun catchNotification(user: User) {
-        if(intent.hasExtra("click_action")
-            && (intent.getStringExtra("click_action").equals("ACTION_NOTIFICATION",true))) {
-            Intent(this, NotificationActivity::class.java).also {
-                it.putExtra("title", intent.getStringExtra("title"))
-                it.putExtra("body", intent.getStringExtra("body"))
-                it.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(it)
             }
         }
     }

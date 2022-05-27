@@ -18,8 +18,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.set
 
 
@@ -259,7 +257,7 @@ class QuizViewModel(
         // check existing qid before adding
         var exists = false
         for(sd in statsData) {
-            if(sd.containsKey(currentq.qid)) {
+            if(sd.containsKey(currentq.qid.toString())) {
                 exists = true
                 break
             }

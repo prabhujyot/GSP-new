@@ -16,14 +16,14 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.util.*
 
-class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
+class MyFirebaseMessagingService: FirebaseMessagingService(), DIAware {
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val preferences: AppPreferences by instance()
     private val messageRepository: MessageRepository by instance()
     private val userRepository: UserRepository by instance()
@@ -165,7 +165,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), KodeinAware {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val channel = NotificationChannel(
                         channelId,
-                        "GSP Notification Channel",
+                        getString(R.string.notification_channel_id),
                         NotificationManager.IMPORTANCE_DEFAULT
                     )
                     notificationManager.createNotificationChannel(channel)

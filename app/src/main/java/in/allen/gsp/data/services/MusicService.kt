@@ -8,18 +8,19 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Binder
 import android.os.IBinder
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
-class MusicService : Service(), KodeinAware, MediaPlayer.OnErrorListener {
+
+class MusicService : Service(), DIAware, MediaPlayer.OnErrorListener {
 
     private val TAG = MusicService::class.java.name
     private val mBinder: IBinder = ServiceBinder()
     private var mediaPlayer: MediaPlayer? = null
     private val appPreferences: AppPreferences by instance()
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
 
     override fun onBind(p0: Intent?): IBinder {
         return mBinder

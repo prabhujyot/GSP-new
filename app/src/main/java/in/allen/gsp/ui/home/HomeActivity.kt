@@ -1,6 +1,9 @@
 package `in`.allen.gsp.ui.home
 
-import `in`.allen.gsp.*
+import `in`.allen.gsp.BuildConfig
+import `in`.allen.gsp.R
+import `in`.allen.gsp.SettingsActivity
+import `in`.allen.gsp.WebActivity
 import `in`.allen.gsp.data.entities.Banner
 import `in`.allen.gsp.data.entities.Leaderboard
 import `in`.allen.gsp.data.entities.Tile
@@ -24,10 +27,13 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
@@ -44,30 +50,25 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.tasks.Task
-import kotlinx.android.synthetic.main.icon_life.view.*
-import kotlinx.android.synthetic.main.toolbar.view.*
-import kotlinx.android.synthetic.main.toolbar_home.*
-import kotlinx.android.synthetic.main.update.view.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import org.kodein.di.KodeinAware
-import org.kodein.di.android.kodein
-import org.kodein.di.generic.instance
-import java.util.*
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import java.util.concurrent.TimeUnit
 
 
 private const val REQUEST_UPDATE = 100
 private const val APP_UPDATE_TYPE_SUPPORTED = AppUpdateType.FLEXIBLE
 
-class HomeActivity : AppCompatActivity(), KodeinAware {
+class HomeActivity : AppCompatActivity(), DIAware {
 
     private val TAG = HomeActivity::class.java.name
     private lateinit var binding: ActivityHomeBinding
     private lateinit var viewModel: HomeViewModel
 
-    override val kodein by kodein()
+    override val di: DI by lazy { (applicationContext as DIAware).di }
     private val factory:HomeViewModelFactory by instance()
     private val userRepository: UserRepository by instance()
     private val messageRepository: MessageRepository by instance()
@@ -81,14 +82,16 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
-        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
 
-        setSupportActionBar(myToolbar)
-        btnClose.setOnClickListener {
+        val toolbar = binding.root.findViewById<Toolbar>(R.id.myToolbar)
+
+        setSupportActionBar(toolbar)
+        toolbar.findViewById<ImageButton>(R.id.btnClose).setOnClickListener {
             onBackPressed()
         }
 
-        menuNotification.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.menuNotification).setOnClickListener {
             val i = Intent()
             i.setClass(this@HomeActivity, NotificationActivity::class.java)
             startActivity(i)
@@ -112,11 +115,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             autoscroll = userRepository.config("banner-scroll")
         }
 
-        userRepository.userLife.observe(this, {
+        userRepository.userLife.observe(this) {
             if (it != null) {
-                binding.iconLife.life.text = "${it["life"]}"
+                val life = binding.root.findViewById<TextView>(R.id.life)
+                life.text = "${it["life"]}"
                 if (System.currentTimeMillis() < preferences.timestampLife) {
-                    binding.iconLife.life.text = getString(R.string.infinity)
+                    life.text = getString(R.string.infinity)
                     it["life"] = 0
                 }
                 if (it["life"]!!.toInt() == 5) {
@@ -136,9 +140,10 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
 
-        messageRepository.unreadMsg.observe(this, {
+        messageRepository.unreadMsg.observe(this) {
+            val msgCounter = toolbar.findViewById<TextView>(R.id.msgCounter)
             msgCounter.show(false)
             if (it > 0) {
                 if (it < 10) {
@@ -148,7 +153,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                 }
                 msgCounter.show()
             }
-        })
+        }
     }
 
     override fun onPause() {
@@ -205,17 +210,17 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
 
 
     private fun observeLoading() {
-        viewModel.getLoading().observe(this, {
+        viewModel.getLoading().observe(this) {
             tag("$TAG _loading: ${it.message}")
             binding.rootLayout.hideProgress()
             if (it.data is Boolean && it.data) {
                 binding.rootLayout.showProgress()
             }
-        })
+        }
     }
 
     private fun observeError() {
-        viewModel.getError().observe(this, {
+        viewModel.getError().observe(this) {
             tag("$TAG _error: ${it.message}")
             if (it != null) {
                 when (it.message) {
@@ -233,11 +238,11 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                     }
                 }
             }
-        })
+        }
     }
 
     private fun observeSuccess() {
-        viewModel.getSuccess().observe(this, {
+        viewModel.getSuccess().observe(this) {
             tag("$TAG ._success: ${it.data}")
             if (it != null) {
                 binding.rootLayout.hideProgress()
@@ -260,7 +265,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                     "user" -> {
                         val user = it.data as User
                         if (user.avatar.isNotBlank()) {
-                            binding.fabProfile.loadImage(user.avatar,true,true)
+                            binding.fabProfile.loadImage(user.avatar, true, true)
                         }
                         viewModel.bannerData(user.user_id)
                         viewModel.leaderboard()
@@ -270,7 +275,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                         if (it.data is Deferred<*>) {
                             val deferredList = it.data as Deferred<LiveData<List<Banner>>>
                             lifecycleScope.launch {
-                                deferredList.await().observe(this@HomeActivity, { list ->
+                                deferredList.await().observe(this@HomeActivity) { list ->
                                     binding.viewpagerBanner.adapter = BannerAdapter(
                                         this@HomeActivity,
                                         list,
@@ -280,12 +285,12 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                                     viewModel.tileData()
 
                                     tag("autoscroll: $autoscroll")
-                                    if(!autoscroll.equals("true",true)) {
+                                    if (!autoscroll.equals("true", true)) {
                                         binding.viewpagerBanner.pauseAutoScroll()
                                     } else {
                                         binding.viewpagerBanner.resumeAutoScroll()
                                     }
-                                })
+                                }
                             }
                         }
                     }
@@ -294,27 +299,27 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
                         tag("$TAG, tiles")
                         if (it.data is List<*>) {
                             val list = it.data as List<Tile>
-                            if(list.isNotEmpty()) {
+                            if (list.isNotEmpty()) {
                                 setTiles(list)
                             }
                         }
                     }
 
                     "leaderboard" -> {
-                        if(it.data is Deferred<*>) {
+                        if (it.data is Deferred<*>) {
                             val deferredList = it.data as Deferred<LiveData<List<Leaderboard>>>
                             lifecycleScope.launch {
-                                deferredList.await().observe(this@HomeActivity, { list->
-                                    if(list.size > 4) {
+                                deferredList.await().observe(this@HomeActivity) { list ->
+                                    if (list.size > 4) {
                                         setLeaderboard(list)
                                     }
-                                })
+                                }
                             }
                         }
                     }
                 }
             }
-        })
+        }
     }
 
 
@@ -435,7 +440,7 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
             }
             R.id.btnContests -> {
                 i.setClass(this@HomeActivity, WebActivity::class.java)
-                i.putExtra("url", "${BuildConfig.BASE_URL}category/quiz-time/")
+                i.putExtra("url", "${BuildConfig.BASE_URL}quizzes-and-games/")
             }
         }
         startActivity(i)
@@ -485,37 +490,39 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun setUpdateAction(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
-        binding.layoutUpdate.btn_update.setOnClickListener {
+        val btn_update: Button = binding.root.findViewById(R.id.btn_update)
+        val status: TextView = binding.root.findViewById(R.id.status)
+        btn_update.setOnClickListener {
             updateListener = InstallStateUpdatedListener {
-                binding.layoutUpdate.btn_update.show(false)
-                binding.layoutUpdate.status.show()
+                btn_update.show(false)
+                status.show()
                 when (it.installStatus()) {
                     InstallStatus.FAILED, InstallStatus.UNKNOWN -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_failed)
-                        binding.layoutUpdate.btn_update.visibility = View.VISIBLE
+                        status.text = getString(R.string.info_failed)
+                        btn_update.visibility = View.VISIBLE
                     }
                     InstallStatus.PENDING -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_pending)
+                        status.text = getString(R.string.info_pending)
                     }
                     InstallStatus.CANCELED -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_canceled)
+                        status.text = getString(R.string.info_canceled)
                     }
                     InstallStatus.DOWNLOADING -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_downloading)
+                        status.text = getString(R.string.info_downloading)
                     }
                     InstallStatus.DOWNLOADED -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_installing)
+                        status.text = getString(R.string.info_installing)
                         launchRestart(manager)
                     }
                     InstallStatus.INSTALLING -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_installing)
+                        status.text = getString(R.string.info_installing)
                     }
                     InstallStatus.INSTALLED -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_installed)
+                        status.text = getString(R.string.info_installed)
                         manager.unregisterListener(updateListener)
                     }
                     else -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_restart)
+                        status.text = getString(R.string.info_restart)
                     }
                 }
             }
@@ -590,37 +597,40 @@ class HomeActivity : AppCompatActivity(), KodeinAware {
     }
 
     private fun setTestingUpdateAction(manager: AppUpdateManager, info: Task<AppUpdateInfo>) {
-        binding.layoutUpdate.btn_update.setOnClickListener {
+        val btn_update: Button = binding.root.findViewById(R.id.btn_update)
+        val status: TextView = binding.root.findViewById(R.id.status)
+
+        btn_update.setOnClickListener {
             updateListener = InstallStateUpdatedListener {
-                binding.layoutUpdate.btn_update.show(false)
-                binding.layoutUpdate.status.show()
+                btn_update.show(false)
+                status.show()
                 when (it.installStatus()) {
                     InstallStatus.FAILED, InstallStatus.UNKNOWN -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_failed)
-                        binding.layoutUpdate.btn_update.show()
+                        status.text = getString(R.string.info_failed)
+                        btn_update.show()
                     }
                     InstallStatus.PENDING -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_pending)
+                        status.text = getString(R.string.info_pending)
                     }
                     InstallStatus.CANCELED -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_canceled)
+                        status.text = getString(R.string.info_canceled)
                     }
                     InstallStatus.DOWNLOADING -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_downloading)
+                        status.text = getString(R.string.info_downloading)
                     }
                     InstallStatus.DOWNLOADED -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_downloaded)
+                        status.text = getString(R.string.info_downloaded)
                         launchRestart(manager)
                     }
                     InstallStatus.INSTALLING -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_installing)
+                        status.text = getString(R.string.info_installing)
                     }
                     InstallStatus.INSTALLED -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_installed)
+                        status.text = getString(R.string.info_installed)
                         manager.unregisterListener(updateListener)
                     }
                     else -> {
-                        binding.layoutUpdate.status.text = getString(R.string.info_restart)
+                        status.text = getString(R.string.info_restart)
                     }
                 }
             }

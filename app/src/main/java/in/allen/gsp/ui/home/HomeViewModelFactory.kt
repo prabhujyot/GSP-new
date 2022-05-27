@@ -14,7 +14,7 @@ class HomeViewModelFactory(
     private val leaderboardRepository: LeaderboardRepository,
     private val messageRepository: MessageRepository
 ) : ViewModelProvider.NewInstanceFactory() {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return HomeViewModel(
             userRepository,
             bannerRepository,

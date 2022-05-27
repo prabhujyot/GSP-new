@@ -13,45 +13,39 @@ import `in`.allen.gsp.ui.quiz.QuizViewModelFactory
 import `in`.allen.gsp.ui.reward.RewardViewModelFactory
 import android.app.Application
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Build
 import android.os.IBinder
-import androidx.multidex.MultiDex
 import com.downloader.PRDownloader
 import com.google.android.gms.security.ProviderInstaller
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
+import org.kodein.di.*
 import org.kodein.di.android.x.androidXModule
-import org.kodein.di.generic.bind
-import org.kodein.di.generic.instance
-import org.kodein.di.generic.provider
-import org.kodein.di.generic.singleton
 
-class App: Application(), KodeinAware {
+
+class App: Application(), DIAware {
     private val TAG = App::class.java
 
-    override val kodein = Kodein.lazy {
+    override val di by DI.lazy {
         import(androidXModule(this@App))
 
-        bind() from singleton { NetworkConnectionInterceptor(instance()) }
-        bind() from singleton { Api(instance()) }
-        bind() from singleton { YTApi(instance()) }
-        bind() from singleton { AppDatabase(instance()) }
-        bind() from singleton { AppPreferences(instance()) }
-        bind() from singleton { UserRepository(instance(), instance()) }
-        bind() from singleton { MessageRepository(instance()) }
-        bind() from singleton { BannerRepository(instance(), instance()) }
-        bind() from singleton { LeaderboardRepository(instance(), instance(), instance()) }
-        bind() from singleton { VideosRepository(instance(), instance(), instance(), instance()) }
-        bind() from singleton { RewardRepository(instance()) }
-        bind() from provider { RewardViewModelFactory(instance(), instance()) }
-        bind() from provider { HomeViewModelFactory(instance(), instance(), instance(), instance()) }
-        bind() from provider { NotificationViewModelFactory(instance(), instance()) }
-        bind() from singleton { QuizRepository(instance(), instance()) }
-        bind() from provider { QuizViewModelFactory(instance(), instance(), instance(), instance()) }
-        bind() from provider { ContestViewModelFactory(instance(), instance(), instance()) }
+        bind<NetworkConnectionInterceptor>() with singleton { NetworkConnectionInterceptor(instance()) }
+        bind<Api>() with singleton { Api(instance()) }
+        bind<YTApi>() with singleton { YTApi(instance()) }
+        bind<AppDatabase>() with singleton { AppDatabase(instance()) }
+        bind<AppPreferences>() with singleton { AppPreferences(instance()) }
+        bind<UserRepository>() with singleton { UserRepository(instance(), instance()) }
+        bind<MessageRepository>() with singleton { MessageRepository(instance()) }
+        bind<BannerRepository>() with singleton { BannerRepository(instance(), instance()) }
+        bind<LeaderboardRepository>() with singleton { LeaderboardRepository(instance(), instance(), instance()) }
+        bind<VideosRepository>() with singleton { VideosRepository(instance(), instance(), instance(), instance()) }
+        bind<RewardRepository>() with singleton { RewardRepository(instance()) }
+        bind<RewardViewModelFactory>() with provider { RewardViewModelFactory(instance(), instance()) }
+        bind<HomeViewModelFactory>() with provider { HomeViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind<NotificationViewModelFactory>() with provider { NotificationViewModelFactory(instance(), instance()) }
+        bind<QuizRepository>() with singleton { QuizRepository(instance(), instance()) }
+        bind<QuizViewModelFactory>() with provider { QuizViewModelFactory(instance(), instance(), instance(), instance()) }
+        bind<ContestViewModelFactory>() with provider { ContestViewModelFactory(instance(), instance(), instance()) }
     }
 
     override fun onCreate() {
@@ -65,11 +59,6 @@ class App: Application(), KodeinAware {
         }
 
         PRDownloader.initialize(applicationContext)
-    }
-
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        MultiDex.install(this)
     }
 
 
@@ -110,7 +99,7 @@ class App: Application(), KodeinAware {
         }
     }
 
-    public fun getmServ(): MusicService? {
+    fun getmServ(): MusicService? {
         return mServ
     }
 
