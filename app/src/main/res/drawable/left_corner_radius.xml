@@ -2,8 +2,8 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <!-- view background color -->
     <gradient
-        android:startColor="#ec6326"
-        android:endColor="#feca00"
+        android:startColor="@color/orange"
+        android:endColor="@color/green"
         android:angle="0"/>
 
     <!-- The radius makes the corners rounded -->

@@ -50,7 +50,11 @@ class BannerRepository(
 
     private fun getDBList() = db.getBannerDao().getList()
 
-    suspend fun getTileList() = db.getTileDao().getList()
+    suspend fun getTileList(): List<Tile> {
+        return withContext(Dispatchers.IO) {
+            db.getTileDao().getList()
+        }
+    }
 
     private fun setDBList(list: List<Banner>) {
         Coroutines.io {

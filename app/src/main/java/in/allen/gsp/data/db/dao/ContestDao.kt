@@ -14,7 +14,7 @@ interface ContestDao {
     fun getList(): LiveData<List<Contest>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setList(contest: List<Contest>)
+    fun setList(contest: List<Contest>)
 
     @Query("select * from contest  where id = :id")
     fun getItem(id:Int): Contest

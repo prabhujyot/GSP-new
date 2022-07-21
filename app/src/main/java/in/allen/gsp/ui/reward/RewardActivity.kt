@@ -100,7 +100,7 @@ class RewardActivity : AppCompatActivity(), DIAware {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.reward, menu)
         return super.onCreateOptionsMenu(menu)
     }

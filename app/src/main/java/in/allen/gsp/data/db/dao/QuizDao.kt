@@ -11,7 +11,7 @@ import androidx.room.Query
 interface QuizDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(quiz: Quiz): Long
+    fun upsert(quiz: Quiz): Long
 
     @Query("select * from quiz where id = 0")
     fun getQuiz(): LiveData<Quiz>

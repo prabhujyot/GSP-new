@@ -72,27 +72,37 @@ class SplashViewModel(
         signInFirebaseAccount(credential)
     }
 
-    fun firebaseAuthWithFB(token: AccessToken) {
-        provider = "facebook"
-        tag("firebaseAuthWithFB: $token authUser: $currentUser")
-        setLoading(true)
-        val credential = FacebookAuthProvider.getCredential(token.token)
-        signInFirebaseAccount(credential)
-    }
+//    fun firebaseAuthWithFB(token: AccessToken) {
+//        provider = "facebook"
+//        tag("firebaseAuthWithFB: $token authUser: $currentUser")
+//        setLoading(true)
+//        val credential = FacebookAuthProvider.getCredential(token.token)
+//        signInFirebaseAccount(credential)
+//    }
 
-    private fun fbGraphRequest(token: AccessToken) {
+    fun fbGraphRequest(token: AccessToken) {
         val graphRequest = GraphRequest.newMeRequest(
             token
         ) { _, response ->
             tag("FB GraphResponse $response")
-            val obj = response.jsonObject
-            val params = HashMap<String, String>()
-            params["name"] = obj.getString("name")
-            params["email"] = obj.getString("email")
-            params["avatar"] = obj.getJSONObject("picture").getJSONObject("data").getString("url")
-            params["firebase_token"] = firebaseToken
-            params["referred_by_id"] = referredById
-            authToServer(params)
+            if(response != null) {
+                val obj = response.jsonObject
+                val params = HashMap<String, String>()
+                params["name"] = obj.getString("name")
+                if(obj.has("email")) {
+                    params["email"] = obj.getString("email")
+                } else {
+                    params["email"] = obj.getString("id")
+                }
+                params["avatar"] =
+                    obj.getJSONObject("picture").getJSONObject("data").getString("url")
+                params["firebase_token"] = firebaseToken
+                params["referred_by_id"] = referredById
+                setLoading(true)
+                authToServer(params)
+            } else {
+                setError("", "")
+            }
         }
 
         val parameters = Bundle()
@@ -182,7 +192,7 @@ class SplashViewModel(
 
     fun authUser() {
         currentUser = auth.currentUser
-        tag("firebaseAuthWithFB init: authUser: $currentUser")
+        tag("authUser: $currentUser")
 
 
         val isSignedIn = currentUser != null
@@ -236,7 +246,7 @@ class SplashViewModel(
                 }
             }
         } else {
-            setError("", "")
+            setSuccess("", "checkFB")
         }
     }
 

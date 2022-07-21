@@ -15,7 +15,9 @@ class MessageRepository(
     val unreadMsg = MutableLiveData<Int>()
 
     suspend fun setItem(message: Message): Long {
-        return db.getMessageDao().insert(message)
+        return withContext(Dispatchers.IO) {
+            db.getMessageDao().insert(message)
+        }
     }
 
     suspend fun getItem(id: Int): Message {
@@ -24,9 +26,23 @@ class MessageRepository(
         }
     }
 
-    fun updateItem(id: Int,status: Int) = db.getMessageDao().update(id,status)
+    suspend fun updateItem(id: Int, status: Int) {
+        return withContext(Dispatchers.IO) {
+            db.getMessageDao().update(id,status)
+        }
+    }
 
-    fun getLastItem() = db.getMessageDao().getLastItem()
+    suspend fun deleteItem(id: Int) {
+        return withContext(Dispatchers.IO) {
+            db.getMessageDao().delete(id)
+        }
+    }
+
+    suspend fun getLastItem(): Message? {
+        return withContext(Dispatchers.IO) {
+            db.getMessageDao().getLastItem()
+        }
+    }
 
     suspend fun getList(userId: Int, page: Int): HashMap<String,Any> {
         val hashMap = HashMap<String,Any>()

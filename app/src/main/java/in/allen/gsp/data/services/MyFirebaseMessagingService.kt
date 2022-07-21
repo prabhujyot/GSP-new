@@ -53,12 +53,24 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), DIAware {
         remoteMessage.data.let {
             tag("$TAG Message data payload: $it")
             if(it["title"] != null && it["body"] != null) {
+                var sub_text = ""
+                var large_icon = ""
+                var big_image = ""
+                if(it.contains("sub_text")) {
+                    sub_text = it["sub_text"].toString()
+                }
+                if(it.contains("large_icon")) {
+                    large_icon = it["large_icon"].toString()
+                }
+                if(it.contains("big_image")) {
+                    big_image = it["big_image"].toString()
+                }
                 sendNotification(
                     it["title"]!!,
                     it["body"]!!,
-                    it["sub_text"]!!,
-                    it["large_icon"]!!,
-                    it["big_image"]!!
+                    sub_text,
+                    large_icon,
+                    big_image
                 )
             }
         }
@@ -127,52 +139,51 @@ class MyFirebaseMessagingService: FirebaseMessagingService(), DIAware {
                 tag("message saved")
             }
 
-            if(preferences.appNotification) {
-                val intent = Intent(this, NotificationActivity::class.java)
-                intent.putExtra("title", messageTitle)
-                intent.putExtra("body", messageBody)
-                intent.putExtra("notificationId", notificationId)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                val pendingIntent = PendingIntent.getActivity(
-                    this, 0 /* Request code */, intent,
-                    PendingIntent.FLAG_ONE_SHOT
-                )
+            val intent = Intent(this, NotificationActivity::class.java)
+            intent.putExtra("title", messageTitle)
+            intent.putExtra("body", messageBody)
+            intent.putExtra("notificationId", notificationId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            val pendingIntent = PendingIntent.getActivity(
+                this, 0 /* Request code */, intent,
+                PendingIntent.FLAG_ONE_SHOT
+            )
 
-                val channelId = getString(R.string.default_notification_channel_id)
-                val defaultSoundUri =
-                    RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-                val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
-                if(largeIcon.isNotEmpty()) {
-                    notificationBuilder.setLargeIcon(urlToBitmap(largeIcon))
-                }
-                notificationBuilder.setContentTitle(messageTitle)
-                notificationBuilder.setContentText(messageBody)
-                if(subText.isNotEmpty()) {
-                    notificationBuilder.setContentText(subText)
-                }
-                notificationBuilder.setAutoCancel(true)
-                notificationBuilder.setSound(defaultSoundUri)
-                notificationBuilder.setContentIntent(pendingIntent)
-
-                if(bigImage.isNotEmpty()) {
-                    notificationBuilder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(urlToBitmap(bigImage)))
-                }
-                val notificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-                // Since android Oreo notification channel is needed.
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(
-                        channelId,
-                        getString(R.string.notification_channel_id),
-                        NotificationManager.IMPORTANCE_DEFAULT
-                    )
-                    notificationManager.createNotificationChannel(channel)
-                }
-
-                notificationManager.notify(notificationId, notificationBuilder.build())
+            val channelId = getString(R.string.default_notification_channel_id)
+            val defaultSoundUri =
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            notificationBuilder.setSmallIcon(R.mipmap.ic_launcher)
+            if(largeIcon.isNotEmpty()) {
+                notificationBuilder.setLargeIcon(urlToBitmap(largeIcon))
             }
+            notificationBuilder.setContentTitle(messageTitle)
+            notificationBuilder.setContentText(messageBody)
+            if(subText.isNotEmpty()) {
+                notificationBuilder.setContentText(subText)
+            }
+            notificationBuilder.setAutoCancel(true)
+            notificationBuilder.setSound(defaultSoundUri)
+            notificationBuilder.setContentIntent(pendingIntent)
+
+            if(bigImage.isNotEmpty()) {
+                notificationBuilder.setStyle(NotificationCompat.BigPictureStyle().bigPicture(urlToBitmap(bigImage)))
+            }
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            // Since android Oreo notification channel is needed.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    channelId,
+                    getString(R.string.notification_channel_id),
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            notificationManager.notify(notificationId, notificationBuilder.build())
+
         }
     }
 

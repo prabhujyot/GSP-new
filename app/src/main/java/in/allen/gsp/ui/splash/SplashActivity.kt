@@ -14,6 +14,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
@@ -92,10 +93,10 @@ class SplashActivity : AppCompatActivity(), DIAware {
         app.bindMusicService()
 
         // subscribe notification
-        if(!preferences.subscribeNotification) {
+        if(preferences.getPref("Notification")?.isEmpty() == true) {
             FirebaseMessaging.getInstance().subscribeToTopic("Notification").addOnCompleteListener {
-                preferences.subscribeNotification = it.isSuccessful
-                tag("Subscription: ${preferences.subscribeNotification}")
+                preferences.setPref("Notification","true")
+                tag("Subscription: ${preferences.getPref("Notification")}")
             }
         }
 
@@ -109,6 +110,7 @@ class SplashActivity : AppCompatActivity(), DIAware {
         observeError()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when(requestCode) {
@@ -163,7 +165,7 @@ class SplashActivity : AppCompatActivity(), DIAware {
                         tag("initFB onSuccess loginResult.accessToken ${loginResult.accessToken}")
                         viewModel.fbAccessToken = loginResult.accessToken
                         tag("initFB onSuccess loginResult.accessToken ${viewModel.fbAccessToken}")
-                        viewModel.firebaseAuthWithFB(loginResult.accessToken)
+                        viewModel.fbGraphRequest(loginResult.accessToken)
                     }
 
                     override fun onCancel() {
@@ -267,6 +269,15 @@ class SplashActivity : AppCompatActivity(), DIAware {
                                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                     startActivity(it1)
                                 }
+                        }
+                    }
+                    "checkFB" -> {
+                        val accessToken = AccessToken.getCurrentAccessToken()
+                        val isLoggedIn = accessToken != null && !accessToken.isExpired
+                        if(isLoggedIn) {
+                            viewModel.fbGraphRequest(accessToken)
+                        } else {
+                            viewModel.setError("", "")
                         }
                     }
                 }

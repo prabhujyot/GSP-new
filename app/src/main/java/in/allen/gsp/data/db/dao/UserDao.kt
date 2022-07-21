@@ -10,10 +10,10 @@ import androidx.room.Query
 interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun upsert(user: User): Long
+    fun upsert(user: User): Long
 
     @Query("select * from user where id = 0")
-    suspend fun getUser(): User?
+    fun getUser(): User?
 
     @Query("delete from user")
     fun deleteUser()

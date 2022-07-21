@@ -10,7 +10,7 @@ import androidx.room.Query
 interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(messages: Message): Long
+    fun insert(messages: Message): Long
 
     @Query("update message set status = :status where id = :id")
     fun update(id:Int,status: Int)
@@ -28,7 +28,7 @@ interface MessageDao {
     fun getItem(id:Int): Message
 
     @Query("select * from message order by id desc limit 1")
-    fun getLastItem(): Message
+    fun getLastItem(): Message?
 
     @Query("select count(msg) from message where user_id = :user_id and status = 0")
     fun countUnread(user_id: Int): Int

@@ -11,7 +11,7 @@ import androidx.room.Query
 interface BannerDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setList(banner: List<Banner>)
+    fun setList(banner: List<Banner>)
 
     @Query("select * from banner order by id desc")
     fun getList(): LiveData<List<Banner>>

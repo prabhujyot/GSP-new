@@ -11,10 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 
-//import kotlinx.android.synthetic.main.activity_web.*
-//import kotlinx.android.synthetic.main.toolbar.*
-//import kotlinx.android.synthetic.main.toolbar.view.*
-
 class WebActivity : AppCompatActivity() {
 
     private val TAG = WebActivity::class.java.name

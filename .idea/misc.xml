@@ -10,11 +10,16 @@
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/drawable/bg_circle_blue.xml" value="0.1962962962962963" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/drawable/circular_progressbar.xml" value="0.2545" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/drawable/gradiant_orange.xml" value="0.18333333333333332" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/drawable/left_corner_radius.xml" value="0.295" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/drawable/progressbar.xml" value="0.18" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/drawable/right_corner_radius.xml" value="0.295" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_contest_instruction.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_home.xml" value="0.22" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_intro.xml" value="0.16875" />
-        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_profile_edit.xml" value="0.16875" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_leaderboard.xml" value="0.371875" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_notification.xml" value="0.32037037037037036" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_profile.xml" value="0.33" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_profile_edit.xml" value="0.33" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_quiz.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_reward.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/activity_splash.xml" value="0.371875" />
@@ -24,7 +29,7 @@
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/bottomsheet_finish.xml" value="0.1" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/bottomsheet_message.xml" value="0.16875" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/bottomsheet_redemption.xml" value="0.16875" />
-        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/bottomsheet_verification.xml" value="0.16875" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/bottomsheet_verification.xml" value="0.371875" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/checkin.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/dialog_alert.xml" value="0.371875" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/dialog_confirm.xml" value="0.371875" />
@@ -32,14 +37,18 @@
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/fragment_prize.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/icon_life.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/item_banner.xml" value="0.22135416666666666" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/item_leaderboard.xml" value="0.371875" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/item_notification.xml" value="0.371875" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/item_ranks.xml" value="0.20652173913043478" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/item_statement.xml" value="0.184375" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/item_topic_progress.xml" value="0.2866666666666667" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/option_linear.xml" value="0.371875" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/progress.xml" value="0.371875" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/settings_activity.xml" value="0.32037037037037036" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/toolbar.xml" value="0.32037037037037036" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/toolbar_home.xml" value="0.184375" />
         <entry key="..\:/studioprojects/GSP-new/app/src/main/res/layout/update.xml" value="0.22" />
+        <entry key="..\:/studioprojects/GSP-new/app/src/main/res/xml/root_preferences.xml" value="0.17955112219451372" />
       </map>
     </option>
   </component>

@@ -214,10 +214,9 @@
                                 android:id="@+id/layoutWin"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
-                                android:layout_weight=".33"
+                                android:layout_weight=".5"
                                 android:orientation="vertical"
-                                android:padding="@dimen/margin4"
-                                android:gravity="center_horizontal">
+                                android:padding="@dimen/margin4">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -241,7 +240,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:maxLines="1"
-                                    android:text="33%"
                                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                                     android:textColor="@color/black"
                                     android:textStyle="bold" />
@@ -250,10 +248,9 @@
                                 android:id="@+id/layoutPlayed"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
-                                android:layout_weight=".33"
+                                android:layout_weight=".0"
                                 android:orientation="vertical"
-                                android:padding="@dimen/margin4"
-                                android:gravity="center_horizontal">
+                                android:padding="@dimen/margin4">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -285,10 +282,9 @@
                                 android:id="@+id/layoutLose"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
-                                android:layout_weight=".33"
+                                android:layout_weight=".5"
                                 android:orientation="vertical"
-                                android:padding="@dimen/margin4"
-                                android:gravity="center_horizontal">
+                                android:padding="@dimen/margin4">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -312,7 +308,6 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:maxLines="1"
-                                    android:text="33%"
                                     android:textAppearance="@style/TextAppearance.AppCompat.Caption"
                                     android:textColor="@color/black"
                                     android:textStyle="bold" />

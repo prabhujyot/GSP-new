@@ -19,7 +19,6 @@ import `in`.allen.gsp.ui.quiz.QuizActivity
 import `in`.allen.gsp.ui.reward.RewardActivity
 import `in`.allen.gsp.ui.videos.VideosActivity
 import `in`.allen.gsp.utils.*
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -186,6 +185,7 @@ class HomeActivity : AppCompatActivity(), DIAware {
         }, {})
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (REQUEST_UPDATE == requestCode) {
             when (resultCode) {
@@ -272,12 +272,12 @@ class HomeActivity : AppCompatActivity(), DIAware {
                     }
 
                     "banner" -> {
+                        tag("banner data")
                         if (it.data is Deferred<*>) {
                             val deferredList = it.data as Deferred<LiveData<List<Banner>>>
                             lifecycleScope.launch {
                                 deferredList.await().observe(this@HomeActivity) { list ->
                                     binding.viewpagerBanner.adapter = BannerAdapter(
-                                        this@HomeActivity,
                                         list,
                                         true
                                     )
@@ -324,10 +324,9 @@ class HomeActivity : AppCompatActivity(), DIAware {
 
 
     class BannerAdapter(
-        context: Context,
         itemList: List<Banner>,
         isInfinite: Boolean
-    ) : LoopingPagerAdapter<Banner>(context, itemList, isInfinite) {
+    ) : LoopingPagerAdapter<Banner>(itemList, isInfinite) {
 
         //This method will be triggered if the item View has not been inflated before.
         override fun inflateView(
@@ -335,7 +334,7 @@ class HomeActivity : AppCompatActivity(), DIAware {
             container: ViewGroup,
             listPosition: Int
         ): View {
-            return LayoutInflater.from(context).inflate(R.layout.item_banner, container, false)
+            return LayoutInflater.from(container.context).inflate(R.layout.item_banner, container, false)
         }
 
         //Bind your data with your item View here.
@@ -355,7 +354,7 @@ class HomeActivity : AppCompatActivity(), DIAware {
                 if(item?.action?.trim()!!.length > 10) {
                     try {
                         val i = Intent()
-                        i.setClassName(context, item.action)
+                        i.setClassName(convertView.context, item.action)
                         if(item.meta.trim().length > 4) {
                             val obj = JSONObject(item.meta)
                             when {
@@ -367,7 +366,7 @@ class HomeActivity : AppCompatActivity(), DIAware {
                                 }
                             }
                         }
-                        context.startActivity(i)
+                        convertView.context.startActivity(i)
                     } catch (e: Exception) {}
                 }
             }

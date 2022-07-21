@@ -30,6 +30,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
+import com.facebook.login.LoginManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import dev.skymansandy.scratchcardlayout.listener.ScratchListener
@@ -92,7 +93,7 @@ class ProfileActivity : AppCompatActivity(), DIAware {
         viewModel.userData()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.profile, menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -105,6 +106,7 @@ class ProfileActivity : AppCompatActivity(), DIAware {
         if(id == R.id.menu_logout) {
             val auth = FirebaseAuth.getInstance()
             auth.signOut()
+            LoginManager.getInstance().logOut()
             Intent(this, SplashActivity::class.java)
                 .also { it1 ->
                     it1.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -176,7 +178,9 @@ class ProfileActivity : AppCompatActivity(), DIAware {
                         if (user.avatar.isNotBlank())
                             binding.avatar.loadImage(user.avatar, true)
                         binding.username.text = user.name
-                        binding.email.text = user.email
+                        if(user.email.contains('@')) {
+                            binding.email.text = user.email
+                        }
                         if (user.mobile.length > 9) {
                             binding.mobile.text = "Mob. ${user.mobile} "
                             if (user.is_verified == 1) {
@@ -273,18 +277,18 @@ class ProfileActivity : AppCompatActivity(), DIAware {
         binding.percentWin.text = "${formatNumber("#.##",data.getDouble("won").times(100))} %"
 
         // played graph
-        val param2 = binding.layoutPlayed.layoutParams
-        (param2 as LinearLayout.LayoutParams).weight = data.getDouble("played").toFloat()
-        binding.layoutPlayed.layoutParams = param2
-        binding.percentPlayed.text = "${formatNumber("#.##",data.getDouble("played").times(100))} %"
+//        val param2 = binding.layoutPlayed.layoutParams
+//        (param2 as LinearLayout.LayoutParams).weight = data.getDouble("played").toFloat()
+//        binding.layoutPlayed.layoutParams = param2
+//        binding.percentPlayed.text = "${formatNumber("#.##",data.getDouble("played").times(100))} %"
 
         var colorList = IntArray(2)
-        colorList[0] = Color.rgb(253, 195, 0)
-        colorList[1] = Color.rgb(112, 101, 193)
-        binding.progressPlayed.background = drawaleGradiantColor(
-            R.drawable.gradiant,
-            colorList
-        )
+//        colorList[0] = Color.rgb(253, 195, 0)
+//        colorList[1] = Color.rgb(112, 101, 193)
+//        binding.progressPlayed.background = drawaleGradiantColor(
+//            R.drawable.gradiant,
+//            colorList
+//        )
 
         // lose graph
         val param3 = binding.layoutLose.layoutParams
@@ -292,13 +296,13 @@ class ProfileActivity : AppCompatActivity(), DIAware {
         binding.layoutLose.layoutParams = param3
         binding.percentLose.text = "${formatNumber("#.##",data.getDouble("lose").times(100))} %"
 
-        colorList = IntArray(2)
-        colorList[0] = Color.rgb(112, 101, 193)
-        colorList[1] = Color.rgb(0, 147, 234)
-        binding.progressLose.background = drawaleGradiantColor(
-            R.drawable.right_corner_radius,
-            colorList
-        )
+//        colorList = IntArray(2)
+//        colorList[0] = Color.rgb(112, 101, 193)
+//        colorList[1] = Color.rgb(0, 147, 234)
+//        binding.progressLose.background = drawaleGradiantColor(
+//            R.drawable.right_corner_radius,
+//            colorList
+//        )
 
         val topics = ArrayList<HashMap<String, String>>()
         if(data.has("stats")) {
@@ -366,7 +370,7 @@ class ProfileActivity : AppCompatActivity(), DIAware {
             binding.scrollView.setOnScrollChangeListener(
                 NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, oldScrollY ->
                     tag("scrollY: $scrollY")
-                if(v?.getChildAt(v.childCount - 1) != null) {
+                if(v.getChildAt(v.childCount - 1) != null) {
                     if ((scrollY >= (v.getChildAt(v.childCount - 1).measuredHeight - v.measuredHeight)) &&
                         scrollY > oldScrollY) {
                         visibleItemCount = (layoutManager as GridLayoutManager).childCount

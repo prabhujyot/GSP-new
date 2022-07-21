@@ -100,4 +100,12 @@ class AppPreferences(context: Context) {
             editor.putBoolean("appNotification", value).commit()
         }
 
+    fun setPref(key: String,value: String) {
+        editor.putString(key,value).commit()
+    }
+
+    fun getPref(key: String,default:String = ""): String? {
+        return sharedPreferences.getString(key,default)
+    }
+
 }

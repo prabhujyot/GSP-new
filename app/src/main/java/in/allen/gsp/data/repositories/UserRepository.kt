@@ -5,6 +5,8 @@ import `in`.allen.gsp.data.entities.User
 import `in`.allen.gsp.data.network.Api
 import `in`.allen.gsp.data.network.SafeApiRequest
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -22,9 +24,17 @@ class UserRepository(
         }
     }
 
-    suspend fun setDBUser(user: User) = db.getUserDao().upsert(user)
+    suspend fun setDBUser(user: User): Long {
+        return withContext(Dispatchers.IO) {
+            db.getUserDao().upsert(user)
+        }
+    }
 
-    suspend fun getDBUser() = db.getUserDao().getUser()
+    suspend fun getDBUser(): User? {
+        return withContext(Dispatchers.IO) {
+            db.getUserDao().getUser()
+        }
+    }
 
     suspend fun profile(user_id: Int): String? {
         return apiRequest {

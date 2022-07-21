@@ -10,10 +10,10 @@ import androidx.room.Query
 interface TileDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun setList(tiles: List<Tile>)
+    fun setList(tiles: List<Tile>)
 
     @Query("select * from tile order by id desc")
-    suspend fun getList(): List<Tile>
+    fun getList(): List<Tile>
 
     @Query("select * from tile where id = :id")
     fun getItem(id:Int): Tile
